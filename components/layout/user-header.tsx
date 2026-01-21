@@ -49,7 +49,7 @@ export function UserHeader({ user }: UserHeaderProps) {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-card",
         isScrolled 
           ? "bg-background/98 backdrop-blur-sm border-b border-border/50" 
           : "bg-background"

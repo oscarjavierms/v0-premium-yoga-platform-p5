@@ -33,9 +33,9 @@ export default function DashboardClient({
   const firstName = profile?.full_name?.split(" ")[0] || "Alma"
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header - Quiet Luxury */}
-      <header className="sticky top-0 z-50 bg-background/98 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 backdrop-blur-sm bg-white/95 border-b border-border/10">
         <div className="container mx-auto px-6 md:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <div className="w-8 h-8 rounded-full border border-foreground/80 flex items-center justify-center">
@@ -71,32 +71,59 @@ export default function DashboardClient({
         </div>
       </header>
 
-      <main className="container mx-auto px-6 md:px-8 py-12 md:py-16">
-        {/* Mi Santuario - Welcome */}
-        <section className="mb-16">
-          <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Bienvenida a tu espacio</p>
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-light tracking-tight text-foreground">
+      {/* Hero Banner - Full Width with B&W Zen Landscape */}
+      <section 
+        className="relative h-[300px] flex items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-800"
+        style={{
+          backgroundImage: "url('/images/hero-zen-landscape.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative z-10 text-center px-6">
+          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white mb-3">
             Mi Santuario
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground font-light">Hola, {firstName}.</p>
-        </section>
+          <p className="text-xl md:text-2xl text-white/90 font-light">
+            Hola, {firstName}
+          </p>
+        </div>
+      </section>
 
-        {/* Intention Counters - Quiet Luxury */}
-        <section className="grid grid-cols-2 gap-8 md:gap-12 mb-20 max-w-2xl">
-          <IntentionCounter 
-            value={stats.currentStreak || stats.completedClasses} 
-            label="Días de Conciencia" 
-          />
-          <IntentionCounter 
-            value={stats.totalMinutes || stats.completedClasses * 25} 
-            label="Minutos de Intención" 
-          />
+      <main className="container mx-auto px-6 md:px-8">
+        {/* Intention Counters - Horizontal Row Below Hero */}
+        <section className="py-12 border-b border-border/10">
+          <div className="flex justify-center gap-16 md:gap-24 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Sparkles className="h-5 w-5 text-zinc-400" />
+              </div>
+              <p className="font-serif text-5xl md:text-6xl font-light text-foreground tracking-tight mb-2">
+                {stats.currentStreak || stats.completedClasses}
+              </p>
+              <p className="text-sm text-muted-foreground tracking-wider uppercase">
+                Días de Conciencia
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Clock className="h-5 w-5 text-zinc-400" />
+              </div>
+              <p className="font-serif text-5xl md:text-6xl font-light text-foreground tracking-tight mb-2">
+                {stats.totalMinutes || stats.completedClasses * 25}
+              </p>
+              <p className="text-sm text-muted-foreground tracking-wider uppercase">
+                Minutos de Intención
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* Mi Práctica - Class Grid */}
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="font-serif text-2xl md:text-3xl font-light text-foreground">Mi Práctica</h2>
+        <section className="py-16">
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="font-serif text-3xl md:text-4xl font-light text-foreground">Mi Práctica</h2>
             <Link href="/mi-practica">
               <Button variant="ghost" className="gap-1 text-muted-foreground text-sm">
                 Ver todo
@@ -131,9 +158,9 @@ export default function DashboardClient({
 
         {/* Recommended Section */}
         {recommendedClasses.length > 3 && (
-          <section>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="font-serif text-2xl md:text-3xl font-light text-foreground">Recomendado</h2>
+          <section className="py-16 border-t border-border/10">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="font-serif text-3xl md:text-4xl font-light text-foreground">Recomendado</h2>
               <Link href="/explorar">
                 <Button variant="ghost" className="gap-1 text-muted-foreground text-sm">
                   Ver todo
