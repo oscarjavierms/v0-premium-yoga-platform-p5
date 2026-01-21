@@ -66,3 +66,105 @@ export default async function InstructorPage({
           )}
         </div>
 
+        <div className="h-28 w-28 overflow-hidden rounded-full border border-black/10 bg-black/5 md:h-32 md:w-32">
+          {instructor.avatar_url ? (
+            <img
+              src={instructor.avatar_url}
+              alt={instructor.name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="text-sm font-medium text-black/70">
+                {instructor.name
+                  ?.split(" ")
+                  .map((p) => p[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bio */}
+      <section className="mt-10 rounded-2xl border border-black/10 bg-white p-8">
+        <h2 className="text-sm font-medium text-black">Biografía</h2>
+        <p className="mt-3 text-sm leading-relaxed text-black/70">
+          {instructor.bio ?? "Este instructor aún no tiene biografía publicada."}
+        </p>
+      </section>
+
+      {/* Clases */}
+      <section className="mt-14">
+        <h2 className="font-serif text-2xl tracking-tight text-black md:text-3xl">
+          Clases
+        </h2>
+
+        {safeClasses.length === 0 ? (
+          <div className="mt-6 rounded-2xl border border-black/10 bg-white p-10">
+            <p className="text-sm text-black/60">
+              Aún no hay clases publicadas para este instructor.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 gap-4">
+            {safeClasses.map((c) => (
+              <Link
+                key={c.id}
+                href={`/clase/${c.slug}`}
+                className="group rounded-2xl border border-black/10 bg-white p-6 transition hover:border-black/20"
+              >
+                <div className="flex items-center justify-between gap-8">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-black">
+                      {c.title ?? "Clase"}
+                    </p>
+                    <p className="mt-1 text-xs text-black/50">
+                      {c.is_free ? "Clase gratuita" : "Clase premium"}
+                    </p>
+                  </div>
+
+                  <span className="text-xs text-black/60 group-hover:text-black">
+                    Ver →
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Programas */}
+      <section className="mt-14">
+        <h2 className="font-serif text-2xl tracking-tight text-black md:text-3xl">
+          Programas
+        </h2>
+
+        {!programs || programs.length === 0 ? (
+          <div className="mt-6 rounded-2xl border border-black/10 bg-white p-10">
+            <p className="text-sm text-black/60">
+              Aún no hay programas asociados a este instructor.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {programs.map((p) => (
+              <Link
+                key={p.id}
+                href={`/programa/${p.slug}`}
+                className="group rounded-2xl border border-black/10 bg-white p-6 transition hover:border-black/20"
+              >
+                <p className="text-sm font-medium text-black">{p.title}</p>
+                <p className="mt-2 text-xs text-black/60 group-hover:text-black">
+                  Ver programa →
+                </p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  )
+}
