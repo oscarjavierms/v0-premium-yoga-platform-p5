@@ -6,7 +6,7 @@ export default async function InstructoresPage() {
 
   const { data: instructors, error } = await supabase
     .from("instructors")
-    .select("id, name, slug, bio, avatar_url, focus")
+.select("id, name, slug, bio, specialty")
     .order("name", { ascending: true })
 
   if (error) {
