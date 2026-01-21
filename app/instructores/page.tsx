@@ -48,7 +48,7 @@ export default async function InstructoresPage() {
                     {i.name}
                   </div>
                   <div className="truncate text-xs text-neutral-600">
-                    {i.focus ?? "Instructor"}
+                  {i.specialty ?? "Instructor"}
                   </div>
                 </div>
               </div>
