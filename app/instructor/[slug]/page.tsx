@@ -29,9 +29,9 @@ export default async function InstructorProfilePage({
 
       <h1 className="mt-3 font-serif text-4xl tracking-tight">
         {instructor.name}
-      </h1>
       <p className="mt-3 text-sm text-neutral-600">
-        {instructor.focus ?? "Instructor"}
+        {instructor.specialty ?? "Instructor"}
+
       </p>
 
       <div className="mt-10 rounded-2xl border border-black/10 bg-white p-8">
