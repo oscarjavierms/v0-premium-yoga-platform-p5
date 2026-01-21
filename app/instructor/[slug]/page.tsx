@@ -11,7 +11,7 @@ export default async function InstructorProfilePage({
 
   const { data: instructor, error } = await supabase
     .from("instructors")
-    .select("id, name, slug, bio, avatar_url, focus")
+    .select("id, name, slug, bio, specialty")
     .eq("slug", params.slug)
     .single()
 
