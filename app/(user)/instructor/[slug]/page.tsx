@@ -23,15 +23,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
     .select("id, slug, name")
     .eq("slug", params.slug)
     .maybeSingle()
-export default async function Page({ params }: { params: { slug: string } }) {
-  return (
-    <main style={{ padding: 40 }}>
-      <h1>✅ ESTA ES LA PAGINA CORRECTA</h1>
-      <p>slug: {params.slug}</p>
-      <p>timestamp: {Date.now()}</p>
-    </main>
-  )
-}
+
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
