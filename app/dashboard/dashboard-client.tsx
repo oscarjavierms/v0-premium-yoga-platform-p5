@@ -80,14 +80,10 @@ export default function DashboardClient({
           backgroundPosition: "center"
         }}
       >
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/40 my-0 font-normal p-1" />
         <div className="relative z-10 text-center px-6">
-          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white mb-3">
-            Mi Santuario
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 font-light">
-            Hola, {firstName}
-          </p>
+          
+          
         </div>
       </section>
 
