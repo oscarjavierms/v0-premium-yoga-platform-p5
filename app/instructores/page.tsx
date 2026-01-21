@@ -34,28 +34,38 @@ export default async function InstructoresPage() {
           </p>
         </div>
       ) : (
-        <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-2 gap-y-10 md:grid-cols-4 lg:grid-cols-6">
           {instructors.map((i) => (
             <Link
               key={i.id}
               href={`/instructor/${i.slug}`}
-              className="group flex items-center gap-4 rounded-2xl border border-black/10 bg-white p-6 transition hover:border-black/20"
+              className="group flex flex-col items-center gap-4"
             >
-              <div className="h-14 w-14 rounded-full border border-black/10 bg-black/5 flex items-center justify-center overflow-hidden">
-                <span className="text-xs font-medium text-black/70">
-                  {i.name
-                    ?.split(" ")
-                    .map((p) => p[0])
-                    .join("")
-                    .slice(0, 2)
-                    .toUpperCase()}
-                </span>
+              <div className="h-28 w-28 overflow-hidden rounded-full border border-black/10 bg-black/5 transition group-hover:border-black/20 md:h-32 md:w-32">
+                {i.avatar_url ? (
+                  <img
+                    src={i.avatar_url}
+                    alt={i.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-black/60">
+                      {i.name
+                        ?.split(" ")
+                        .map((p) => p[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </span>
+                  </div>
+                )}
               </div>
 
-              <div className="min-w-0">
-                <div className="truncate text-base font-medium text-black">
+              <div className="text-center">
+                <p className="text-sm font-semibold tracking-wide uppercase text-black">
                   {i.name}
-                </div>
+                </p>
               </div>
             </Link>
           ))}
