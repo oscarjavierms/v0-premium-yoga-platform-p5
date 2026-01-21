@@ -14,37 +14,46 @@ export default async function InstructorPage({
     .from("instructors")
     .select("id, name, slug, bio, avatar_url, specialty")
     .eq("slug", params.slug)
-    .single()
+    .maybeSingle()
 
+  // ✅ DEBUG TEMPORAL (para ver el error real)
   if (instructorError || !instructor) {
-  return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-12">
-      <h1 className="font-serif text-3xl text-black">Debug Instructor</h1>
-      <pre className="mt-6 rounded-2xl border border-black/10 bg-white p-6 text-xs text-black/80 overflow-auto">
-        {JSON.stringify(
-          {
-            slug: params.slug,
-            instructorError,
-            instructor,
-          },
-          null,
-          2
-        )}
-      </pre>
-    </div>
-  )
-}
+    return (
+      <div className="mx-auto w-full max-w-4xl px-6 py-12">
+        <h1 className="font-serif text-3xl text-black">Debug Instructor</h1>
 
+        <pre className="mt-6 rounded-2xl border border-black/10 bg-white p-6 text-xs text-black/80 overflow-auto">
+          {JSON.stringify(
+            {
+              slug: params.slug,
+              envUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+              instructorError,
+              instructor,
+            },
+            null,
+            2
+          )}
+        </pre>
+
+        <div className="mt-6 text-sm text-black/60">
+          <p>
+            Si <b>envUrl</b> no coincide con tu proyecto real de Supabase, tu
+            Vercel está apuntando a otra base de datos.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   // 2) Traer clases publicadas del instructor
-  const { data: classes, error: classesError } = await supabase
+  const { data: classes } = await supabase
     .from("classes")
     .select("id, title, slug, is_free, is_published, program_id, program_order")
     .eq("instructor_id", instructor.id)
     .eq("is_published", true)
     .order("program_order", { ascending: true })
 
-  const safeClasses = classesError ? [] : classes ?? []
+  const safeClasses = classes ?? []
 
   // 3) Traer programas (desde los program_id en clases)
   const programIds = Array.from(
