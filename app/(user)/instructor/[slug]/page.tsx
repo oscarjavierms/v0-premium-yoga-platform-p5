@@ -16,7 +16,25 @@ export default async function InstructorPage({
     .eq("slug", params.slug)
     .single()
 
-  if (instructorError || !instructor) return notFound()
+  if (instructorError || !instructor) {
+  return (
+    <div className="mx-auto w-full max-w-4xl px-6 py-12">
+      <h1 className="font-serif text-3xl text-black">Debug Instructor</h1>
+      <pre className="mt-6 rounded-2xl border border-black/10 bg-white p-6 text-xs text-black/80 overflow-auto">
+        {JSON.stringify(
+          {
+            slug: params.slug,
+            instructorError,
+            instructor,
+          },
+          null,
+          2
+        )}
+      </pre>
+    </div>
+  )
+}
+
 
   // 2) Traer clases publicadas del instructor
   const { data: classes, error: classesError } = await supabase
