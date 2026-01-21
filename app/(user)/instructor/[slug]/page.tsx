@@ -5,6 +5,7 @@ import { createServerClient } from "@/lib/supabase/server"
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const supabase = await createServerClient()
+const slug = decodeURIComponent(params.slug).trim().toLowerCase()
 
   const envUrl =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -21,7 +22,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
   const { data: one, error: oneError } = await supabase
     .from("instructors")
     .select("id, slug, name")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .maybeSingle()
 
 
