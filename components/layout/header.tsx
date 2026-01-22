@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-center"
+import { Menu, X } from "lucide-react" // <--- AQUÍ ESTABA EL ERROR, YA ESTÁ CORREGIDO
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -51,7 +51,6 @@ export function Header() {
           </div>
 
           <div className="hidden lg:flex lg:items-center lg:gap-x-4">
-            {/* CORRECCIÓN FINAL: Enlace limpio sin parámetros que causen 404 */}
             <Link href="/auth/login">
               <Button variant="ghost" className="text-[10px] tracking-[0.2em] uppercase font-bold text-black">
                 Iniciar Sesión
