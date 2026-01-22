@@ -1,88 +1,81 @@
 "use client"
 import React, { useState } from "react"
 import Link from "next/link"
-import { Menu, X, Play, Heart, Clock, User, LogOut, Settings, CreditCard } from "lucide-react"
+import { Menu, X, User, LogOut, Settings, CreditCard, Heart, Clock, BarChart2 } from "lucide-react"
 
-export function MiSantuarioClient({ profile, stats, continueWatching, recommendedClasses }: any) {
+export function MiSantuarioClient({ profile, stats, recommendedClasses }: any) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const handleLogout = () => {
-    window.location.href = "/"
-  }
-
   return (
-    <div className="min-h-screen bg-[#FDFCFB] text-[#1a1a1a]">
-      {/* HEADER SUPERIOR QUE TE GUSTABA */}
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-black/5 bg-white/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="font-serif text-2xl tracking-tighter italic">SANTUARIO</div>
+    <div className="min-h-screen bg-[#FDFCFB]">
+      {/* HEADER SUPERIOR (DE TU FOTO 1) */}
+      <nav className="flex items-center justify-between px-10 py-8 bg-white/50 backdrop-blur-sm sticky top-0 z-40">
+        <div className="font-serif text-2xl tracking-tight font-bold">SANTUARIO</div>
         
-        <div className="hidden md:flex items-center gap-10 text-[10px] uppercase tracking-[0.2em] font-medium">
-          <Link href="/yoga" className="hover:text-gray-400 transition-colors">Yoga</Link>
-          <Link href="/meditacion" className="hover:text-gray-400 transition-colors">Meditación</Link>
-          <Link href="/cursos" className="hover:text-gray-400 transition-colors">Cursos</Link>
+        <div className="hidden lg:flex items-center gap-12 text-[10px] uppercase tracking-[0.2em] font-medium text-gray-500">
+          <Link href="/yoga" className="hover:text-black">Yoga</Link>
+          <Link href="/meditacion" className="hover:text-black">Meditación</Link>
+          <Link href="/fitness" className="hover:text-black">Fitness</Link>
+          <Link href="/instructores" className="hover:text-black">Instructores</Link>
+          <span className="w-[1px] h-4 bg-gray-200 mx-2"></span>
+          <Link href="/mi-santuario" className="text-black border-b border-black pb-1">Mi Santuario</Link>
+          <Link href="/mi-practica" className="hover:text-black">Mi Práctica</Link>
         </div>
 
-        <button onClick={() => setIsMenuOpen(true)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
-          <Menu size={20} strokeWidth={1.5} />
+        <button onClick={() => setIsMenuOpen(true)} className="p-2 border border-black/5 rounded-full hover:bg-black/5 transition-all">
+          <User size={20} strokeWidth={1} />
         </button>
       </nav>
 
-      {/* CONTENIDO PRINCIPAL CON AIRE */}
-      <main className="max-w-7xl mx-auto px-8 py-16">
-        <header className="mb-20">
-          <h1 className="font-serif text-6xl lg:text-7xl italic mb-4">Hola, {profile?.full_name?.split(' ')[0] || 'Oscar'}</h1>
-          <p className="text-gray-400 text-xl font-light italic">Tu espacio de paz y crecimiento.</p>
+      {/* CUERPO PRINCIPAL */}
+      <main className="max-w-7xl mx-auto px-10 py-20">
+        <header className="mb-24">
+          <h1 className="font-serif text-7xl italic mb-6">Hola, {profile?.full_name?.split(' ')[0] || 'oscar'}.</h1>
+          <p className="text-gray-500 text-xl font-light max-w-2xl leading-relaxed">
+            Tu espacio de bienestar te espera. Cada práctica es un paso hacia tu mejor versión.
+          </p>
         </header>
 
-        {/* STATS CIRCULARES O LIMPIOS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-24">
+        {/* STATS (TUS TARJETAS BLANCAS) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {[
-            { label: "Días de Conciencia", value: stats.diasConciencia },
-            { label: "Minutos de Intención", value: stats.minutosIntencion },
-            { label: "Prácticas", value: stats.clasesCompletadas },
+            { label: "Días de Conciencia", value: stats.diasConciencia, icon: Heart },
+            { label: "Minutos de Intención", value: stats.minutosIntencion, icon: Clock },
+            { label: "Clases Completadas", value: stats.clasesCompletadas, icon: BarChart2 },
           ].map((stat, i) => (
-            <div key={i} className="border-t border-black/10 pt-6">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-2">{stat.label}</p>
+            <div key={i} className="bg-white border border-black/[0.03] p-10 rounded-sm shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
+              <div className="flex items-center gap-3 mb-10 text-gray-400">
+                <stat.icon size={16} strokeWidth={1.5} />
+                <span className="text-[10px] uppercase tracking-widest">{stat.label}</span>
+              </div>
               <p className="font-serif text-5xl italic">{stat.value}</p>
             </div>
           ))}
         </div>
 
-        {/* CLASES RECOMENDADAS */}
-        <section>
-          <div className="flex justify-between items-end mb-10">
-            <h2 className="font-serif text-3xl italic">Recomendados para tu práctica</h2>
-            <Link href="/clases" className="text-[10px] uppercase tracking-widest border-b border-black pb-1">Ver todo</Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {recommendedClasses.map((cls: any) => (
-              <div key={cls.id} className="group cursor-pointer">
-                <div className="aspect-[16/10] overflow-hidden bg-gray-100 mb-6">
-                  <img src={cls.thumbnail_url} alt="" className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" />
-                </div>
-                <h3 className="font-serif text-2xl italic mb-2">{cls.title}</h3>
-                <p className="text-[10px] uppercase tracking-widest text-gray-400">{cls.duration_minutes} MIN • {cls.instructors?.name}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* BOTONES DE ACCIÓN RÁPIDA (DE TU FOTO 1) */}
+        <div className="flex flex-wrap gap-4">
+          <button className="px-8 py-3 border border-black/10 rounded-full text-[10px] uppercase tracking-widest hover:bg-black hover:text-white transition-all">Mi Práctica →</button>
+          <button className="px-8 py-3 border border-black/10 rounded-full text-[10px] uppercase tracking-widest hover:bg-black hover:text-white transition-all">Explorar Clases →</button>
+          <button className="px-8 py-3 border border-black/10 rounded-full text-[10px] uppercase tracking-widest hover:bg-black hover:text-white transition-all">Ver Programas →</button>
+        </div>
       </main>
 
-      {/* MENÚ LATERAL FLOTANTE (EL QUE NO EMPUJA EL CONTENIDO) */}
+      {/* MENÚ DE USUARIO (DERECHA) */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white p-12 shadow-2xl animate-in slide-in-from-right duration-300">
-            <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8">
+          <div className="absolute inset-0 bg-black/5 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white p-12 shadow-2xl animate-in slide-in-from-right duration-500">
+            <button onClick={() => setIsMenuOpen(false)} className="mb-16 hover:rotate-90 transition-transform">
               <X size={24} strokeWidth={1} />
             </button>
-            
-            <div className="mt-20 space-y-8 text-right">
-              <Link href="/perfil" className="block font-serif text-3xl italic hover:text-gray-400 transition-colors">Perfil</Link>
-              <Link href="/membresia" className="block font-serif text-3xl italic hover:text-gray-400 transition-colors">Membresía</Link>
-              <Link href="/historial" className="block font-serif text-3xl italic hover:text-gray-400 transition-colors">Historial</Link>
-              <Link href="/ajustes" className="block font-serif text-3xl italic hover:text-gray-400 transition-colors">Ajustes</Link>
-              <button onClick={handleLogout} className="block w-full text-right font-serif text-3xl italic text-red-400 mt-20">Salir</button>
+            <div className="space-y-8">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-10">Gestión de cuenta</p>
+              <Link href="/perfil" className="flex items-center gap-4 font-light text-lg hover:translate-x-2 transition-transform"><User size={18}/> Perfil</Link>
+              <Link href="/membresia" className="flex items-center gap-4 font-light text-lg hover:translate-x-2 transition-transform"><CreditCard size={18}/> Membresía</Link>
+              <Link href="/historial" className="flex items-center gap-4 font-light text-lg hover:translate-x-2 transition-transform"><Clock size={18}/> Historial</Link>
+              <Link href="/ajustes" className="flex items-center gap-4 font-light text-lg hover:translate-x-2 transition-transform"><Settings size={18}/> Ajustes</Link>
+              <button onClick={() => window.location.href="/"} className="flex items-center gap-4 font-light text-lg text-red-400 pt-10 border-t border-black/5 w-full"><LogOut size={18}/> Cerrar Sesión</button>
             </div>
           </div>
         </div>
