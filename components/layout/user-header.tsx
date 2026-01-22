@@ -2,42 +2,41 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { UserSidebar } from "./UserSidebar" // Importamos la Sidebar
+import { UserSidebar } from "./UserSidebar"
 import { User } from "lucide-react"
 
 export function UserHeader({ user }: { user: any }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-white border-b border-black/5">
+    <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
       <div className="max-w-[1800px] mx-auto px-6 h-16 flex items-center justify-between">
         
-        {/* Tu Logo Original */}
+        {/* Logo */}
         <Link href="/" className="text-xl font-bold tracking-tighter">
           Santuario
         </Link>
 
-        {/* Mantenemos tus links de navegación originales */}
-        <nav className="hidden md:flex items-center gap-8">
-          <Link href="/yoga" className="text-sm font-medium">Yoga</Link>
-          <Link href="/instructores" className="text-sm font-medium">Instructores</Link>
-          <Link href="/programas" className="text-sm font-medium">Programas</Link>
+        {/* Navegación que pediste: Yoga, Meditación, Fitness, Instructores */}
+        <nav className="hidden md:flex items-center gap-8 text-[13px] font-medium text-black/70">
+          <Link href="/yoga" className="hover:text-black transition-colors">Yoga</Link>
+          <Link href="/meditacion" className="hover:text-black transition-colors">Meditación</Link>
+          <Link href="/fitness" className="hover:text-black transition-colors">Fitness</Link>
+          <Link href="/instructores" className="hover:text-black transition-colors">Instructores</Link>
         </nav>
 
-        {/* El botón de usuario que ahora abre la Sidebar */}
+        {/* Botón de Perfil para abrir Sidebar */}
         <div className="flex items-center">
           <button 
             onClick={() => setIsSidebarOpen(true)}
-            className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+            className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <User size={18} />
-            </div>
+            <User size={18} strokeWidth={1.5} />
           </button>
         </div>
       </div>
 
-      {/* Renderizamos la Sidebar aquí */}
+      {/* Sidebar Lateral */}
       <UserSidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
