@@ -7,34 +7,35 @@
   /* Blanco Absoluto y Negro Puro */
   --background: oklch(1 0 0);
   --foreground: oklch(0 0 0);
-  
+
   /* Tarjetas y Popups */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0 0 0);
-  
+
   /* Colores Primarios */
   --primary: oklch(0 0 0);
   --primary-foreground: oklch(1 0 0);
-  
+
   /* Secundarios y Muted (Gris muy claro, sin rastro de arena/crema) */
   --secondary: oklch(0.98 0 0);
   --secondary-foreground: oklch(0 0 0);
   --muted: oklch(0.98 0 0);
   --muted-foreground: oklch(0.5 0 0);
+
   --accent: oklch(0.98 0 0);
   --accent-foreground: oklch(0 0 0);
-  
+
   /* Otros */
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(1 0 0);
-  
+
   /* Bordes y Entradas (Minimalistas) */
   --border: oklch(0.92 0 0);
   --input: oklch(0.92 0 0);
   --ring: oklch(0 0 0);
-  
+
   /* Estética de Lujo: Bordes Rectos */
   --radius: 0rem;
 
@@ -42,9 +43,7 @@
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0 0 0);
   --sidebar-primary: oklch(0 0 0);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.98 0 0);
-  --sidebar-accent-foreground: oklch(0 0 0);
+@@ -42,3 +48,91 @@
   --sidebar-border: oklch(0.95 0 0);
   --sidebar-ring: oklch(0 0 0);
 }
