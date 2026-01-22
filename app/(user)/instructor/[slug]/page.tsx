@@ -4,72 +4,85 @@ export const revalidate = 0
 import Link from "next/link"
 import { createServerClient } from "@/lib/supabase/server"
 
-// Agregamos Promise para que Next.js resuelva los parámetros correctamente
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const supabase = await createServerClient()
-  
-  // RESOLVEMOS la promesa de params antes de usar el slug
-  const resolvedParams = await params
-  const rawSlug = resolvedParams.slug
-  
-  // Limpieza del slug para evitar errores de búsqueda
+  const { slug: rawSlug } = await params
   const cleanSlug = decodeURIComponent(rawSlug).trim()
 
-  // Buscamos en Supabase (usamos .ilike para ser flexibles con Mayúsculas/Minúsculas)
-  const { data: instructor, error } = await supabase
+  // 1. Buscamos al Instructor
+  const { data: instructor, error: instError } = await supabase
     .from("instructors")
-    .select("id, slug, name, bio, specialty")
-    .ilike("slug", cleanSlug) 
+    .select("id, name, bio, specialty")
+    .ilike("slug", cleanSlug)
     .maybeSingle()
 
-  if (error) {
-    return (
-      <main className="mx-auto max-w-5xl px-6 py-16">
-        <h1 className="text-2xl font-light text-black">Error de servidor</h1>
-        <p className="mt-2 text-sm text-black/60">{error.message}</p>
-      </main>
-    )
+  if (instError || !instructor) {
+    return <main className="p-16 text-center">Instructor no encontrado</main>
   }
 
-  // Si no existe, ahora sí mostrará el slug real en lugar de "undefined"
-  if (!instructor) {
-    return (
-      <main className="mx-auto max-w-5xl px-6 py-16 text-center">
-        <h1 className="text-3xl font-light text-black">Instructor no encontrado</h1>
-        <p className="mt-4 text-black/60">
-          No encontramos el perfil asociado a: <span className="font-medium text-black italic">"{cleanSlug}"</span>
-        </p>
-        <Link href="/instructores" className="mt-8 inline-block rounded-full border border-black px-6 py-2 text-sm hover:bg-black hover:text-white transition">
-          Ver todos los instructores
-        </Link>
-      </main>
-    )
-  }
+  // 2. Buscamos sus Clases/Programas (Asumiendo que la tabla se llama 'classes')
+  // Cambia 'classes' por el nombre real de tu tabla si es distinto
+  const { data: classes } = await supabase
+    .from("classes") 
+    .select("id, title, thumbnail_url, duration")
+    .eq("instructor_id", instructor.id)
+    .order("created_at", { ascending: false })
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      {/* Diseño B&W Premium */}
-      <header className="flex flex-col gap-4">
-        <h1 className="text-5xl font-light tracking-tight text-black">{instructor.name}</h1>
-        <p className="max-w-xl text-lg text-black/70 font-light leading-relaxed">
-          {instructor.bio || "Inspirando presencia y movimiento."}
+    <main className="mx-auto max-w-[1400px] px-6 py-16 bg-white min-h-screen">
+      {/* Header del Instructor - Estilo Minimalista Lujo */}
+      <header className="mb-20">
+        <h1 className="text-6xl font-light tracking-tighter text-black mb-6">
+          {instructor.name}
+        </h1>
+        <p className="max-w-2xl text-lg text-black/60 font-light leading-relaxed">
+          {instructor.bio}
         </p>
-        
-        <div className="flex gap-2 mt-4">
-          {instructor.specialty?.map((s: string) => (
-            <span key={s} className="text-[10px] uppercase tracking-widest border border-black/10 px-3 py-1 rounded-full text-black/50">
-              {s}
-            </span>
-          ))}
-        </div>
       </header>
 
-      <section className="mt-20 border-t border-black/5 pt-12">
-        <h3 className="text-sm uppercase tracking-widest text-black/40">Contenido disponible</h3>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 opacity-30 italic text-sm">
-          Cargando biblioteca de clases...
-        </div>
-      </section>
+      {/* Título de la Sección */}
+      <div className="flex items-center justify-between mb-8 border-b border-black/5 pb-4">
+        <h2 className="text-xs uppercase tracking-[0.3em] text-black/40 font-medium">
+          Biblioteca de Clases ({classes?.length || 0})
+        </h2>
+      </div>
+
+      {/* GRILLA DE 5 COLUMNAS - Tu diseño solicitado */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-10">
+        {classes && classes.length > 0 ? (
+          classes.map((item) => (
+            <Link key={item.id} href={`/clase/${item.id}`} className="group cursor-pointer">
+              {/* Contenedor 16:9 */}
+              <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 rounded-sm">
+                {item.thumbnail_url ? (
+                  <img 
+                    src={item.thumbnail_url} 
+                    alt={item.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-neutral-900 text-[10px] text-white/20 uppercase tracking-widest">
+                    16:9 Preview
+                  </div>
+                )}
+                {/* Duración flotante */}
+                <div className="absolute bottom-2 right-2 bg-black/80 px-1.5 py-0.5 text-[10px] text-white">
+                  {item.duration} min
+                </div>
+              </div>
+
+              {/* Título del Video */}
+              <h3 className="mt-3 text-sm font-light leading-snug text-black group-hover:underline decoration-black/20 underline-offset-4">
+                {item.title}
+              </h3>
+            </Link>
+          ))
+        ) : (
+          <p className="col-span-full py-20 text-center text-sm text-black/30 italic">
+            Aún no hay clases publicadas por este instructor.
+          </p>
+        )}
+      </div>
     </main>
   )
 }
