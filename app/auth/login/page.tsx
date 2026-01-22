@@ -56,7 +56,7 @@ function LoginForm() {
         }
       }
 
-      window.location.href = redirect
+      window.location.href = "/mi-santuario"
     } catch (error: unknown) {
       console.error("[v0] Login error:", error)
       if (error instanceof Error) {
