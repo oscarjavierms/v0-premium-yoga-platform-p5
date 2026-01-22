@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-center"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -34,7 +34,6 @@ export function Header() {
     >
       <nav className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
-          {/* Logo con el diseño de anoche */}
           <Link href="/" className="flex items-center">
             <span className="font-serif text-2xl tracking-tighter font-bold uppercase text-black">SANTUARIO</span>
           </Link>
@@ -52,9 +51,9 @@ export function Header() {
           </div>
 
           <div className="hidden lg:flex lg:items-center lg:gap-x-4">
-            {/* CORRECCIÓN: Ahora te lleva a mi-santuario después del login */}
-            <Link href="/auth/login?callbackUrl=/mi-santuario">
-              <Button variant="ghost" className="text-[10px] tracking-[0.2em] uppercase font-bold">
+            {/* CORRECCIÓN FINAL: Enlace limpio sin parámetros que causen 404 */}
+            <Link href="/auth/login">
+              <Button variant="ghost" className="text-[10px] tracking-[0.2em] uppercase font-bold text-black">
                 Iniciar Sesión
               </Button>
             </Link>
@@ -66,7 +65,7 @@ export function Header() {
           </div>
 
           <button type="button" className="lg:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isMobileMenuOpen ? <X className="h-6 w-6 text-black" /> : <Menu className="h-6 w-6 text-black" />}
           </button>
         </div>
       </nav>
