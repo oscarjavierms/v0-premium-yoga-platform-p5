@@ -29,75 +29,47 @@ export function Header() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-        isScrolled ? "bg-background/95 backdrop-blur-md border-b border-border" : "bg-transparent",
+        isScrolled ? "bg-white/95 backdrop-blur-md border-b border-black/5" : "bg-transparent",
       )}
     >
       <nav className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
-          {/* Logo */}
+          {/* Logo con el diseño de anoche */}
           <Link href="/" className="flex items-center">
-            <span className="font-serif text-2xl tracking-tight">TU ACADEMIA</span>
+            <span className="font-serif text-2xl tracking-tighter font-bold uppercase text-black">SANTUARIO</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:gap-x-10">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm tracking-wide uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
+                className="text-[10px] tracking-[0.2em] uppercase font-bold text-black/50 hover:text-black transition-colors"
               >
                 {item.name}
               </Link>
             ))}
           </div>
 
-          {/* CTA Buttons */}
           <div className="hidden lg:flex lg:items-center lg:gap-x-4">
-            <Link href="/auth/login">
-              <Button variant="ghost" className="text-sm tracking-wide uppercase">
+            {/* CORRECCIÓN: Ahora te lleva a mi-santuario después del login */}
+            <Link href="/auth/login?callbackUrl=/mi-santuario">
+              <Button variant="ghost" className="text-[10px] tracking-[0.2em] uppercase font-bold">
                 Iniciar Sesión
               </Button>
             </Link>
             <Link href="/auth/registro">
-              <Button className="text-sm tracking-wide uppercase px-6">Comenzar</Button>
+              <Button className="text-[10px] tracking-[0.2em] uppercase font-bold px-6 bg-black text-white rounded-full">
+                Comenzar
+              </Button>
             </Link>
           </div>
 
-          {/* Mobile menu button */}
           <button type="button" className="lg:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </nav>
-
-      {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-background border-b border-border">
-          <div className="px-6 py-8 space-y-6">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="block text-lg tracking-wide text-foreground/70 hover:text-foreground"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <div className="pt-6 border-t border-border space-y-4">
-              <Link href="/auth/login" className="block">
-                <Button variant="outline" className="w-full tracking-wide uppercase bg-transparent">
-                  Iniciar Sesión
-                </Button>
-              </Link>
-              <Link href="/auth/registro" className="block">
-                <Button className="w-full tracking-wide uppercase">Comenzar</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   )
 }
