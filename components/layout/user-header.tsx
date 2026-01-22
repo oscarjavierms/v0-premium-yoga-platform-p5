@@ -2,45 +2,42 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { UserSidebar } from "./UserSidebar"
-import { User, Search } from "lucide-react"
+import { UserSidebar } from "./UserSidebar" // Importamos la Sidebar
+import { User } from "lucide-react"
 
 export function UserHeader({ user }: { user: any }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
-      <div className="max-w-[1800px] mx-auto px-8 h-20 flex items-center justify-between">
+    <header className="fixed top-0 w-full z-50 bg-white border-b border-black/5">
+      <div className="max-w-[1800px] mx-auto px-6 h-16 flex items-center justify-between">
         
-        {/* LOGO IZQUIERDA */}
-        <Link href="/dashboard" className="text-2xl font-serif italic tracking-tighter">
+        {/* Tu Logo Original */}
+        <Link href="/" className="text-xl font-bold tracking-tighter">
           Santuario
         </Link>
 
-        {/* NAVEGACIÓN CENTRAL (Minimalista) */}
-        <nav className="hidden md:flex items-center gap-12 text-[10px] uppercase tracking-[0.3em] text-black/50">
-          <Link href="/yoga" className="hover:text-black transition-colors">Clases</Link>
-          <Link href="/instructores" className="hover:text-black transition-colors">Guías</Link>
-          <Link href="/programas" className="hover:text-black transition-colors">Programas</Link>
+        {/* Mantenemos tus links de navegación originales */}
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/yoga" className="text-sm font-medium">Yoga</Link>
+          <Link href="/instructores" className="text-sm font-medium">Instructores</Link>
+          <Link href="/programas" className="text-sm font-medium">Programas</Link>
         </nav>
 
-        {/* BOTÓN PERFIL DERECHA */}
-        <div className="flex items-center gap-6">
+        {/* El botón de usuario que ahora abre la Sidebar */}
+        <div className="flex items-center">
           <button 
             onClick={() => setIsSidebarOpen(true)}
-            className="flex items-center gap-4 group"
+            className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <span className="hidden md:block text-[9px] uppercase tracking-[0.2em] text-black/40 group-hover:text-black transition-colors">
-              {user?.full_name || "Mi Cuenta"}
-            </span>
-            <div className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center bg-transparent group-hover:bg-black group-hover:text-white transition-all duration-500">
-              <User size={17} strokeWidth={1} />
+            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+              <User size={18} />
             </div>
           </button>
         </div>
       </div>
 
-      {/* Llamada a la Sidebar (El archivo que creaste antes) */}
+      {/* Renderizamos la Sidebar aquí */}
       <UserSidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
