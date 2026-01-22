@@ -1,11 +1,11 @@
 "use client"
 import React from "react"
 
-export function MiSantuarioClient({ profile }: any) {
+export function MiSantuarioClient() {
   return (
-    <div className="p-20 bg-white min-h-screen text-black">
-      <h1 className="font-serif text-6xl">Hola, {profile?.full_name || 'oscar'}</h1>
-      <p className="mt-4 text-gray-500 italic">Bienvenido a tu santuario.</p>
+    <div style={{ padding: '100px', textAlign: 'center' }}>
+      <h1>¡Santuario Activado!</h1>
+      <p>Si ves esto, el error 404 ha muerto.</p>
     </div>
   )
 }
