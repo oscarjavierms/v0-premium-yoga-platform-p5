@@ -5,7 +5,6 @@ import Link from "next/link"
 export function MiSantuarioClient({ profile, stats }: any) {
   return (
     <div className="max-w-[1400px] mx-auto px-10 py-16">
-      {/* SECCIÓN SALUDO */}
       <div className="max-w-4xl mb-24">
         <h1 className="font-serif text-[84px] leading-[1] mb-6 tracking-tight text-black">
           Hola, {profile?.full_name?.split(' ')[0] || 'oscar'}.
@@ -15,7 +14,6 @@ export function MiSantuarioClient({ profile, stats }: any) {
         </p>
       </div>
 
-      {/* TARJETAS DE ESTADÍSTICAS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
         <div className="bg-white border border-black/5 p-12 rounded-2xl shadow-sm">
           <div className="flex items-center gap-4 mb-16 text-black/20">
@@ -42,15 +40,17 @@ export function MiSantuarioClient({ profile, stats }: any) {
         </div>
       </div>
 
-      {/* BOTONES DE ACCIÓN */}
-      <div className="flex flex-wrap gap-4">
+      <div className="flex gap-4">
         <Link href="/mi-practica" className="px-8 py-3 bg-white border border-black/10 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white transition-all flex items-center gap-3 group">
           Mi Práctica <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
         </Link>
         <Link href="/clases" className="px-8 py-3 bg-white border border-black/10 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white transition-all flex items-center gap-3 group">
           Explorar Clases <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
         </Link>
+        <Link href="/programas" className="px-8 py-3 bg-white border border-black/10 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white transition-all flex items-center gap-3 group">
+          Ver Programas <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
     </div>
-  );
+  )
 }
