@@ -29,8 +29,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes that require authentication
-  const PROTECTED_ROUTES = ["/mi-cuenta", "/dashboard", "/ver", "/favoritos", "/suscripcion", "/admin"]
+  // RUTAS PROTEGIDAS: Cambiamos dashboard por mi-santuario
+  const PROTECTED_ROUTES = ["/mi-cuenta", "/mi-santuario", "/ver", "/favoritos", "/suscripcion", "/admin"]
 
   const isProtectedRoute = PROTECTED_ROUTES.some((route) => request.nextUrl.pathname.startsWith(route))
 
@@ -41,31 +41,30 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // If user is authenticated and going to dashboard, check onboarding status
-
+  // REDIRECCIÓN DE ADMIN: Si no es admin, va a mi-santuario
   if (user && request.nextUrl.pathname.startsWith("/admin")) {
     try {
       const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
 
       if (!profile || profile.role !== "admin") {
         const url = request.nextUrl.clone()
-        url.pathname = "/dashboard"
+        url.pathname = "/mi-santuario"
         return NextResponse.redirect(url)
       }
     } catch {
       const url = request.nextUrl.clone()
-      url.pathname = "/dashboard"
+      url.pathname = "/mi-santuario"
       return NextResponse.redirect(url)
     }
   }
 
-  // Redirect logged in users away from auth pages
+  // REDIRECCIÓN DE USUARIOS LOGUEADOS: Si ya están dentro, van a mi-santuario
   const AUTH_ROUTES = ["/auth/login", "/auth/registro"]
   const isAuthRoute = AUTH_ROUTES.some((route) => request.nextUrl.pathname.startsWith(route))
 
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone()
-    url.pathname = "/dashboard"
+    url.pathname = "/mi-santuario"
     return NextResponse.redirect(url)
   }
 
