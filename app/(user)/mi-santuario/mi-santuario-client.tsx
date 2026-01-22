@@ -47,9 +47,6 @@ export function MiSantuarioClient({ profile, stats }: any) {
         <Link href="/clases" className="px-8 py-3 bg-white border border-black/10 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white transition-all flex items-center gap-3 group">
           Explorar Clases <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
         </Link>
-        <Link href="/programas" className="px-8 py-3 bg-white border border-black/10 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white transition-all flex items-center gap-3 group">
-          Ver Programas <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-        </Link>
       </div>
     </div>
   )
