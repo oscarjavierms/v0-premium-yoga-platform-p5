@@ -1,13 +1,13 @@
 "use client"
 
-import { X, LogOut, User, CreditCard, History } from "lucide-react"
+import { X, LogOut, User, CreditCard, History, Settings } from "lucide-react"
 import Link from "next/link"
 
 export function UserSidebar({ isOpen, onClose, user }: any) {
   return (
     <>
       <div 
-        className={`fixed inset-0 bg-black/10 backdrop-blur-[1px] z-[110] transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+        className={`fixed inset-0 bg-black/5 backdrop-blur-[2px] z-[110] transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
         onClick={onClose} 
       />
       
@@ -17,25 +17,23 @@ export function UserSidebar({ isOpen, onClose, user }: any) {
             <X size={20} strokeWidth={1} />
           </button>
 
-          <div className="mb-10">
-             <p className="text-[10px] uppercase tracking-widest text-black/40 mb-1">Cuenta</p>
-             <h2 className="text-sm font-bold truncate">{user?.email || "usuario@mail.com"}</h2>
-          </div>
-
-          <nav className="flex-1 space-y-2">
-            <Link href="/perfil" className="flex items-center gap-3 p-3 text-sm hover:bg-black/[0.02] rounded-lg transition-all">
+          <nav className="flex-1 space-y-1">
+            <p className="text-[9px] uppercase tracking-[0.2em] text-black/30 mb-4 px-3">Gestión de Cuenta</p>
+            <Link href="/perfil" onClick={onClose} className="flex items-center gap-3 p-3 text-sm hover:bg-black/[0.02] rounded-lg">
               <User size={16} strokeWidth={1.5} /> Perfil
             </Link>
-            <Link href="/membresia" className="flex items-center gap-3 p-3 text-sm hover:bg-black/[0.02] rounded-lg transition-all">
+            <Link href="/membresia" onClick={onClose} className="flex items-center gap-3 p-3 text-sm hover:bg-black/[0.02] rounded-lg">
               <CreditCard size={16} strokeWidth={1.5} /> Membresía
             </Link>
-            {/* Agregamos el Historial aquí por ser algo técnico/administrativo */}
-            <Link href="/historial" className="flex items-center gap-3 p-3 text-sm hover:bg-black/[0.02] rounded-lg transition-all">
-              <History size={16} strokeWidth={1.5} /> Mi Historial
+            <Link href="/historial" onClick={onClose} className="flex items-center gap-3 p-3 text-sm hover:bg-black/[0.02] rounded-lg">
+              <History size={16} strokeWidth={1.5} /> Historial
+            </Link>
+            <Link href="/configuracion" onClick={onClose} className="flex items-center gap-3 p-3 text-sm hover:bg-black/[0.02] rounded-lg">
+              <Settings size={16} strokeWidth={1.5} /> Ajustes
             </Link>
           </nav>
 
-          <button className="mt-auto flex items-center justify-center gap-2 p-3 text-[10px] uppercase tracking-[0.2em] font-bold text-red-500 hover:bg-red-50 rounded-lg transition-all">
+          <button className="mt-auto flex items-center justify-center gap-2 p-3 text-[10px] uppercase tracking-widest font-bold text-red-500 hover:bg-red-50 rounded-lg transition-all">
             <LogOut size={14} /> Cerrar Sesión
           </button>
         </div>
