@@ -16,7 +16,6 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,34 +24,22 @@ function LoginForm() {
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
-      if (error) throw error
+      
+      if (loginError) throw loginError
 
-      if (data.user) {
-        // Verificamos perfil
-        const { data: profile } = await supabase.from("profiles").select("id").eq("id", data.user.id).single()
-
-        if (!profile) {
-          const fullName = [data.user.user_metadata?.first_name, data.user.user_metadata?.last_name].filter(Boolean).join(" ") || data.user.user_metadata?.full_name || ""
-          await supabase.from("profiles").insert({
-            id: data.user.id,
-            email: data.user.email,
-            full_name: fullName,
-            avatar_url: data.user.user_metadata?.avatar_url || "",
-            role: "user",
-          })
-        }
+      // Si el login fue exitoso, saltamos directo al santuario
+      // Ignoramos la verificación de perfil aquí para evitar bloqueos
+      if (data?.user) {
+        window.location.href = "/mi-santuario"
+        return // Detenemos cualquier otra ejecución
       }
-
-      // FUERZA LA REDIRECCIÓN AL NUEVO DESTINO
-      window.location.replace("/mi-santuario")
       
     } catch (error: any) {
       setError(error.message || "Error al ingresar")
-    } finally {
       setIsLoading(false)
     }
   }
