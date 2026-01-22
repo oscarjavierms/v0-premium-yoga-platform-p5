@@ -4,92 +4,70 @@ export const revalidate = 0
 import Link from "next/link"
 import { createServerClient } from "@/lib/supabase/server"
 
-export default async function Page({ params }: { params: { slug: string } }) {
+// Agregamos Promise para que Next.js resuelva los parámetros correctamente
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const supabase = await createServerClient()
-
-  // 1. Limpiamos el slug: quitamos espacios y decodificamos caracteres raros
-  const rawSlug = params.slug
+  
+  // RESOLVEMOS la promesa de params antes de usar el slug
+  const resolvedParams = await params
+  const rawSlug = resolvedParams.slug
+  
+  // Limpieza del slug para evitar errores de búsqueda
   const cleanSlug = decodeURIComponent(rawSlug).trim()
 
-  // 2. Usamos .ilike para que 'oscar' encuentre a 'Oscar' u 'OSCAR'
+  // Buscamos en Supabase (usamos .ilike para ser flexibles con Mayúsculas/Minúsculas)
   const { data: instructor, error } = await supabase
     .from("instructors")
     .select("id, slug, name, bio, specialty")
     .ilike("slug", cleanSlug) 
     .maybeSingle()
 
-  // Manejo de Error de Conexión
   if (error) {
     return (
       <main className="mx-auto max-w-5xl px-6 py-16">
-        <h1 className="text-3xl font-light tracking-wide text-black">Error de conexión</h1>
-        <p className="mt-4 text-sm text-black/70">{error.message}</p>
+        <h1 className="text-2xl font-light text-black">Error de servidor</h1>
+        <p className="mt-2 text-sm text-black/60">{error.message}</p>
       </main>
     )
   }
 
-  // Si no existe el instructor
+  // Si no existe, ahora sí mostrará el slug real en lugar de "undefined"
   if (!instructor) {
     return (
       <main className="mx-auto max-w-5xl px-6 py-16 text-center">
-        <h1 className="text-4xl font-light tracking-tight text-black">Instructor no encontrado</h1>
-        <p className="mt-4 text-lg text-black/60">
-          No encontramos a nadie con el usuario: <span className="font-semibold italic">"{cleanSlug}"</span>
+        <h1 className="text-3xl font-light text-black">Instructor no encontrado</h1>
+        <p className="mt-4 text-black/60">
+          No encontramos el perfil asociado a: <span className="font-medium text-black italic">"{cleanSlug}"</span>
         </p>
-        <div className="mt-10">
-          <Link href="/instructores" className="rounded-full border border-black px-8 py-3 text-sm hover:bg-black hover:text-white transition-all">
-            Ver todos los instructores
-          </Link>
-        </div>
+        <Link href="/instructores" className="mt-8 inline-block rounded-full border border-black px-6 py-2 text-sm hover:bg-black hover:text-white transition">
+          Ver todos los instructores
+        </Link>
       </main>
     )
   }
 
-  // Renderizado de la página (Tu diseño B&W original)
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16 animate-in fade-in duration-700">
-      <header className="flex flex-col gap-6">
-        <span className="text-xs uppercase tracking-[0.2em] text-black/40">Perfil Profesional</span>
-        <h1 className="text-6xl font-light tracking-tighter text-black">
-          {instructor.name}
-        </h1>
-
-        {instructor.bio ? (
-          <p className="max-w-2xl text-lg leading-relaxed text-black/70 font-light">
-            {instructor.bio}
-          </p>
-        ) : (
-          <p className="max-w-2xl text-base italic text-black/30">Sin biografía disponible.</p>
-        )}
-
-        {/* Especialidades */}
-        <div className="flex flex-wrap gap-2 mt-4">
-          {Array.isArray(instructor.specialty) && instructor.specialty.length > 0 ? (
-            instructor.specialty.map((tag: string) => (
-              <span key={tag} className="rounded-full border border-black/10 bg-neutral-50 px-4 py-1.5 text-[10px] uppercase tracking-widest text-black/60">
-                {tag}
-              </span>
-            ))
-          ) : (
-            <span className="text-[10px] uppercase tracking-widest text-black/30">Generalista</span>
-          )}
-        </div>
-
-        <div className="mt-8 flex gap-4">
-          <Link href="/clases" className="bg-black text-white px-8 py-3 rounded-full text-sm hover:bg-neutral-800 transition">
-            Ver clases
-          </Link>
-          <button className="border border-black px-8 py-3 rounded-full text-sm hover:bg-black hover:text-white transition">
-            Seguir
-          </button>
+    <main className="mx-auto max-w-5xl px-6 py-16">
+      {/* Diseño B&W Premium */}
+      <header className="flex flex-col gap-4">
+        <h1 className="text-5xl font-light tracking-tight text-black">{instructor.name}</h1>
+        <p className="max-w-xl text-lg text-black/70 font-light leading-relaxed">
+          {instructor.bio || "Inspirando presencia y movimiento."}
+        </p>
+        
+        <div className="flex gap-2 mt-4">
+          {instructor.specialty?.map((s: string) => (
+            <span key={s} className="text-[10px] uppercase tracking-widest border border-black/10 px-3 py-1 rounded-full text-black/50">
+              {s}
+            </span>
+          ))}
         </div>
       </header>
 
-      <section className="mt-24 border-t border-black/5 pt-16">
-        <h2 className="text-2xl font-light tracking-tight text-black mb-8">Contenido de {instructor.name.split(' ')[0]}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 opacity-40 italic">
-             {/* Aquí irá tu grilla de 5 o 3 según el diseño final */}
-             Próximamente...
+      <section className="mt-20 border-t border-black/5 pt-12">
+        <h3 className="text-sm uppercase tracking-widest text-black/40">Contenido disponible</h3>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 opacity-30 italic text-sm">
+          Cargando biblioteca de clases...
         </div>
       </section>
     </main>
