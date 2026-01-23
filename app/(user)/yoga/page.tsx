@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { YogaClient } from "./yoga-client"
-// 1. Importamos el componente que creamos
 import { SectionHero } from "@/components/ui/section-hero"
 
 export default async function YogaPage() {
@@ -33,16 +32,28 @@ export default async function YogaPage() {
   const bookmarkedIds = new Set(bookmarks?.map(b => b.class_id) || [])
 
   return (
-    <div className="w-full">
-      {/* 2. Insertamos el Hero Banner con tu imagen hero-zen-landscape */}
-      <SectionHero 
-        title="Yoga" 
-        subtitle="EL ARTE DEL MOVIMIENTO CONSCIENTE" 
-        image="/hero-zen-landscape.jpg" 
-      />
+    /* -mt-32: Anula el espacio superior del layout para que la foto toque el Header.
+      relative: Para que el posicionamiento de los hijos funcione correctamente.
+    */
+    <div className="relative -mt-32">
+      
+      {/* Este DIV "rompe" los márgenes laterales del layout:
+        w-screen: Ocupa todo el ancho de la pantalla física.
+        left-1/2 -ml-[50vw]: Centra el elemento ignorando los contenedores padres.
+      */}
+      <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] overflow-hidden">
+        <SectionHero 
+          title="Yoga" 
+          subtitle="EL ARTE DEL MOVIMIENTO CONSCIENTE" 
+          image="/hero-zen-landscape.jpg" 
+        />
+      </div>
 
-      {/* 3. El contenido original aparece debajo del Hero */}
-      <div className="px-4">
+      {/* Contenido de las clases:
+        Aquí volvemos a centrar el contenido y le damos un espacio (py-12) 
+        para que se vea elegante debajo de la gran imagen.
+      */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
         <YogaClient 
           classes={classes || []} 
           bookmarkedIds={bookmarkedIds} 
