@@ -10,8 +10,8 @@ interface SectionHeroProps {
 
 export function SectionHero({ title, subtitle, image, align = "center" }: SectionHeroProps) {
   return (
-    /* h-[90vh]: La imagen ocupa el 90% de la altura de la pantalla */
-    <section className="relative w-full h-[90vh] overflow-hidden">
+    /* h-[90vh]: La imagen ocupa el 100% de la altura de la pantalla */
+    <section className="relative w-full h-[100vh] overflow-hidden">
       <div 
         className={cn(
           "absolute inset-0 bg-cover bg-no-repeat transition-transform duration-[3000ms] ease-out scale-105 hover:scale-100",
