@@ -35,9 +35,10 @@ export function UserSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () 
 
         <nav className="flex-1 px-8 space-y-2">
           {[
+            { name: "Mi Santuario", href: "/mi-santuario", icon: Layout },
+            { name: "Mi Práctica", href: "/mi-practica", icon: History },
             { name: "Perfil", href: "/perfil", icon: User },
             { name: "Membresía", href: "/membresia", icon: CreditCard },
-            { name: "Historial", href: "/historial", icon: History },
             { name: "Ajustes", href: "/ajustes", icon: Settings },
           ].map((item) => (
             <Link
@@ -56,10 +57,13 @@ export function UserSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         </nav>
 
         <div className="p-10">
-          <button className="w-full flex items-center justify-between px-6 py-5 border border-black/5 rounded-2xl text-[9px] tracking-[0.3em] uppercase font-bold text-red-500 hover:bg-red-50 transition-all duration-500">
+          <Link
+            href="/auth/logout"
+            className="w-full flex items-center justify-between px-6 py-5 border border-black/5 rounded-2xl text-[9px] tracking-[0.3em] uppercase font-bold text-red-500 hover:bg-red-50 transition-all duration-500"
+          >
             <span>Cerrar Sesión</span>
             <LogOut size={14} />
-          </button>
+          </Link>
         </div>
       </aside>
     </>
