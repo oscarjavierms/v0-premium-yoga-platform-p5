@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* 1. IMPORTACIÓN DE FUENTES DE LUJO (Playfair para Títulos y Montserrat para Menús) */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -18,7 +21,7 @@
   --primary: oklch(0 0 0);
   --primary-foreground: oklch(1 0 0);
 
-  /* Secundarios y Muted (Gris muy claro, sin rastro de arena/crema) */
+  /* Secundarios y Muted (Gris muy claro) */
   --secondary: oklch(0.98 0 0);
   --secondary-foreground: oklch(0 0 0);
   --muted: oklch(0.98 0 0);
@@ -43,7 +46,9 @@
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0 0 0);
   --sidebar-primary: oklch(0 0 0);
-@@ -42,3 +48,91 @@
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0 0 0);
   --sidebar-border: oklch(0.95 0 0);
   --sidebar-ring: oklch(0 0 0);
 }
@@ -69,9 +74,11 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-serif: var(--font-cormorant), Georgia, serif;
+  /* ASIGNACIÓN DE FUENTES SEGÚN LA IMAGEN */
+  --font-sans: "Montserrat", system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
   --font-mono: "Geist Mono", monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -91,10 +98,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --radius-sm: calc(var(--radius) + 2px);
   --radius-md: calc(var(--radius) + 4px);
   --radius-lg: calc(var(--radius) + 6px);
   --radius-xl: calc(var(--radius) + 8px);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -111,6 +120,8 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    /* Mejora el renderizado de la tipografía serif */
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
 }
 
@@ -134,4 +145,9 @@ html {
 ::selection {
   background: oklch(0 0 0);
   color: oklch(1 0 0);
+}
+
+/* UTILIDAD EXTRA PARA EL LOOK DE LA IMAGEN (Espaciado de menú) */
+.tracking-luxury {
+  letter-spacing: 0.2em;
 }
