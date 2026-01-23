@@ -1,20 +1,26 @@
-"use client"
+"use client" // Necesario para que el botón funcione
+
 import { useState } from "react"
 import { UserHeader } from "@/components/layout/user-header"
 import { UserSidebar } from "@/components/layout/user-sidebar"
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
+  // Este es el estado que controla si el menú se ve o no
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <div className="relative min-h-screen bg-[#F9F9F9]">
-      {/* Pasamos la función para abrir el menú */}
+    <div className="relative min-h-screen">
+      {/* Le pasamos la orden de abrir al Header */}
       <UserHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
       
-      {/* Pasamos el estado y la función para cerrar el menú */}
-      <UserSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      {/* Le pasamos el estado y la orden de cerrar al Sidebar */}
+      <UserSidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
       
-      <main className="pt-20">
+      {/* El contenido de la página se desenfoca suavemente al abrir el menú */}
+      <main className={`transition-all duration-700 ${isSidebarOpen ? 'blur-md' : ''}`}>
         {children}
       </main>
     </div>
