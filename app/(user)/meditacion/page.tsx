@@ -44,6 +44,7 @@ export default async function MeditacionPage() {
           title="Meditación" 
           subtitle="EL SILENCIO ES EL LENGUAJE DEL ALMA" 
           image="/minimalista-me.png" 
+          align="center" // <--- Esto asegura el centrado de la persona
         />
       </div>
 
