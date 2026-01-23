@@ -23,12 +23,9 @@ export default async function YogaPage() {
   const bookmarkedIds = new Set(bookmarks?.map(b => b.class_id) || [])
 
   return (
-    /* 1. -mt-[128px]: Anula exactamente el espacio blanco superior (32 * 4px).
-       2. relative z-0: Asegura que esté por debajo del header pero pegado a él.
-    */
-    <div className="relative -mt-[128px]">
-      
-      {/* Contenedor Full Width */}
+    /* -mt-32 anula el espacio del layout. 
+       El Header ahora es blanco sólido, así que la foto se pegará perfectamente debajo. */
+    <div className="relative -mt-32">
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] overflow-hidden">
         <SectionHero 
           title="Yoga" 
@@ -37,9 +34,6 @@ export default async function YogaPage() {
         />
       </div>
 
-      {/* Contenido de las clases: 
-          py-12 le da el aire necesario después de la imagen inmersiva 
-      */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <YogaClient 
           classes={classes || []} 
