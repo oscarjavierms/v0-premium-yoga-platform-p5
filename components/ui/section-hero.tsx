@@ -10,7 +10,7 @@ interface SectionHeroProps {
 
 export function SectionHero({ title, subtitle, image, align = "center" }: SectionHeroProps) {
   return (
-    <section className="relative w-full h-[90vh] overflow-hidden bg-neutral-900">
+    <section className="relative w-full h-[100vh] overflow-hidden bg-neutral-900">
       <div 
         className={cn(
           "absolute inset-0 bg-cover bg-no-repeat transition-all duration-1000",
