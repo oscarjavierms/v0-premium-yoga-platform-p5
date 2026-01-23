@@ -21,7 +21,8 @@ export function UserHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   ]
 
   return (
-    <header className="fixed top-0 left-0 w-full h-20 bg-white/80 backdrop-blur-md border-b border-black/[0.03] z-[100]">
+    /* CAMBIO CLAVE: bg-white sólido y z-index alto */
+    <header className="fixed top-0 left-0 w-full h-20 bg-white border-b border-black/[0.05] z-[100]">
       <div className="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
         {/* Logo */}
         <Link href="/mi-santuario" className="font-serif text-xl text-black hover:text-black/60 transition-colors">
