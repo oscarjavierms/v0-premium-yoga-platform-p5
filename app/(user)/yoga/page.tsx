@@ -23,10 +23,12 @@ export default async function YogaPage() {
   const bookmarkedIds = new Set(bookmarks?.map(b => b.class_id) || [])
 
   return (
-    <div className="relative">
-      {/* 1. Eliminamos el margen negativo (-mt-32) para que NO se meta bajo el header.
-          2. Usamos w-screen y el truco de márgenes para que la imagen sea full-width.
-      */}
+    /* 1. -mt-[128px]: Anula exactamente el espacio blanco superior (32 * 4px).
+       2. relative z-0: Asegura que esté por debajo del header pero pegado a él.
+    */
+    <div className="relative -mt-[128px]">
+      
+      {/* Contenedor Full Width */}
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] overflow-hidden">
         <SectionHero 
           title="Yoga" 
@@ -35,7 +37,9 @@ export default async function YogaPage() {
         />
       </div>
 
-      {/* 3. Contenido de las clases centrado y con aire arriba */}
+      {/* Contenido de las clases: 
+          py-12 le da el aire necesario después de la imagen inmersiva 
+      */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <YogaClient 
           classes={classes || []} 
