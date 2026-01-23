@@ -10,10 +10,8 @@ interface SectionHeroProps {
 
 export function SectionHero({ title, subtitle, image, align = "center" }: SectionHeroProps) {
   return (
-    <section className="relative w-full h-[40vh] md:h-[50vh] overflow-hidden">
-      {/* - Quitamos el hover:scale para que no distraiga.
-         - Usamos un overlay mucho más sutil (bg-black/10).
-      */}
+    /* h-[70vh]: Esto hará que la imagen sea mucho más alta y se vea más contenido */
+    <section className="relative w-full h-[60vh] md:h-[75vh] overflow-hidden">
       <div 
         className={cn(
           "absolute inset-0 bg-cover bg-no-repeat transition-all duration-1000",
@@ -21,23 +19,22 @@ export function SectionHero({ title, subtitle, image, align = "center" }: Sectio
         )}
         style={{ backgroundImage: `url('${image}')` }}
       >
-        <div className="absolute inset-0 bg-black/15" /> 
+        {/* Un overlay muy suave para no apagar los colores de la foto */}
+        <div className="absolute inset-0 bg-black/10" /> 
       </div>
 
-      {/* CONTENIDO MINIMALISTA:
-         - Bajamos el tamaño de la letra drásticamente.
-         - Aumentamos mucho el espacio entre letras (tracking).
-         - Eliminamos el botón para que la foto respire.
-      */}
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-6 pt-16">
-        <h1 className="font-serif text-3xl md:text-4xl text-white tracking-[0.3em] uppercase opacity-90 drop-shadow-sm">
+      {/* Contenido centrado pero con aire */}
+      <div className="relative h-full flex flex-col items-center justify-center text-center px-6">
+        <h1 className="font-serif text-4xl md:text-6xl text-white tracking-[0.2em] uppercase drop-shadow-md">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-4 font-sans text-white/70 text-[10px] md:text-[11px] uppercase tracking-[0.6em] font-light max-w-2xl">
+          <p className="mt-6 font-sans text-white/90 text-[10px] md:text-xs tracking-[0.5em] uppercase font-light max-w-3xl leading-relaxed">
             {subtitle}
           </p>
         )}
+        
+        {/* Eliminamos el botón para que no tape el centro de la imagen */}
       </div>
     </section>
   );
