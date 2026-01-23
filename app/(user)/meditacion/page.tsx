@@ -43,7 +43,7 @@ export default async function MeditacionPage() {
         <SectionHero 
           title="Meditación" 
           subtitle="EL SILENCIO ES EL LENGUAJE DEL ALMA" 
-          image="/serene-person-meditating.jpg" 
+          image="/minimalista-me.png" 
         />
       </div>
 
