@@ -1,23 +1,24 @@
 "use client"
-
 import { User } from "lucide-react"
+
+interface UserHeaderProps {
+  onOpenSidebar: () => void
+}
 
 export function UserHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   return (
-    <header className="fixed top-0 left-0 w-full h-20 bg-white/80 backdrop-blur-md border-b border-black/[0.03] z-[100]">
-      <div className="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
-        {/* Espacio para tu logo a la izquierda */}
-        <div className="font-serif text-xl">SANTUARIO</div>
-
-        {/* Botón de usuario a la derecha */}
+    <header className="fixed top-0 left-0 right-0 h-20 bg-white/80 backdrop-blur-md border-b border-black/5 z-40">
+      <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
+        <div className="text-xl font-serif tracking-widest font-bold text-black">
+          SANTUARIO
+        </div>
+        
         <button 
-          onClick={(e) => {
-            e.preventDefault();
-            onOpenSidebar();
-          }}
-          className="p-3 rounded-full border border-black/5 hover:bg-black/5 transition-all cursor-pointer pointer-events-auto flex items-center justify-center bg-white shadow-sm hover:shadow-md"
+          onClick={onOpenSidebar}
+          className="p-2 hover:bg-black/5 rounded-full transition-all cursor-pointer"
+          aria-label="Abrir menú de usuario"
         >
-          <User size={20} strokeWidth={1.5} className="text-black/70" />
+          <User size={24} strokeWidth={1.2} />
         </button>
       </div>
     </header>
