@@ -23,14 +23,19 @@ export default async function YogaPage() {
   const bookmarkedIds = new Set(bookmarks?.map(b => b.class_id) || [])
 
   return (
-    /* -mt-32 anula el espacio del layout. 
-       El Header ahora es blanco sólido, así que la foto se pegará perfectamente debajo. */
+    /* Mantenemos el -mt-32 para que la foto suba hasta el header */
     <div className="relative -mt-32">
-      <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] overflow-hidden">
+      
+      {/* HEMOS CAMBIADO ESTO: 
+          Eliminamos el cálculo de -ml-[50vw] que causaba que se viera torcida.
+          Usamos w-full y overflow-hidden para un centrado limpio y real.
+      */}
+      <div className="w-full overflow-hidden">
         <SectionHero 
           title="Yoga" 
           subtitle="EL ARTE DEL MOVIMIENTO CONSCIENTE" 
           image="/hero-zen-landscape.jpg" 
+          // Asegúrate de que tu componente SectionHero acepte el align="center" que hicimos antes
         />
       </div>
 
