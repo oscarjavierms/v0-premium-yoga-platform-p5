@@ -1,14 +1,10 @@
 "use client"
 
-import { UserHeader } from "@/components/layout/user-header"
 import { PlayCircle, Clock, Star } from "lucide-react"
 
 export default function MiSantuarioPage() {
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
-      {/* Header para usuarios logueados */}
-      <UserHeader />
-      
       <main className="max-w-7xl mx-auto px-6 pt-32 pb-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>

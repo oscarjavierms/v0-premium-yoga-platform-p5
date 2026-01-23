@@ -119,7 +119,7 @@ Clases guardadas como favoritas.
 
 ## Función de seguridad
 
-```sql
+\`\`\`sql
 -- Evita recursión infinita en políticas RLS
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
@@ -132,7 +132,7 @@ AS $$
     WHERE id = auth.uid() AND role = 'admin'
   );
 $$;
-```
+\`\`\`
 
 ---
 
