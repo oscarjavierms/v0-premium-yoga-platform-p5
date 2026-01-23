@@ -29,7 +29,7 @@ export default async function YogaPage() {
         <SectionHero 
           title="Yoga" 
           subtitle="EL ARTE DEL MOVIMIENTO CONSCIENTE" 
-          image="/hero-zen-landscape.jpg" 
+          image="/Bosque-yogaa.png" 
         />
       </div>
 
