@@ -5,20 +5,19 @@ interface UserHeaderProps {
   onOpenSidebar: () => void
 }
 
-export function UserHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
+export function UserHeader({ onOpenSidebar }: UserHeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 h-20 bg-white/80 backdrop-blur-md border-b border-black/5 z-40">
       <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
-        <div className="text-xl font-serif tracking-widest font-bold text-black">
-          SANTUARIO
+        <div className="text-xl font-serif tracking-widest font-bold text-black uppercase">
+          Santuario
         </div>
         
         <button 
           onClick={onOpenSidebar}
-          className="p-2 hover:bg-black/5 rounded-full transition-all cursor-pointer"
-          aria-label="Abrir menú de usuario"
+          className="p-2 hover:bg-black/5 rounded-full transition-all cursor-pointer border-none bg-transparent"
         >
-          <User size={24} strokeWidth={1.2} />
+          <User size={24} strokeWidth={1.2} className="text-black" />
         </button>
       </div>
     </header>
