@@ -9,19 +9,23 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <div className="relative min-h-screen">
-      {/* Le pasamos la orden de abrir al Header */}
+    <div className="relative min-h-screen bg-background">
+      {/* El Header se mantiene fijo arriba */}
       <UserHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
       
-      {/* Le pasamos el estado y la orden de cerrar al Sidebar */}
+      {/* El Sidebar aparece sobre el contenido */}
       <UserSidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
       />
       
-      {/* El contenido de la página se desenfoca suavemente al abrir el menú */}
-      <main className={`transition-all duration-700 ${isSidebarOpen ? 'blur-md' : ''}`}>
-        {children}
+      {/* 1. Eliminado el filtro 'blur-md' y la transición lenta.
+          2. Mantenemos 'pt-32' para que el contenido de Yoga/Meditación no choque con el menú.
+      */}
+      <main className="pt-32 px-6 md:px-12">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   )
