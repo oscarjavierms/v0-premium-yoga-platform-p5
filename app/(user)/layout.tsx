@@ -8,10 +8,10 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="relative min-h-screen bg-[#F9F9F9]">
-      {/* Header que recibe la orden de abrir */}
+      {/* Pasamos la función para abrir el menú */}
       <UserHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
       
-      {/* Sidebar que recibe el estado y la orden de cerrar */}
+      {/* Pasamos el estado y la función para cerrar el menú */}
       <UserSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       
       <main className="pt-20">
