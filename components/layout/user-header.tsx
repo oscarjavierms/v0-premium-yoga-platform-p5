@@ -17,9 +17,9 @@ export function UserHeader() {
     { name: "INSTRUCTORES", href: "/instructores" },
   ]
 
+  // Hemos quitado "MI PRÁCTICA" de aquí para evitar redundancia
   const secondaryItems = [
     { name: "MI SANTUARIO", href: "/mi-santuario" },
-    { name: "MI PRÁCTICA", href: "/mi-practica" },
   ]
 
   return (
@@ -30,7 +30,7 @@ export function UserHeader() {
           SANTUARIO
         </Link>
 
-        {/* Navegación Principal (Se mantiene igual) */}
+        {/* Navegación Principal */}
         <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
             <Link
@@ -61,7 +61,7 @@ export function UserHeader() {
           ))}
         </nav>
 
-        {/* Menú de Usuario Corregido */}
+        {/* Menú de Usuario */}
         <div className="relative">
           <button 
             onClick={() => setIsOpen(!isOpen)}
@@ -72,7 +72,6 @@ export function UserHeader() {
 
           {isOpen && (
             <>
-              {/* Overlay invisible para cerrar el menú sin desenfoque */}
               <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)} />
               
               <div className="absolute right-0 mt-2 w-52 bg-white border border-black/5 shadow-2xl rounded-xl p-2 animate-in fade-in zoom-in duration-200">
