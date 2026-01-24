@@ -7,10 +7,10 @@ export default function AjustesPage() {
   const [activeModal, setActiveModal] = useState<"email" | "password" | null>(null)
 
   return (
-    /* Reducido pt-32 a pt-20 para subir el contenido */
-    <div className="max-w-4xl mx-auto px-6 pt-20 pb-20">
-      <header className="mb-10">
-        <h1 className="font-serif text-4xl mb-2">Ajustes</h1>
+    /* pt-10 para que el título esté lo más arriba posible */
+    <div className="max-w-4xl mx-auto px-6 pt-10 pb-20">
+      <header className="mb-8">
+        <h1 className="font-serif text-4xl mb-2 text-black">Ajustes</h1>
         <p className="text-sm text-black/40 italic font-light tracking-wide">
           Gestiona la seguridad y el acceso a tu santuario personal.
         </p>
@@ -72,9 +72,9 @@ export default function AjustesPage() {
         </section>
       </div>
 
-      {/* MODAL (Se mantiene igual) */}
+      {/* MODAL */}
       {activeModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 text-black">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setActiveModal(null)} />
           <div className="relative bg-white w-full max-w-md rounded-3xl p-10 shadow-2xl animate-in fade-in zoom-in duration-300">
             <h3 className="font-serif text-2xl mb-6 text-black">
@@ -84,17 +84,17 @@ export default function AjustesPage() {
             <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setActiveModal(null); }}>
               {activeModal === "email" ? (
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold tracking-widest uppercase text-black/40 text-black">Nuevo Email</label>
+                  <label className="text-[10px] font-bold tracking-widest uppercase text-black/40">Nuevo Email</label>
                   <input type="email" className="w-full border-b border-black/10 py-2 outline-none italic text-sm text-black" placeholder="nuevo@correo.com" />
                 </div>
               ) : (
                 <>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold tracking-widest uppercase text-black/40 text-black">Contraseña Actual</label>
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-black/40">Contraseña Actual</label>
                     <input type="password" className="w-full border-b border-black/10 py-2 outline-none italic text-sm text-black" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold tracking-widest uppercase text-black/40 text-black">Nueva Contraseña</label>
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-black/40">Nueva Contraseña</label>
                     <input type="password" className="w-full border-b border-black/10 py-2 outline-none italic text-sm text-black" />
                   </div>
                 </>
@@ -104,7 +104,7 @@ export default function AjustesPage() {
                 <button type="submit" className="w-full bg-black text-white text-[10px] font-bold tracking-widest py-4 rounded-full uppercase hover:opacity-90 transition-opacity">
                   Guardar Cambios
                 </button>
-                <button type="button" onClick={() => setActiveModal(null)} className="w-full text-[10px] font-bold tracking-widest py-4 uppercase text-black/40 text-black">
+                <button type="button" onClick={() => setActiveModal(null)} className="w-full text-[10px] font-bold tracking-widest py-4 uppercase text-black/40">
                   Cancelar
                 </button>
               </div>
