@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ShieldCheck, Mail, Lock, Bell, Eye, EyeOff } from "lucide-react"
+import { ShieldCheck, Bell, UserCircle, Settings, LogOut, CreditCard } from "lucide-react"
 
 export default function AjustesPage() {
   const [activeModal, setActiveModal] = useState<"email" | "password" | null>(null)
@@ -55,7 +55,7 @@ export default function AjustesPage() {
           </div>
         </section>
 
-        {/* SECCIÓN: PREFERENCIAS DE NOTIFICACIÓN */}
+        {/* SECCIÓN: COMUNICACIONES */}
         <section className="p-8">
           <div className="flex items-center gap-3 mb-6">
             <Bell size={18} className="text-black/20" />
@@ -78,11 +78,11 @@ export default function AjustesPage() {
         </section>
       </div>
 
-      {/* MODAL GENÉRICO (Lógica de los formularios) */}
+      {/* MODAL */}
       {activeModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setActiveModal(null)} />
-          <div className="relative bg-white w-full max-w-md rounded-3xl p-10 shadow-2xl animate-in fade-in zoom-in duration-300">
+          <div className="relative bg-white w-full max-w-md rounded-3xl p-10 shadow-2xl">
             <h3 className="font-serif text-2xl mb-6">
               {activeModal === "email" ? "Actualizar Correo" : "Cambiar Contraseña"}
             </h3>
@@ -90,4 +90,34 @@ export default function AjustesPage() {
             <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setActiveModal(null); }}>
               {activeModal === "email" ? (
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold tracking-widest uppercase text-black/40">Nuevo Email
+                  <label className="text-[10px] font-bold tracking-widest uppercase text-black/40">Nuevo Email</label>
+                  <input type="email" className="w-full border-b border-black/10 py-2 outline-none italic text-sm" placeholder="nuevo@correo.com" />
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-black/40">Contraseña Actual</label>
+                    <input type="password" className="w-full border-b border-black/10 py-2 outline-none italic text-sm" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-black/40">Nueva Contraseña</label>
+                    <input type="password" className="w-full border-b border-black/10 py-2 outline-none italic text-sm" />
+                  </div>
+                </>
+              )}
+              
+              <div className="pt-4 flex flex-col gap-3">
+                <button type="submit" className="w-full bg-black text-white text-[10px] font-bold tracking-widest py-4 rounded-full uppercase hover:opacity-90 transition-opacity">
+                  Guardar Cambios
+                </button>
+                <button type="button" onClick={() => setActiveModal(null)} className="w-full text-[10px] font-bold tracking-widest py-4 uppercase text-black/40">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
