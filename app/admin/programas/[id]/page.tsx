@@ -1,4 +1,4 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { ProgramForm } from '../program-form'
@@ -8,9 +8,21 @@ export default async function EditProgramPage({
 }: {
   params: { id: string }
 }) {
-  const supabase = createServerComponentClient({ cookies })
+  const cookieStore = await cookies()
 
-  // Traemos la información del programa específico usando el ID de la URL
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+      },
+    }
+  )
+
+  // Traemos la información del programa específico
   const { data: program } = await supabase
     .from('programs')
     .select('*')
@@ -29,7 +41,6 @@ export default async function EditProgramPage({
         </h2>
       </div>
       <div className="grid gap-4">
-        {/* Pasamos el programa encontrado al formulario que ya tienes creado */}
         <ProgramForm initialData={program} />
       </div>
     </div>
