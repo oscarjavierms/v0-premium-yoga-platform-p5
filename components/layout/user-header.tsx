@@ -42,7 +42,7 @@ export function UserHeader() {
           SANTUARIO
         </Link>
 
-        {/* NAVEGACIÓN ESCRITORIO (Sin cambios para no dañar la web) */}
+        {/* NAVEGACIÓN ESCRITORIO */}
         <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
             <Link
@@ -96,7 +96,7 @@ export function UserHeader() {
                   <Settings className="mr-3 h-4 w-4 opacity-40" /> Ajustes
                 </Link>
                 <div className="h-px bg-black/5 my-2" />
-                <button className="w-full flex items-center p-3 text-[10px] font-bold tracking-widest text-red-600 hover:bg-red-50 rounded-lg transition-colors uppercase">
+                <button className="w-full flex items-center p-3 text-[10px] font-bold tracking-widest text-red-600 hover:bg-red-50 rounded-lg transition-colors uppercase text-black">
                   <LogOut className="mr-3 h-4 w-4" /> Cerrar Sesión
                 </button>
               </div>
@@ -105,37 +105,38 @@ export function UserHeader() {
         </div>
       </div>
 
-      {/* MENÚ MÓVIL DESPLEGABLE: Estilo Editorial (Como el Hero) */}
+      {/* MENÚ MÓVIL DESPLEGABLE: Estilo Editorial Refinado */}
       {isMenuOpen && (
         <div className="fixed inset-0 top-20 bg-white z-[90] md:hidden animate-in fade-in slide-in-from-top duration-500">
-          <nav className="flex flex-col p-8 pt-12 gap-6 h-full bg-white">
+          <nav className="flex flex-col p-8 pt-10 gap-5 h-full bg-white">
             {navItems.map((item) => (
               <Link 
                 key={item.href} 
                 href={item.href} 
                 onClick={() => setIsMenuOpen(false)}
-                className="text-5xl font-serif text-black tracking-tighter hover:opacity-40 transition-opacity lowercase"
+                className="text-2xl font-serif text-black tracking-tight hover:opacity-40 transition-opacity lowercase"
               >
                 {item.name}
               </Link>
             ))}
             
-            <div className="h-px w-full bg-black/5 my-4" />
+            {/* Separador minimalista corto */}
+            <div className="h-px w-10 bg-black/10 my-2" />
             
             {secondaryItems.map((item) => (
               <Link 
                 key={item.href} 
                 href={item.href} 
                 onClick={() => setIsMenuOpen(false)}
-                className="text-5xl font-serif text-black tracking-tighter italic hover:opacity-40 transition-opacity lowercase"
+                className="text-2xl font-serif text-black tracking-tight italic hover:opacity-40 transition-opacity lowercase"
               >
                 {item.name}
               </Link>
             ))}
 
             <div className="mt-auto pb-16">
-              <p className="text-[10px] tracking-[0.3em] font-bold text-black/20 uppercase italic">
-                Santuario Personal
+              <p className="text-[9px] tracking-[0.2em] font-bold text-black/20 uppercase">
+                Tu espacio de bienestar
               </p>
             </div>
           </nav>
