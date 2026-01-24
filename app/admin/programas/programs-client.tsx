@@ -4,50 +4,68 @@ import { useState } from "react"
 import { Plus, Eye, Edit, Trash2, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { ProgramForm } from "./program-form" 
 import { ConfirmDeleteDialog } from "../components/confirm-delete-dialog"
 import { EmptyState } from "../components/empty-state"
-import { deleteProgram } from "@/lib/actions/programs"
-import { PILLAR_LABELS, LEVEL_LABELS } from "@/types/content"
 
 export function ProgramsClient({ programs: initialPrograms, instructors }: any) {
   const [programs, setPrograms] = useState(initialPrograms)
+  const [search, setSearch] = useState("")
+  
+  // Estos estados controlan el Formulario
   const [formOpen, setFormOpen] = useState(false)
   const [editingProgram, setEditingProgram] = useState<any>(null)
-  const [search, setSearch] = useState("")
 
-  const handleEdit = (program: any) => {
-    setEditingProgram(program) // Pasamos los datos del programa
-    setFormOpen(true)          // Abrimos el formulario
-  }
-
+  // Función para abrir el formulario vacío (Nuevo)
   const handleNew = () => {
-    setEditingProgram(null)    // Limpiamos datos para nuevo programa
-    setFormOpen(true)          // Abrimos el formulario
+    setEditingProgram(null)
+    setFormOpen(true)
   }
+
+  // Función para abrir el formulario con datos (Editar)
+  const handleEdit = (program: any) => {
+    setEditingProgram(program)
+    setFormOpen(true)
+  }
+
+  const filteredPrograms = programs.filter((p: any) => 
+    p.title.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-serif">Programas</h1>
-        <Button onClick={handleNew} className="gap-2">
+        <div>
+          <h1 className="text-3xl font-serif">Programas</h1>
+          <p className="text-sm text-muted-foreground">{programs.length} programas totales</p>
+        </div>
+        <Button onClick={handleNew} className="gap-2 bg-black text-white">
           <Plus className="w-4 h-4" /> Nuevo programa
         </Button>
       </div>
 
-      {/* Tabla de programas con botón de editar corregido */}
-      <div className="bg-card border rounded-xl overflow-hidden">
-        <table className="w-full">
+      <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 border-b">
+            <tr>
+              <th className="text-left px-6 py-4 font-serif uppercase tracking-wider">Título</th>
+              <th className="text-right px-6 py-4 font-serif uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
           <tbody className="divide-y">
-            {programs.map((program: any) => (
-              <tr key={program.id} className="hover:bg-muted/30">
-                <td className="px-6 py-4 font-medium">{program.title}</td>
+            {filteredPrograms.map((program: any) => (
+              <tr key={program.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-6 py-4 font-medium text-gray-900">{program.title}</td>
                 <td className="px-6 py-4 text-right">
-                  <Button variant="ghost" size="icon" onClick={() => handleEdit(program)}>
-                    <Edit className="w-4 h-4" />
-                  </Button>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(program)}>
+                      <Edit className="w-4 h-4 text-blue-600" />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -55,13 +73,15 @@ export function ProgramsClient({ programs: initialPrograms, instructors }: any) 
         </table>
       </div>
 
-      {/* EL FORMULARIO: Ahora es un modal real que recibe datos */}
-      <ProgramForm 
-        open={formOpen} 
-        onOpenChange={setFormOpen}
-        program={editingProgram} 
-        instructors={instructors}
-      />
+      {/* EL FORMULARIO: Solo se activa cuando formOpen es true */}
+      {formOpen && (
+        <ProgramForm 
+          open={formOpen} 
+          onOpenChange={setFormOpen}
+          program={editingProgram} 
+          instructors={instructors}
+        />
+      )}
     </>
   )
 }
