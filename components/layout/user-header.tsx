@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils"
 
 export function UserHeader() {
   const pathname = usePathname()
-  const [isMenuOpen, setIsMenuOpen] = useState(false) // Estado para el menú móvil
-  const [isUserOpen, setIsUserOpen] = useState(false) // Estado para el menú de usuario
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserOpen, setIsUserOpen] = useState(false)
 
   const navItems = [
     { name: "YOGA", href: "/yoga" },
@@ -26,15 +26,15 @@ export function UserHeader() {
     <header className="fixed top-0 left-0 w-full h-20 bg-white border-b border-black/[0.05] z-[100]">
       <div className="max-w-7xl mx-auto h-full px-6 flex justify-between items-center relative">
         
-        {/* BOTÓN HAMBURGUESA: Solo visible en móviles/iPad (md:hidden) */}
+        {/* BOTÓN HAMBURGUESA: Solo visible en móviles/iPad */}
         <button 
           className="md:hidden p-2 -ml-2 text-black/70 outline-none"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          {isMenuOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
+          {isMenuOpen ? <X size={24} strokeWidth={1.2} /> : <Menu size={24} strokeWidth={1.2} />}
         </button>
 
-        {/* LOGO: Centrado en móvil (absolute), a la izquierda en escritorio (md:static) */}
+        {/* LOGO: Estética constante */}
         <Link 
           href="/mi-santuario" 
           className="font-serif text-xl text-black hover:text-black/60 transition-colors absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"
@@ -42,7 +42,7 @@ export function UserHeader() {
           SANTUARIO
         </Link>
 
-        {/* NAVEGACIÓN ESCRITORIO: Se oculta en tablets/móviles (hidden md:flex) */}
+        {/* NAVEGACIÓN ESCRITORIO (Sin cambios para no dañar la web) */}
         <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
             <Link
@@ -89,18 +89,10 @@ export function UserHeader() {
                 <div className="px-3 py-2 mb-1">
                   <p className="text-[9px] tracking-[0.2em] font-bold text-black/30 uppercase">Cuenta</p>
                 </div>
-                <Link 
-                  href="/perfil" 
-                  onClick={() => setIsUserOpen(false)}
-                  className="flex items-center p-3 text-[10px] font-bold tracking-widest hover:bg-black/[0.03] rounded-lg transition-colors uppercase text-black"
-                >
+                <Link href="/perfil" onClick={() => setIsUserOpen(false)} className="flex items-center p-3 text-[10px] font-bold tracking-widest hover:bg-black/[0.03] rounded-lg transition-colors uppercase text-black">
                   <UserCircle className="mr-3 h-4 w-4 opacity-40" /> Perfil
                 </Link>
-                <Link 
-                  href="/ajustes" 
-                  onClick={() => setIsUserOpen(false)}
-                  className="flex items-center p-3 text-[10px] font-bold tracking-widest hover:bg-black/[0.03] rounded-lg transition-colors uppercase text-black"
-                >
+                <Link href="/ajustes" onClick={() => setIsUserOpen(false)} className="flex items-center p-3 text-[10px] font-bold tracking-widest hover:bg-black/[0.03] rounded-lg transition-colors uppercase text-black">
                   <Settings className="mr-3 h-4 w-4 opacity-40" /> Ajustes
                 </Link>
                 <div className="h-px bg-black/5 my-2" />
@@ -113,30 +105,39 @@ export function UserHeader() {
         </div>
       </div>
 
-      {/* MENÚ MÓVIL DESPLEGABLE: Solo visible en pantallas pequeñas */}
+      {/* MENÚ MÓVIL DESPLEGABLE: Estilo Editorial (Como el Hero) */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-20 bg-white z-[90] md:hidden animate-in slide-in-from-left duration-300">
-          <nav className="flex flex-col p-8 gap-8">
+        <div className="fixed inset-0 top-20 bg-white z-[90] md:hidden animate-in fade-in slide-in-from-top duration-500">
+          <nav className="flex flex-col p-8 pt-12 gap-6 h-full bg-white">
             {navItems.map((item) => (
               <Link 
                 key={item.href} 
                 href={item.href} 
                 onClick={() => setIsMenuOpen(false)}
-                className="text-3xl font-serif text-black border-b border-black/5 pb-4 lowercase italic"
+                className="text-5xl font-serif text-black tracking-tighter hover:opacity-40 transition-opacity lowercase"
               >
                 {item.name}
               </Link>
             ))}
+            
+            <div className="h-px w-full bg-black/5 my-4" />
+            
             {secondaryItems.map((item) => (
               <Link 
                 key={item.href} 
                 href={item.href} 
                 onClick={() => setIsMenuOpen(false)}
-                className="text-3xl font-serif text-black font-bold border-b border-black/5 pb-4 lowercase"
+                className="text-5xl font-serif text-black tracking-tighter italic hover:opacity-40 transition-opacity lowercase"
               >
                 {item.name}
               </Link>
             ))}
+
+            <div className="mt-auto pb-16">
+              <p className="text-[10px] tracking-[0.3em] font-bold text-black/20 uppercase italic">
+                Santuario Personal
+              </p>
+            </div>
           </nav>
         </div>
       )}
