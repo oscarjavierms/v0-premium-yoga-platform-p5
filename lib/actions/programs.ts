@@ -12,7 +12,7 @@ const ProgramSchema = z.object({
   duration_weeks: z.number().min(1).optional(),
   difficulty: z.enum(["beginner", "intermediate", "advanced"]),
   pillar: z.enum(["movement", "mindfulness", "nutrition", "sleep", "stress", "connection"]),
-  instructor_id: z.string().uuid().optional().nullable(),
+  instructor_id: z.string().uuid().optional().nullable().or(z.literal("")),
   is_featured: z.boolean().default(false),
   is_published: z.boolean().default(false),
 })
@@ -52,7 +52,7 @@ export async function createProgram(formData: ProgramFormData) {
       duration_weeks: formData.duration_weeks || null,
       difficulty: formData.difficulty,
       pillar: formData.pillar,
-      instructor_id: formData.instructor_id || null,
+      instructor_id: formData.instructor_id && formData.instructor_id !== "" ? formData.instructor_id : null,
       is_featured: formData.is_featured,
       is_published: formData.is_published,
     })
@@ -91,7 +91,7 @@ export async function updateProgram(id: string, formData: ProgramFormData) {
       duration_weeks: formData.duration_weeks || null,
       difficulty: formData.difficulty,
       pillar: formData.pillar,
-      instructor_id: formData.instructor_id || null,
+      instructor_id: formData.instructor_id && formData.instructor_id !== "" ? formData.instructor_id : null,
       is_featured: formData.is_featured,
       is_published: formData.is_published,
     })
