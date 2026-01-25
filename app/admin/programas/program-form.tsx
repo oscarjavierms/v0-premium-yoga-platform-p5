@@ -93,6 +93,7 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
   }
 
   const onSubmit = async (data: ProgramFormValues) => {
+    console.log("[v0] SUBMIT DATA", data)
     setLoading(true)
     try {
       const formData: ProgramFormData = {
@@ -100,17 +101,23 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
         instructor_id: data.instructor_id || null,
       }
 
+      console.log("[v0] CALLING SERVER ACTION", formData)
       const result = program ? await updateProgram(program.id, formData) : await createProgram(formData)
 
+      console.log("[v0] INSERT RESULT", result)
+
       if (result.error) {
-        toast.error(result.error)
+        console.error("[v0] INSERT ERROR", result.error)
+        toast.error(`Error: ${result.error}`)
       } else {
+        console.log("[v0] SUCCESS - DATA SAVED", result.data)
         toast.success(program ? "Programa actualizado" : "Programa creado")
         router.push("/admin/programas")
         router.refresh()
       }
-    } catch {
-      toast.error("Error al guardar el programa")
+    } catch (error) {
+      console.error("[v0] CATCH ERROR", error)
+      toast.error(`Error al guardar el programa: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
       setLoading(false)
     }

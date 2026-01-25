@@ -20,12 +20,27 @@ const ProgramSchema = z.object({
 export type ProgramFormData = z.infer<typeof ProgramSchema>
 
 export async function createProgram(formData: ProgramFormData) {
+  console.log("[v0] SERVER ACTION - createProgram called with:", formData)
   const supabase = await createClient()
+
+  // Check session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  console.log("[v0] SESSION", session?.user?.id)
+
+  if (!session) {
+    console.error("[v0] NO SESSION - User not authenticated")
+    return { error: "Debes iniciar sesión como admin" }
+  }
 
   const validation = ProgramSchema.safeParse(formData)
   if (!validation.success) {
+    console.error("[v0] VALIDATION ERROR", validation.error.errors[0].message)
     return { error: validation.error.errors[0].message }
   }
+
+  console.log("[v0] Validation passed, inserting to database...")
 
   const { data, error } = await supabase
     .from("programs")
@@ -43,6 +58,9 @@ export async function createProgram(formData: ProgramFormData) {
     })
     .select()
     .single()
+
+  console.log("[v0] INSERT RESULT - data:", data)
+  console.error("[v0] INSERT ERROR:", error)
 
   if (error) {
     if (error.code === "23505") {

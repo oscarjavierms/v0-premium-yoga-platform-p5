@@ -153,6 +153,7 @@ export function ClassForm({ open, onOpenChange, classItem, instructors, programs
   }
 
   const onSubmit = async (data: ClassFormValues) => {
+    console.log("[v0] SUBMIT DATA", data)
     setLoading(true)
     try {
       const formData = {
@@ -161,11 +162,16 @@ export function ClassForm({ open, onOpenChange, classItem, instructors, programs
         program_id: data.program_id || null,
       }
 
+      console.log("[v0] CALLING SERVER ACTION", formData)
       const result = classItem ? await updateClass(classItem.id, formData) : await createClass(formData)
 
+      console.log("[v0] INSERT RESULT", result)
+
       if (result.error) {
-        toast.error(result.error)
+        console.error("[v0] INSERT ERROR", result.error)
+        toast.error(`Error: ${result.error}`)
       } else {
+        console.log("[v0] SUCCESS - DATA SAVED", result.data)
         toast.success(classItem ? "Clase actualizada" : "Clase creada")
         reset()
         setVimeoInput("")
@@ -173,8 +179,9 @@ export function ClassForm({ open, onOpenChange, classItem, instructors, programs
         onOpenChange(false)
         onSuccess?.()
       }
-    } catch {
-      toast.error("Error al guardar la clase")
+    } catch (error) {
+      console.error("[v0] CATCH ERROR", error)
+      toast.error(`Error al guardar la clase: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
       setLoading(false)
     }
