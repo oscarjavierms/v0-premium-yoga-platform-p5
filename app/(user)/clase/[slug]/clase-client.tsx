@@ -224,23 +224,21 @@ export function ClaseClient({
   return (
     <div className="min-h-screen bg-background">
       {/* Video Player Section */}
-      <section className="bg-black">
-        <div className="max-w-6xl mx-auto">
-          <div className="relative aspect-video">
-            {classData.vimeo_id ? (
-              <iframe
-                id="vimeo-player"
-                src={`https://player.vimeo.com/video/${classData.vimeo_id}?title=0&byline=0&portrait=0`}
-                className="w-full h-full"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <p className="text-muted-foreground">Video no disponible</p>
-              </div>
-            )}
-          </div>
+      <section className="bg-black py-6">
+        <div className="max-w-6xl mx-auto px-4">
+          {classData.vimeo_id ? (
+            <iframe
+              id="vimeo-player"
+              src={`https://player.vimeo.com/video/${classData.vimeo_id}?title=0&byline=0&portrait=0&color=000000`}
+              className="w-full aspect-video rounded-lg border border-border shadow-sm"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="w-full aspect-video flex items-center justify-center bg-muted rounded-lg border border-border">
+              <p className="text-muted-foreground">Video no disponible</p>
+            </div>
+          )}
         </div>
       </section>
 
