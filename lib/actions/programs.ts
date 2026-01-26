@@ -19,6 +19,9 @@ export async function saveProgram(data: any, id?: string) {
     instructor_id: data.instructor_id || null,
     is_published: Boolean(data.is_published),
     vimeo_url: data.vimeo_url || null,
+    // --- AQUÍ ESTÁ LA CORRECCIÓN ---
+    cover_image_url: data.cover_image_url || null, 
+    // -------------------------------
     category: data.category || null,
     is_standalone_class: data.is_standalone_class || false,
     total_classes: Number(data.total_classes) || 0,
@@ -36,10 +39,12 @@ export async function saveProgram(data: any, id?: string) {
     return { error: result.error.message }
   }
 
-  // LIMPIEZA DE CACHÉ: Esto asegura que el programa aparezca en todas las listas
+  // LIMPIEZA DE CACHÉ
   revalidatePath("/admin/programas")
   revalidatePath("/(user)/[experience]", "page")
-  revalidatePath(`/${data.experience_type.toLowerCase()}`) // Limpia específicamente /yoga o /meditacion
+  revalidatePath(`/${data.experience_type.toLowerCase()}`)
+  // Añadimos esta para que la página del programa se actualice al instante
+  revalidatePath(`/programas/${data.slug}`) 
   
   return { success: true }
 }
