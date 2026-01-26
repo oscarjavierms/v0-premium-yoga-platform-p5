@@ -22,58 +22,52 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
     <main className="min-h-screen bg-white pb-12">
       <div className="w-full">
         
-        {/* Sección principal compacta para que quepa en un pantallazo */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
+        {/* GAP REDUCIDO AL MÍNIMO (gap-4) */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start mb-10">
           
-          {/* COLUMNA IZQUIERDA: INFORMACIÓN */}
+          {/* COLUMNA IZQUIERDA: INFORMACIÓN (6.5 columnas para acercarse más) */}
           <div className="lg:col-span-6 pt-0">
             <header className="mb-4">
-              <h1 className="text-6xl md:text-7xl font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter mb-3">
+              <h1 className="text-6xl md:text-7xl font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter mb-2">
                 {program.title}
               </h1>
-              <div className="flex items-center gap-4">
-                <p className="text-lg font-cormorant italic text-zinc-400">
-                  Por {program.instructors?.name}
-                </p>
-                {/* Experiencia con prefijo */}
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                  Experiencia: {program.experience_type || 'Yoga'}
-                </span>
-              </div>
+              <p className="text-lg font-cormorant italic text-zinc-400">
+                Por {program.instructors?.name}
+              </p>
             </header>
 
-            <div className="mt-6 space-y-6">
-              {/* DESCRIPCIÓN con título en Negro */}
-              <div className="space-y-2">
+            <div className="space-y-6">
+              {/* DESCRIPCIÓN */}
+              <div className="space-y-1">
                 <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">Descripción</h3>
-                <p className="text-zinc-500 leading-relaxed text-[15px] font-light italic whitespace-pre-wrap max-w-xl">
+                <p className="text-zinc-500 leading-relaxed text-[15px] font-light italic whitespace-pre-wrap">
                   {program.description}
                 </p>
               </div>
 
-              {/* ÁREA DE ENFOQUE */}
-              <div className="space-y-1">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-300">Área de enfoque</h3>
-                <p className="text-zinc-800 font-cormorant italic text-xl">
-                  {program.area_of_focus || 'Bienestar Integral'}
-                </p>
-              </div>
-              
-              {/* METADATOS: Nivel de práctica más grande */}
-              <div className="flex gap-12 pt-4 border-t border-zinc-50">
+              {/* FICHA TÉCNICA UNIFORME (Misma fuente y tamaño para todos) */}
+              <div className="grid grid-cols-2 gap-y-6 gap-x-4 pt-6 border-t border-zinc-100">
+                 <div>
+                    <span className="block text-[9px] uppercase tracking-widest text-zinc-300 mb-1">Experiencia</span>
+                    <span className="text-base text-zinc-700 italic font-medium font-cormorant">{program.experience_type || 'Yoga'}</span>
+                 </div>
+                 <div>
+                    <span className="block text-[9px] uppercase tracking-widest text-zinc-300 mb-1">Área de enfoque</span>
+                    <span className="text-base text-zinc-700 italic font-medium font-cormorant">{program.area_of_focus || 'Bienestar Integral'}</span>
+                 </div>
                  <div>
                     <span className="block text-[9px] uppercase tracking-widest text-zinc-300 mb-1">Nivel de práctica</span>
-                    <span className="text-lg text-zinc-600 italic font-medium font-cormorant">{program.practice_level || 'Principiante'}</span>
+                    <span className="text-base text-zinc-700 italic font-medium font-cormorant">{program.practice_level || 'Principiante'}</span>
                  </div>
                  <div>
                     <span className="block text-[9px] uppercase tracking-widest text-zinc-300 mb-1">Total de clases</span>
-                    <span className="text-lg text-zinc-400 italic font-light font-cormorant">{program.classes?.length || 0} Sesiones</span>
+                    <span className="text-base text-zinc-700 italic font-medium font-cormorant">{program.classes?.length || 0} Sesiones</span>
                  </div>
               </div>
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: VIDEO (+10% de tamaño al usar col-span-6) */}
+          {/* COLUMNA DERECHA: VIDEO (Ocupa el resto del espacio) */}
           <div className="lg:col-span-6">
             <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100">
               <iframe
@@ -86,8 +80,8 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
         </section>
 
         {/* CONTENIDO DE CLASES */}
-        <section className="pt-12 border-t border-zinc-100">
-          <h2 className="text-xl font-cormorant italic text-zinc-900 mb-8 uppercase tracking-widest">Contenido</h2>
+        <section className="pt-8 border-t border-zinc-100">
+          <h2 className="text-xl font-cormorant italic text-zinc-900 mb-6 uppercase tracking-widest">Contenido</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {program.classes?.map((clase: any) => (
               <Link href={`/clases/${clase.slug || clase.id}`} key={clase.id} className="group">
