@@ -19,52 +19,47 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const introVideoId = program.vimeo_url?.split("/").pop()
 
   return (
-    /* bg-white y pt-6 para que todo suba y se vea limpio */
-    <main className="min-h-screen bg-white pb-24 pt-6 overflow-x-hidden">
-      
-      {/* CONTENEDOR FULL WIDTH: Sin márgenes laterales forzados */}
-      <div className="w-full px-6 md:px-10 lg:px-16">
+    <main className="min-h-screen bg-white pb-24">
+      <div className="w-full">
         
-        {/* SECCIÓN PRINCIPAL: TÍTULO Y VIDEO BALANCEADOS */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start mb-24">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-20">
           
-          {/* COLUMNA IZQUIERDA: DISEÑO EDITORIAL */}
-          <div className="lg:col-span-5 pt-2">
-            <header className="mb-6">
-              <h1 className="text-6xl md:text-7xl font-cormorant italic text-zinc-900 leading-none tracking-tighter mb-2">
+          {/* COLUMNA IZQUIERDA: ESTILO EDITORIAL */}
+          <div className="lg:col-span-5 pt-0">
+            <header className="mb-2">
+              <h1 className="text-5xl md:text-7xl font-cormorant italic text-zinc-900 leading-[0.9] tracking-tighter">
                 {program.title}
               </h1>
-              <p className="text-base font-medium uppercase tracking-[0.2em] text-zinc-400">
-                {program.instructors?.name}
+              <p className="text-lg font-cormorant italic text-zinc-400 mt-1">
+                Un programa de {program.instructors?.name}
               </p>
             </header>
 
-            <div className="space-y-10">
-              <div className="space-y-4">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">Resumen del programa</h3>
-                {/* Letra más pequeña, gris elegante y mucho aire entre líneas */}
-                <p className="text-zinc-500 leading-relaxed text-base font-light italic whitespace-pre-wrap max-w-md">
+            <div className="mt-10 space-y-8">
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-300">Sobre el programa</h3>
+                {/* LETRA PEQUEÑA Y REFINADA */}
+                <p className="text-zinc-500 leading-relaxed text-[15px] font-light italic whitespace-pre-wrap max-w-sm">
                   {program.description}
                 </p>
               </div>
               
-              {/* METADATOS MINIMALISTAS */}
-              <div className="flex gap-12 pt-6 border-t border-zinc-100">
+              <div className="flex gap-10 pt-6 border-t border-zinc-50">
                  <div>
-                    <span className="block text-[10px] uppercase tracking-widest text-zinc-300 mb-1">Nivel</span>
-                    <span className="text-xs text-zinc-500 font-medium tracking-wide">{program.difficulty || 'Multinivel'}</span>
+                    <span className="block text-[9px] uppercase tracking-widest text-zinc-300">Nivel</span>
+                    <span className="text-xs text-zinc-400">{program.difficulty || 'Multinivel'}</span>
                  </div>
                  <div>
-                    <span className="block text-[10px] uppercase tracking-widest text-zinc-300 mb-1">Sesiones</span>
-                    <span className="text-xs text-zinc-500 font-medium tracking-wide">{program.classes?.length || 0} Prácticas</span>
+                    <span className="block text-[9px] uppercase tracking-widest text-zinc-300">Sesiones</span>
+                    <span className="text-xs text-zinc-400">{program.classes?.length || 0} prácticas</span>
                  </div>
               </div>
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: VIDEO (Tamaño Refinado) */}
+          {/* COLUMNA DERECHA: VIDEO */}
           <div className="lg:col-span-7">
-            <div className="aspect-video bg-zinc-50 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden rounded-sm ring-1 ring-zinc-100">
+            <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100">
               <iframe
                 src={`https://player.vimeo.com/video/${introVideoId}?h=0&title=0&byline=0&portrait=0`}
                 className="w-full h-full"
@@ -74,26 +69,16 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* ESTRUCTURA DE CLASES */}
+        {/* CLASES */}
         <section className="pt-20 border-t border-zinc-100">
-          <h2 className="text-2xl font-cormorant italic text-zinc-900 mb-16 uppercase tracking-widest">Contenido del Curso</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+          <h2 className="text-2xl font-cormorant italic text-zinc-900 mb-12 uppercase tracking-widest">Contenido</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {program.classes?.map((clase: any, index: number) => (
               <Link href={`/clases/${clase.slug || clase.id}`} key={clase.id} className="group">
-                <div className="aspect-[16/10] bg-zinc-50 mb-5 relative overflow-hidden transition-all duration-1000 group-hover:shadow-2xl">
-                  <img 
-                    src={clase.thumbnail_url || "/placeholder-yoga.jpg"} 
-                    className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" 
-                    alt={clase.title} 
-                  />
-                  <div className="absolute bottom-0 left-0 bg-white/90 backdrop-blur-sm px-3 py-1 text-[9px] font-bold text-zinc-400">
-                    MÓDULO {String(index + 1).padStart(2, '0')}
-                  </div>
+                <div className="aspect-[16/10] bg-zinc-50 mb-3 overflow-hidden shadow-sm transition-all duration-700 group-hover:shadow-lg">
+                  <img src={clase.thumbnail_url} className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" alt={clase.title} />
                 </div>
-                <h3 className="text-lg font-cormorant italic text-zinc-800 group-hover:text-zinc-500 transition-colors">
-                  {clase.title}
-                </h3>
+                <h3 className="text-sm font-medium text-zinc-800 tracking-tight">{clase.title}</h3>
               </Link>
             ))}
           </div>
