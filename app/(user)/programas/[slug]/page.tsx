@@ -20,26 +20,28 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const introVideoId = program.vimeo_url?.split("/").pop()
 
   return (
-    /* Ajuste en el main: 
-       Aseguramos que no haya scroll horizontal accidental con overflow-x-hidden
+    /* overflow-x-hidden: Evita que aparezca una barra de scroll horizontal.
+       -mt-32: Sube la imagen para que quede debajo del menú transparente.
+       -mx-6 md:-mx-12: Anula los márgenes que vienen por defecto en el layout.
     */
     <main className="-mt-32 -mx-6 md:-mx-12 min-h-screen bg-white pb-24 overflow-x-hidden">
       
-      {/* SECCIÓN 1: IMAGEN TOTALMENTE CENTRADA Y A TODO EL ANCHO */}
-      <section className="relative w-full h-[65vh] lg:h-[85vh] bg-zinc-900">
+      {/* SECCIÓN 1: FOTO FULL WIDTH (DE LADO A LADO REAL) */}
+      <section className="relative w-screen h-[65vh] lg:h-[85vh]">
         <img 
           src={program.cover_image_url || "/placeholder-yoga.jpg"} 
           alt={program.title}
-          /* object-cover: Llena todo el espacio sin deformar.
-             object-center: Mantiene el centro de la foto siempre visible.
+          /* w-full h-full: Llena el contenedor w-screen.
+             object-cover: Ajusta la imagen sin deformarla.
+             object-center: Asegura que el centro de la foto sea el punto de enfoque.
           */
           className="w-full h-full object-cover object-center block"
         />
-        {/* Capa de oscuridad superior para que el menú se lea perfecto */}
+        {/* Capa de degradado superior para legibilidad del menú */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent h-60" />
       </section>
 
-      {/* Contenedor del contenido: Aquí volvemos al ancho normal */}
+      {/* CONTENEDOR DE TEXTO: Volvemos al ancho centrado para el contenido */}
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         
         {/* SECCIÓN 2: TÍTULO */}
@@ -52,7 +54,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </p>
         </header>
 
-        {/* SECCIÓN 3: DESCRIPCIÓN E INTRODUCCIÓN */}
+        {/* SECCIÓN 3: DESCRIPCIÓN Y VIDEO DE 1 MINUTO */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-32 items-start">
           <div className="lg:col-span-5 space-y-8">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">The Experience</h3>
@@ -72,7 +74,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* SECCIÓN 4: CLASES */}
+        {/* SECCIÓN 4: LISTADO DE CLASES */}
         <section className="pt-24 border-t border-zinc-100">
           <h2 className="text-4xl font-cormorant italic text-zinc-900 mb-16 uppercase tracking-tighter">Estructura del Programa</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
@@ -80,7 +82,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
               <Link href={`/clases/${clase.slug || clase.id}`} key={clase.id} className="group">
                 <div className="aspect-[16/10] bg-zinc-100 mb-6 relative overflow-hidden transition-all duration-700 group-hover:shadow-2xl">
                   <img 
-                    src={clase.thumbnail_url} 
+                    src={clase.thumbnail_url || "/placeholder-yoga.jpg"} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                     alt={clase.title} 
                   />
