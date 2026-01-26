@@ -6,15 +6,18 @@ import { revalidatePath } from "next/cache"
 export async function saveProgram(data: any, id?: string) {
   const supabase = await createClient()
 
+  // Normalizamos la experiencia: "yoga" -> "Yoga" para que coincida con la base de datos
+  const expType = data.experience_type.charAt(0).toUpperCase() + data.experience_type.slice(1).toLowerCase();
+
   const programData = {
     title: data.title,
     slug: data.slug,
     description: data.description || "",
-    experience_type: data.experience_type,
+    experience_type: expType,
     difficulty: data.difficulty,
-    focus_area: data.focus_area || "", // Campo de área de enfoque
+    focus_area: data.focus_area || "",
     instructor_id: data.instructor_id || null,
-    is_published: data.is_published,
+    is_published: Boolean(data.is_published),
     vimeo_url: data.vimeo_url || null,
     category: data.category || null,
     is_standalone_class: data.is_standalone_class || false,
@@ -22,23 +25,18 @@ export async function saveProgram(data: any, id?: string) {
   }
 
   let result
-
   if (id) {
-    result = await supabase
-      .from("programs")
-      .update(programData)
-      .eq("id", id)
+    result = await supabase.from("programs").update(programData).eq("id", id)
   } else {
-    result = await supabase
-      .from("programs")
-      .insert([programData])
+    result = await supabase.from("programs").insert([programData])
   }
 
   if (result.error) {
-    console.error("Supabase Error:", result.error)
+    console.error("Error en Supabase:", result.error)
     return { error: result.error.message }
   }
 
+  // Esto limpia la memoria caché para que el contenido aparezca al instante
   revalidatePath("/admin/programas")
   revalidatePath("/(user)/[experience]", "page")
   
