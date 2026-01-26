@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
-import { notFound } from "next/navigation"
+import { notFound } from "not-found"
 import Link from "next/link"
-import { Clock, Play, BarChart } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -20,31 +19,28 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const introVideoId = program.vimeo_url?.split("/").pop()
 
   return (
-    /* overflow-x-hidden: Evita que aparezca una barra de scroll horizontal.
-       -mt-32: Sube la imagen para que quede debajo del menú transparente.
-       -mx-6 md:-mx-12: Anula los márgenes que vienen por defecto en el layout.
-    */
-    <main className="-mt-32 -mx-6 md:-mx-12 min-h-screen bg-white pb-24 overflow-x-hidden">
+    /* overflow-x-hidden es vital para que la imagen full-width no cree scroll lateral */
+    <main className="-mt-32 min-h-screen bg-white pb-24 overflow-x-hidden">
       
-      {/* SECCIÓN 1: FOTO FULL WIDTH (DE LADO A LADO REAL) */}
-      <section className="relative w-screen h-[65vh] lg:h-[85vh]">
+      {/* SECCIÓN 1: FOTO FULL WIDTH Y PERSONA CENTRADA */}
+      <section className="relative w-screen h-[65vh] lg:h-[85vh] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
         <img 
           src={program.cover_image_url || "/placeholder-yoga.jpg"} 
           alt={program.title}
-          /* w-full h-full: Llena el contenedor w-screen.
-             object-cover: Ajusta la imagen sin deformarla.
-             object-center: Asegura que el centro de la foto sea el punto de enfoque.
+          /* w-full h-full: Llena todo el ancho de la pantalla (w-screen).
+             object-cover: Evita que la foto se estire feo.
+             object-center: Mantiene a la persona siempre en el centro de la pantalla.
           */
           className="w-full h-full object-cover object-center block"
         />
-        {/* Capa de degradado superior para legibilidad del menú */}
+        {/* Sombreado superior para que el logo "SANTUARIO" se lea bien */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent h-60" />
       </section>
 
-      {/* CONTENEDOR DE TEXTO: Volvemos al ancho centrado para el contenido */}
+      {/* CONTENIDO (Título, Descripción, Clases) */}
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         
-        {/* SECCIÓN 2: TÍTULO */}
+        {/* TÍTULO */}
         <header className="py-20 mb-16 border-b border-zinc-100">
           <h1 className="text-7xl md:text-[120px] font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter">
             {program.title}
@@ -54,7 +50,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </p>
         </header>
 
-        {/* SECCIÓN 3: DESCRIPCIÓN Y VIDEO DE 1 MINUTO */}
+        {/* VIDEO Y DESCRIPCIÓN */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-32 items-start">
           <div className="lg:col-span-5 space-y-8">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">The Experience</h3>
@@ -74,7 +70,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* SECCIÓN 4: LISTADO DE CLASES */}
+        {/* GRILLA DE CLASES */}
         <section className="pt-24 border-t border-zinc-100">
           <h2 className="text-4xl font-cormorant italic text-zinc-900 mb-16 uppercase tracking-tighter">Estructura del Programa</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
