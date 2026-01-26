@@ -1,43 +1,50 @@
-// Dentro del return de ProgramForm, organiza los campos así:
+"use server"
 
-<div className="grid grid-cols-2 gap-4">
-  {/* EXPERIENCIA */}
-  <div>
-    <label className="text-sm font-medium">Experiencia</label>
-    <select {...register("experience_type")} className="w-full border p-2 rounded">
-      <option value="Yoga">Yoga</option>
-      <option value="Meditacion">Meditación</option>
-      <option value="Fitness">Fitness</option>
-    </select>
-  </div>
+import { revalidatePath } from "next/cache"
+import { createClient } from "@/lib/supabase/server"
+import { z } from "zod"
 
-  {/* DIFICULTAD */}
-  <div>
-    <label className="text-sm font-medium">Dificultad</label>
-    <select {...register("difficulty")} className="w-full border p-2 rounded">
-      <option value="beginner">Principiante</option>
-      <option value="intermediate">Intermedio</option>
-      <option value="advanced">Avanzado</option>
-    </select>
-  </div>
-</div>
+const ProgramSchema = z.object({
+  title: z.string().min(2, "El título es obligatorio"),
+  slug: z.string().min(2, "El slug es obligatorio"),
+  description: z.string().optional(),
+  experience_type: z.enum(["Yoga", "Meditacion", "Fitness"]),
+  category: z.string().optional(),
+  difficulty: z.enum(["beginner", "intermediate", "advanced"]),
+  focus_area: z.string().optional(),
+  total_classes: z.number().default(0),
+  is_published: z.boolean().default(false),
+  instructor_id: z.string().uuid().optional().nullable(),
+})
 
-{/* ÁREA DE ENFOQUE */}
-<div className="mt-4">
-  <label className="text-sm font-medium">Área de Enfoque</label>
-  <input 
-    {...register("focus_area")} 
-    placeholder="Ej: Flexibilidad de cadera" 
-    className="w-full border p-2 rounded"
-  />
-</div>
+export async function saveProgram(formData: any, id?: string) {
+  const supabase = await createClient()
 
-{/* TOTAL DE CLASES */}
-<div className="mt-4">
-  <label className="text-sm font-medium">Total de Clases</label>
-  <input 
-    type="number" 
-    {...register("total_classes")} 
-    className="w-full border p-2 rounded"
-  />
-</div>
+  const validation = ProgramSchema.safeParse(formData)
+  if (!validation.success) {
+    return { error: validation.error.errors[0].message }
+  }
+
+  const dataToSave = {
+    title: validation.data.title,
+    slug: validation.data.slug,
+    description: validation.data.description,
+    pillar: validation.data.experience_type.toLowerCase(),
+    difficulty: validation.data.difficulty,
+    category: validation.data.category,
+    focus_area: validation.data.focus_area,
+    total_classes: validation.data.total_classes,
+    is_published: validation.data.is_published,
+    instructor_id: validation.data.instructor_id,
+  }
+
+  const query = id 
+    ? supabase.from("programs").update(dataToSave).eq("id", id) 
+    : supabase.from("programs").insert([dataToSave])
+
+  const { error } = await query
+  if (error) return { error: error.message }
+
+  revalidatePath("/admin/programas")
+  return { success: true }
+}
