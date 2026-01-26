@@ -1,256 +1,50 @@
-"use client"
-
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "sonner"
-import { createProgram, updateProgram, type ProgramFormData } from "@/lib/actions/programs"
-import { PILLAR_LABELS, LEVEL_LABELS } from "@/types/content"
-
-const ProgramSchema = z.object({
-  title: z.string().min(2, "El título debe tener al menos 2 caracteres"),
-  slug: z.string().min(2, "El slug debe tener al menos 2 caracteres"),
-  description: z.string().optional(),
-  thumbnail_url: z.string().url("URL inválida").optional().or(z.literal("")),
-  duration_weeks: z.coerce.number().min(1).optional(),
-  difficulty: z.enum(["beginner", "intermediate", "advanced"]),
-  pillar: z.enum(["movement", "mindfulness", "nutrition", "sleep", "stress", "connection"]),
-  instructor_id: z.string().optional(),
-  is_featured: z.boolean(),
-  is_published: z.boolean(),
-})
-
-type ProgramFormValues = z.infer<typeof ProgramSchema>
-
-interface Program {
-  id: string
-  title: string
-  slug: string
-  description: string | null
-  thumbnail_url: string | null
-  duration_weeks: number | null
-  difficulty: string
-  pillar: string
-  instructor_id: string | null
-  is_featured: boolean
-  is_published: boolean
-}
-
-interface Instructor {
-  id: string
-  name: string
-}
-
-interface ProgramFormProps {
-  program?: Program | null
-  instructors: Instructor[]
-}
-
-export function ProgramForm({ program, instructors }: ProgramFormProps) {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-  } = useForm<ProgramFormValues>({
-    resolver: zodResolver(ProgramSchema),
-    defaultValues: {
-      title: program?.title || "",
-      slug: program?.slug || "",
-      description: program?.description || "",
-      thumbnail_url: program?.thumbnail_url || "",
-      duration_weeks: program?.duration_weeks || undefined,
-      difficulty: (program?.difficulty as any) || "beginner",
-      pillar: (program?.pillar as any) || "movement",
-      instructor_id: program?.instructor_id || undefined,
-      is_featured: program?.is_featured || false,
-      is_published: program?.is_published || false,
-    },
-  })
-
-  const titleValue = watch("title")
-
-  const generateSlug = () => {
-    const slug = titleValue
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "")
-    setValue("slug", slug)
-  }
-
-  const onSubmit = async (data: ProgramFormValues) => {
-    console.log("[v0] SUBMIT DATA", data)
-    setLoading(true)
-    try {
-      const formData: ProgramFormData = {
-        ...data,
-        instructor_id: data.instructor_id || null,
-      }
-
-      console.log("[v0] CALLING SERVER ACTION", formData)
-      const result = program ? await updateProgram(program.id, formData) : await createProgram(formData)
-
-      console.log("[v0] INSERT RESULT", result)
-
-      if (result.error) {
-        console.error("[v0] INSERT ERROR", result.error)
-        toast.error(`Error: ${result.error}`)
-      } else {
-        console.log("[v0] SUCCESS - DATA SAVED", result.data)
-        toast.success(program ? "Programa actualizado" : "Programa creado")
-        router.push("/admin/programas")
-        router.refresh()
-      }
-    } catch (error) {
-      console.error("[v0] CATCH ERROR", error)
-      toast.error(`Error al guardar el programa: ${error instanceof Error ? error.message : String(error)}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="title">Título *</Label>
-        <Input id="title" {...register("title")} placeholder="Nombre del programa" />
-        {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
+// Esto va dentro del archivo program-form.tsx
+return (
+  <form onSubmit={handleSubmit(onSave)}>
+    <div className="grid grid-cols-2 gap-4">
+      {/* EXPERIENCIA */}
+      <div>
+        <label className="text-sm font-medium">Experiencia</label>
+        <select {...register("experience_type")} className="w-full border p-2 rounded">
+          <option value="Yoga">Yoga</option>
+          <option value="Meditacion">Meditación</option>
+          <option value="Fitness">Fitness</option>
+        </select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="slug">Slug *</Label>
-        <div className="flex gap-2">
-          <Input id="slug" {...register("slug")} placeholder="nombre-programa" />
-          <Button type="button" variant="outline" onClick={generateSlug} className="shrink-0">
-            Generar
-          </Button>
-        </div>
-        {errors.slug && <p className="text-sm text-red-500">{errors.slug.message}</p>}
+      {/* DIFICULTAD */}
+      <div>
+        <label className="text-sm font-medium">Dificultad</label>
+        <select {...register("difficulty")} className="w-full border p-2 rounded">
+          <option value="beginner">Principiante</option>
+          <option value="intermediate">Intermedio</option>
+          <option value="advanced">Avanzado</option>
+        </select>
       </div>
+    </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Descripción</Label>
-        <Textarea id="description" {...register("description")} placeholder="Descripción del programa..." rows={4} />
-      </div>
+    {/* ÁREA DE ENFOQUE */}
+    <div className="mt-4">
+      <label className="text-sm font-medium">Área de Enfoque</label>
+      <input 
+        {...register("focus_area")} 
+        placeholder="Ej: Flexibilidad de cadera" 
+        className="w-full border p-2 rounded"
+      />
+    </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Categoría *</Label>
-          <Select
-            defaultValue={program?.pillar || "movement"}
-            onValueChange={(value) => setValue("pillar", value as any)}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(PILLAR_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+    {/* TOTAL DE CLASES */}
+    <div className="mt-4">
+      <label className="text-sm font-medium">Total de Clases</label>
+      <input 
+        type="number" 
+        {...register("total_classes")} 
+        className="w-full border p-2 rounded"
+      />
+    </div>
 
-        <div className="space-y-2">
-          <Label>Nivel *</Label>
-          <Select
-            defaultValue={program?.difficulty || "beginner"}
-            onValueChange={(value) => setValue("difficulty", value as any)}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(LEVEL_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Instructor</Label>
-          <Select
-            defaultValue={program?.instructor_id || ""}
-            onValueChange={(value) => setValue("instructor_id", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Seleccionar" />
-            </SelectTrigger>
-            <SelectContent>
-              {instructors.map((instructor) => (
-                <SelectItem key={instructor.id} value={instructor.id}>
-                  {instructor.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="duration_weeks">Duración (semanas)</Label>
-          <Input id="duration_weeks" type="number" {...register("duration_weeks")} placeholder="4" />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="thumbnail_url">URL de imagen</Label>
-        <Input id="thumbnail_url" {...register("thumbnail_url")} placeholder="https://..." />
-        {errors.thumbnail_url && <p className="text-sm text-red-500">{errors.thumbnail_url.message}</p>}
-      </div>
-
-      <div className="flex items-center justify-between py-2 border-t">
-        <div>
-          <Label htmlFor="is_featured">Destacado</Label>
-          <p className="text-sm text-muted-foreground">Aparece en la página principal</p>
-        </div>
-        <Switch
-          id="is_featured"
-          checked={watch("is_featured")}
-          onCheckedChange={(checked) => setValue("is_featured", checked)}
-        />
-      </div>
-
-      <div className="flex items-center justify-between py-2 border-b">
-        <div>
-          <Label htmlFor="is_published">Publicado</Label>
-          <p className="text-sm text-muted-foreground">Visible para los usuarios</p>
-        </div>
-        <Switch
-          id="is_published"
-          checked={watch("is_published")}
-          onCheckedChange={(checked) => setValue("is_published", checked)}
-        />
-      </div>
-
-      <div className="flex gap-3 pt-4">
-        <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={loading} className="flex-1">
-          {loading ? "Guardando..." : program ? "Actualizar" : "Crear"}
-        </Button>
-      </div>
-    </form>
-  )
-}
+    <button type="submit" className="mt-6 bg-black text-white p-3 rounded shadow">
+      Guardar Programa
+    </button>
+  </form>
+);
