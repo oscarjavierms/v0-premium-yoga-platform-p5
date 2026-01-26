@@ -1,50 +1,25 @@
-import { createServerClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { ProgramasClient } from "./programas-client"
+import { createClient } from "@/lib/supabase/server"
+import Link from "next/link"
 
-export const metadata = {
-  title: "Programas | Transforma tu práctica",
-}
-
-export default async function ProgramasPage() {
-  const supabase = await createServerClient()
+export default async function ProgramsPage() {
+  const supabase = await createClient()
   
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    redirect("/auth/login")
-  }
-
-  // Get featured program
-  const { data: featuredProgram } = await supabase
+  // Traemos los programas de la base de datos
+  const { data: programs } = await supabase
     .from("programs")
-    .select(`
-      *,
-      instructors (name, avatar_url),
-      classes (count)
-    `)
+    .select("*")
     .eq("is_published", true)
-    .eq("is_featured", true)
-    .single()
-
-  // Get all programs grouped by pillar
-  const { data: allPrograms } = await supabase
-    .from("programs")
-    .select(`
-      *,
-      instructors (name, avatar_url)
-    `)
-    .eq("is_published", true)
-    .order("created_at", { ascending: false })
-
-  // Get unique pillars
-  const pillars = [...new Set(allPrograms?.map(p => p.pillar).filter(Boolean))]
 
   return (
-    <ProgramasClient
-      featuredProgram={featuredProgram}
-      programs={allPrograms || []}
-      pillars={pillars}
-    />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
+      {programs?.map((program) => (
+        <Link href={`/programas/${program.slug}`} key={program.id}>
+          <div className="border rounded-xl p-4 hover:shadow-lg transition">
+            <h3 className="text-xl font-bold">{program.title}</h3>
+            <p className="text-sm text-gray-500">{program.experience_type}</p>
+          </div>
+        </Link>
+      ))}
+    </div>
   )
 }
