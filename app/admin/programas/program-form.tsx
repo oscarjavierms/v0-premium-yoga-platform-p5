@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { saveProgram } from "@/lib/actions/programs"
+import { Sparkles } from "lucide-react" // Necesitarás instalar lucide-react o usar un texto
 
 interface ProgramFormProps {
   program?: any
@@ -15,7 +16,7 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { register, handleSubmit, watch } = useForm({
+  const { register, handleSubmit, watch, setValue } = useForm({
     defaultValues: program || {
       title: "",
       slug: "",
@@ -32,6 +33,22 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
   })
 
   const isStandalone = watch("is_standalone_class")
+  const currentTitle = watch("title")
+
+  // Función para autogenerar el Slug
+  const generateSlug = () => {
+    if (!currentTitle) return;
+    const slug = currentTitle
+      .toLowerCase()
+      .trim()
+      .normalize("NFD") // Quita acentos
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9 -]/g, "") // Quita caracteres especiales
+      .replace(/\s+/g, "-") // Cambia espacios por guiones
+      .replace(/-+/g, "-"); // Evita guiones dobles
+    
+    setValue("slug", slug);
+  }
 
   const onSave = async (data: any) => {
     setLoading(true)
@@ -60,16 +77,38 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Título */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">Título</label>
-          <input {...register("title")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="Ej: Yoga para el despertar" />
+          <input 
+            {...register("title")} 
+            className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" 
+            placeholder="Ej: Yoga para el despertar" 
+          />
         </div>
 
+        {/* Slug con Botón de Autogenerar */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">Slug (URL)</label>
-          <input {...register("slug")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="ej-yoga-despertar" />
+          <div className="flex gap-2">
+            <input 
+              {...register("slug")} 
+              className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black flex-1" 
+              placeholder="ej-yoga-despertar" 
+            />
+            <button
+              type="button"
+              onClick={generateSlug}
+              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md border flex items-center gap-1 text-sm transition-colors"
+              title="Generar desde el título"
+            >
+              <Sparkles size={16} />
+              Generar
+            </button>
+          </div>
         </div>
 
+        {/* Experiencia */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">Experiencia</label>
           <select {...register("experience_type")} className="border p-2 rounded-md bg-white">
@@ -79,11 +118,13 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
           </select>
         </div>
 
+        {/* Categoría */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">Categoría</label>
           <input {...register("category")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="Ej: Power Yoga" />
         </div>
 
+        {/* Dificultad */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">Dificultad</label>
           <select {...register("difficulty")} className="border p-2 rounded-md bg-white">
@@ -93,16 +134,19 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
           </select>
         </div>
 
+        {/* URL de Vimeo */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">URL de Vimeo (Principal)</label>
           <input {...register("vimeo_url")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="https://vimeo.com/..." />
         </div>
 
+        {/* Área de Enfoque */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">Área de Enfoque</label>
           <input {...register("focus_area")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="Ej: Flexibilidad" />
         </div>
 
+        {/* Instructor */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-700">Instructor</label>
           <select {...register("instructor_id")} className="border p-2 rounded-md bg-white">
@@ -121,8 +165,8 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
         </div>
         {!isStandalone && (
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-700">Total de clases</label>
-            <input type="number" {...register("total_classes")} className="border p-1 rounded-md w-24" />
+            <label className="text-sm font-semibold text-gray-700">Total de clases estimadas</label>
+            <input type="number" {...register("total_classes")} className="border p-1 rounded-md w-24 outline-none focus:ring-2 focus:ring-black" />
           </div>
         )}
       </div>
@@ -134,7 +178,7 @@ export function ProgramForm({ program, instructors }: ProgramFormProps) {
 
       <div className="flex justify-end gap-4 pt-6 border-t">
         <button type="button" onClick={() => router.back()} className="text-gray-500 hover:text-black">Cancelar</button>
-        <button type="submit" disabled={loading} className="bg-black text-white px-8 py-2 rounded-md disabled:bg-gray-400">
+        <button type="submit" disabled={loading} className="bg-black text-white px-8 py-2 rounded-md disabled:bg-gray-400 font-medium">
           {loading ? "Guardando..." : program ? "Actualizar" : "Crear Programa Premium"}
         </button>
       </div>
