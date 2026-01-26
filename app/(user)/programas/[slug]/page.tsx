@@ -22,7 +22,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
     <main className="min-h-screen bg-white pb-10">
       <div className="w-full">
         
-        {/* Gap mínimo para pegar el texto al video */}
+        {/* Sección principal: Información y Video */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-8">
           
           {/* COLUMNA IZQUIERDA */}
@@ -45,7 +45,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
                 </p>
               </div>
 
-              {/* FICHA TÉCNICA CON ESTILOS INVERTIDOS */}
+              {/* FICHA TÉCNICA */}
               <div className="grid grid-cols-2 gap-y-5 gap-x-2 pt-6 border-t border-zinc-100">
                  <div>
                     <span className="block text-xl text-zinc-800 font-cormorant italic leading-none mb-1">Experiencia</span>
@@ -64,10 +64,18 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
                     <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.classes?.length || 0} Sesiones</span>
                  </div>
               </div>
+
+              {/* BOTÓN GUARDAR EN MI SANTUARIO */}
+              <div className="pt-4">
+                <button className="flex items-center gap-2 px-8 py-3 border border-zinc-900 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all duration-500 group">
+                  <span className="text-lg group-hover:scale-110 transition-transform">♡</span>
+                  Guardar en Mi Santuario
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: VIDEO (Pegado al texto) */}
+          {/* COLUMNA DERECHA: VIDEO */}
           <div className="lg:col-span-6">
             <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100">
               <iframe
@@ -79,16 +87,26 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* CONTENIDO DE CLASES COMPACTO */}
+        {/* CONTENIDO DE CLASES */}
         <section className="pt-8 border-t border-zinc-100">
           <h2 className="text-xl font-cormorant italic text-zinc-900 mb-6 uppercase tracking-widest">Contenido</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {program.classes?.map((clase: any) => (
-              <Link href={`/clases/${clase.slug || clase.id}`} key={clase.id} className="group">
+              <Link 
+                href={`/clases/${clase.slug || clase.id}`} 
+                key={clase.id} 
+                className="group"
+              >
                 <div className="aspect-[16/10] bg-zinc-50 mb-2 overflow-hidden shadow-sm transition-all duration-700 group-hover:shadow-lg">
-                  <img src={clase.thumbnail_url} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" alt={clase.title} />
+                  <img 
+                    src={clase.thumbnail_url} 
+                    className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" 
+                    alt={clase.title} 
+                  />
                 </div>
-                <h3 className="text-[11px] font-medium text-zinc-800 leading-tight tracking-tight uppercase">{clase.title}</h3>
+                <h3 className="text-[11px] font-medium text-zinc-800 leading-tight tracking-tight uppercase group-hover:text-zinc-500 transition-colors">
+                  {clase.title}
+                </h3>
               </Link>
             ))}
           </div>
