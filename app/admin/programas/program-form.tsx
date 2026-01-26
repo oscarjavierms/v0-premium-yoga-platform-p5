@@ -84,7 +84,6 @@ export function ProgramForm({ program, instructors }: any) {
           <input {...register("vimeo_url")} className="border p-3 rounded-lg outline-none focus:ring-1 focus:ring-black" />
         </div>
 
-        {/* --- AQUÍ ESTÁ EL CAMPO NUEVO QUE AGREGAMOS --- */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-bold text-zinc-700 uppercase tracking-widest">Foto de Portada (Full Width)</label>
           <input 
@@ -93,7 +92,6 @@ export function ProgramForm({ program, instructors }: any) {
             placeholder="Pega el link de la imagen aquí"
           />
         </div>
-        {/* ------------------------------------------- */}
 
         <div className="flex flex-col gap-2">
           <label className="text-sm font-bold text-zinc-700 uppercase tracking-widest">Instructor</label>
@@ -109,4 +107,18 @@ export function ProgramForm({ program, instructors }: any) {
           {isPublished ? <Eye className="text-green-600" /> : <EyeOff className="text-zinc-400" />}
           <div>
             <p className="font-bold text-zinc-900">{isPublished ? "Publicado" : "Borrador"}</p>
-            <p className="text-xs text-zinc-500">¿Visible
+            <p className="text-xs text-zinc-500">¿Visible para tus alumnos?</p>
+          </div>
+        </div>
+        <input type="checkbox" {...register("is_published")} className="w-6 h-6 accent-black cursor-pointer" />
+      </div>
+
+      <div className="flex justify-end gap-4 border-t pt-8">
+        <button type="button" onClick={() => router.back()} className="text-zinc-400 font-medium">Cancelar</button>
+        <button type="submit" disabled={loading} className="bg-black text-white px-10 py-3 rounded-full font-bold hover:bg-zinc-800 disabled:bg-zinc-300 transition-all">
+          {loading ? "Guardando..." : "Guardar Cambios"}
+        </button>
+      </div>
+    </form>
+  )
+}
