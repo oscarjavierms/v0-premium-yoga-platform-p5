@@ -1,51 +1,31 @@
 "use server"
-
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
-// Función para GUARDAR (Crear o Editar)
-export async function saveProgram(formData: any) {
+export async function saveContent(data: any) {
   const supabase = await createClient()
 
-  const programData = {
-    title: formData.title,
-    slug: formData.slug || formData.title.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, ""),
-    description: formData.description,
-    experience_type: formData.experience_type,
-    difficulty: formData.difficulty,
-    focus_area: formData.focus_area,
-    instructor_id: formData.instructor_id,
-    is_published: true,
+  const payload = {
+    title: data.title,
+    slug: data.title.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, ""),
+    description: data.description,
+    experience_type: data.experience_type, // Yoga, Meditacion, Fitness
+    category: data.category,
+    difficulty: data.difficulty,
+    focus_area: data.focus_area,
+    vimeo_url: data.vimeo_url,
+    total_classes: data.total_classes || 0,
+    is_standalone_class: data.is_standalone_class, // Booleano
+    is_published: true
   }
 
   const { error } = await supabase
     .from("programs")
-    .upsert([programData]) // Upsert crea si no existe, actualiza si existe
+    .upsert([payload]) // Esto crea o actualiza
 
-  if (error) {
-    console.error("Error en Supabase:", error)
-    throw new Error(error.message)
-  }
+  if (error) throw new Error(error.message)
 
-  revalidatePath("/admin/programas")
-  revalidatePath("/programas")
-  return { success: true }
-}
-
-// Función para BORRAR (La que causó el error de build)
-export async function deleteProgram(id: string) {
-  const supabase = await createClient()
-
-  const { error } = await supabase
-    .from("programs")
-    .delete()
-    .eq("id", id)
-
-  if (error) {
-    console.error("Error al borrar:", error)
-    return { success: false, error: error.message }
-  }
-
-  revalidatePath("/admin/programas")
+  // Esto actualiza las páginas de usuario automáticamente
+  revalidatePath("/(user)/[experience]", "layout")
   return { success: true }
 }
