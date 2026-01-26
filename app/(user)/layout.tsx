@@ -16,7 +16,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         onClose={() => setIsSidebarOpen(false)} 
       />
       
-      {/* Volvemos al estándar para que no se rompa el resto del sitio */}
+      {/* Contenedor amplio (1600px) para que no se vea encerrado, pero estable */}
       <main className="pt-32 px-4 md:px-8">
         <div className="max-w-[1600px] mx-auto">
           {children}
