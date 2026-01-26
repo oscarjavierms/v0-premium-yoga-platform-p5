@@ -50,98 +50,85 @@ export function MiPracticaClient({
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <section className="px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="font-serif text-4xl sm:text-5xl tracking-tight">
-            Mi Práctica
+    <div className="min-h-screen bg-white">
+      {/* Header Estilo Minimalista */}
+      <section className="px-4 sm:px-6 lg:px-8 py-16 lg:py-24 border-b border-zinc-50">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="font-cormorant italic text-5xl sm:text-6xl tracking-tight text-zinc-900">
+            Mi Santuario
           </h1>
-          <p className="mt-4 text-muted-foreground text-lg">
-            Tu biblioteca personal de clases y programas guardados.
+          <p className="mt-4 text-zinc-400 font-light italic text-lg">
+            Tu biblioteca personal de introspección y movimiento.
           </p>
         </div>
       </section>
 
       {/* Tabs */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-24">
+      <section className="px-4 sm:px-6 lg:px-8 pb-24 mt-12">
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 mb-8">
+            <TabsList className="bg-transparent border-b border-zinc-100 w-full justify-center rounded-none h-auto p-0 mb-12 space-x-12">
               <TabsTrigger 
                 value="guardados" 
                 className={cn(
-                  "rounded-none border-b-2 border-transparent data-[state=active]:border-foreground",
+                  "rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900",
                   "data-[state=active]:bg-transparent data-[state=active]:shadow-none",
-                  "pb-4 px-0 mr-8 text-base"
+                  "pb-4 px-2 text-[10px] uppercase font-bold tracking-[0.3em] transition-all"
                 )}
               >
-                <Bookmark className="h-4 w-4 mr-2" />
                 Guardados ({savedClasses.length + savedPrograms.length})
               </TabsTrigger>
               <TabsTrigger 
                 value="historial" 
                 className={cn(
-                  "rounded-none border-b-2 border-transparent data-[state=active]:border-foreground",
+                  "rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900",
                   "data-[state=active]:bg-transparent data-[state=active]:shadow-none",
-                  "pb-4 px-0 text-base"
+                  "pb-4 px-2 text-[10px] uppercase font-bold tracking-[0.3em] transition-all"
                 )}
               >
-                <CheckCircle className="h-4 w-4 mr-2" />
                 Historial ({history.length})
               </TabsTrigger>
             </TabsList>
 
-            {/* Guardados Tab */}
-            <TabsContent value="guardados" className="mt-0">
+            <TabsContent value="guardados" className="mt-0 outline-none">
               {savedClasses.length === 0 && savedPrograms.length === 0 ? (
                 <div className="text-center py-20">
-                  <Bookmark className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                  <h3 className="font-serif text-xl mb-2">Aún no tienes guardados</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Guarda clases y programas para acceder a ellos fácilmente.
-                  </p>
-                  <Link 
-                    href="/explorar" 
-                    className="text-sm underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  >
-                    Explorar clases
+                  <h3 className="font-cormorant italic text-2xl mb-2 text-zinc-400">Tu santuario está esperando ser llenado</h3>
+                  <Link href="/explorar" className="text-[10px] uppercase font-bold tracking-widest underline underline-offset-8 text-zinc-900">
+                    Explorar programas
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-12">
-                  {/* Saved Programs */}
+                <div className="space-y-20">
+                  {/* Saved Programs - EL DISEÑO QUE PEDISTE */}
                   {savedPrograms.length > 0 && (
                     <div>
-                      <h3 className="text-sm uppercase tracking-widest text-muted-foreground mb-6">
-                        Programas
+                      <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-300 mb-8 text-center">
+                        Programas Guardados
                       </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                         {savedPrograms.map((program) => (
-                          <Link key={program.id} href={`/programa/${program.slug}`}>
-                            <Card className="overflow-hidden border-0 bg-transparent group">
-                              <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
-                                <img
-                                  src={program.thumbnail_url || "/placeholder.svg?height=200&width=320"}
-                                  alt={program.title}
-                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                                <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                          <Link key={program.id} href={`/programas/${program.slug}`} className="group">
+                            <div className="relative aspect-[16/10] overflow-hidden mb-5 bg-zinc-50 shadow-sm transition-all duration-700 group-hover:shadow-xl">
+                              <img
+                                src={program.thumbnail_url}
+                                alt={program.title}
+                                className="w-full h-full object-cover transition-all duration-1000 grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105"
+                              />
+                              <div className="absolute top-4 left-4">
+                                <span className="bg-white/90 backdrop-blur-sm text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 text-zinc-900">
                                   {program.duration_weeks} semanas
-                                </div>
+                                </span>
                               </div>
-                              <div>
-                                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
-                                  Programa • {program.pillar}
-                                </p>
-                                <h4 className="font-medium mb-1">{program.title}</h4>
-                                {program.instructors && (
-                                  <p className="text-sm text-muted-foreground">
-                                    {program.instructors.name}
-                                  </p>
-                                )}
-                              </div>
-                            </Card>
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="font-cormorant italic text-3xl text-zinc-900 group-hover:text-zinc-600 transition-colors">
+                                {program.title}
+                              </h4>
+                              <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                                Por {program.instructors?.name} • {program.pillar}
+                              </p>
+                            </div>
                           </Link>
                         ))}
                       </div>
@@ -150,41 +137,27 @@ export function MiPracticaClient({
 
                   {/* Saved Classes */}
                   {savedClasses.length > 0 && (
-                    <div>
-                      <h3 className="text-sm uppercase tracking-widest text-muted-foreground mb-6">
-                        Clases
+                    <div className="pt-10 border-t border-zinc-50">
+                      <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-300 mb-8 text-center">
+                        Clases Individuales
                       </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         {savedClasses.map((classItem) => (
-                          <Link key={classItem.id} href={`/clase/${classItem.slug}`}>
-                            <Card className="overflow-hidden border-0 bg-transparent group">
-                              <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
-                                <img
-                                  src={classItem.thumbnail_url || "/placeholder.svg?height=200&width=320"}
-                                  alt={classItem.title}
-                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Play className="h-4 w-4 text-black ml-0.5" />
-                                  </div>
-                                </div>
-                                <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                                  {classItem.duration_minutes} min
+                          <Link key={classItem.id} href={`/clases/${classItem.slug}`} className="group">
+                            <div className="relative aspect-square overflow-hidden mb-3 bg-zinc-50 transition-all group-hover:shadow-md">
+                              <img
+                                src={classItem.thumbnail_url}
+                                alt={classItem.title}
+                                className="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10">
+                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
+                                  <Play className="h-4 w-4 text-zinc-900 fill-zinc-900 ml-0.5" />
                                 </div>
                               </div>
-                              <div>
-                                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
-                                  {classItem.pillar}
-                                </p>
-                                <h4 className="font-medium mb-1 line-clamp-1">{classItem.title}</h4>
-                                {classItem.instructors && (
-                                  <p className="text-sm text-muted-foreground">
-                                    {classItem.instructors.name}
-                                  </p>
-                                )}
-                              </div>
-                            </Card>
+                            </div>
+                            <h4 className="text-[11px] font-bold uppercase tracking-widest text-zinc-800 truncate">{classItem.title}</h4>
+                            <p className="text-[10px] italic text-zinc-400 font-cormorant">{classItem.duration_minutes} min • {classItem.pillar}</p>
                           </Link>
                         ))}
                       </div>
@@ -194,56 +167,27 @@ export function MiPracticaClient({
               )}
             </TabsContent>
 
-            {/* Historial Tab */}
-            <TabsContent value="historial" className="mt-0">
-              {history.length === 0 ? (
-                <div className="text-center py-20">
-                  <Clock className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                  <h3 className="font-serif text-xl mb-2">Tu historial está vacío</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Las clases que completes aparecerán aquí.
-                  </p>
-                  <Link 
-                    href="/explorar" 
-                    className="text-sm underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  >
-                    Comenzar una clase
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {history.map((item) => (
-                    <Link key={item.id} href={`/clase/${item.slug}`}>
-                      <Card className="overflow-hidden border-0 bg-secondary/20 hover:bg-secondary/40 transition-colors p-4">
-                        <div className="flex gap-4">
-                          <div className="relative w-32 sm:w-40 aspect-video rounded overflow-hidden shrink-0">
-                            <img
-                              src={item.thumbnail_url || "/placeholder.svg?height=90&width=160"}
-                              alt={item.title}
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">
-                              {item.duration_minutes} min
-                            </div>
-                          </div>
-                          <div className="flex flex-col justify-center min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <CheckCircle className="h-3.5 w-3.5 text-green-600 shrink-0" />
-                              <span className="text-xs text-muted-foreground">
-                                Completada el {formatDate(item.completedAt)}
-                              </span>
-                            </div>
-                            <h4 className="font-medium line-clamp-1">{item.title}</h4>
-                            <p className="text-sm text-muted-foreground line-clamp-1">
-                              {item.instructors?.name} • {item.pillar}
-                            </p>
-                          </div>
+            {/* Historial (Estilo minimalista) */}
+            <TabsContent value="historial" className="mt-0 outline-none">
+              <div className="max-w-3xl mx-auto space-y-4">
+                {history.map((item) => (
+                  <Link key={item.id} href={`/clases/${item.slug}`} className="block group">
+                    <div className="flex items-center gap-6 p-4 border border-transparent hover:border-zinc-100 hover:bg-zinc-50/50 transition-all">
+                      <div className="relative w-24 aspect-video overflow-hidden shrink-0 bg-zinc-100">
+                        <img src={item.thumbnail_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-300">
+                            Completada el {formatDate(item.completedAt)}
+                          </span>
                         </div>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              )}
+                        <h4 className="font-cormorant italic text-xl text-zinc-800 leading-tight truncate">{item.title}</h4>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </TabsContent>
           </Tabs>
         </div>
