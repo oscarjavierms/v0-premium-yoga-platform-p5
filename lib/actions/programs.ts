@@ -12,7 +12,7 @@ export async function saveProgram(data: any, id?: string) {
     description: data.description || "",
     experience_type: data.experience_type,
     difficulty: data.difficulty,
-    focus_area: data.focus_area,
+    focus_area: data.focus_area || "", // Campo de área de enfoque
     instructor_id: data.instructor_id || null,
     is_published: data.is_published,
     vimeo_url: data.vimeo_url || null,
@@ -39,7 +39,6 @@ export async function saveProgram(data: any, id?: string) {
     return { error: result.error.message }
   }
 
-  // Limpiar caché para ver cambios al instante
   revalidatePath("/admin/programas")
   revalidatePath("/(user)/[experience]", "page")
   
