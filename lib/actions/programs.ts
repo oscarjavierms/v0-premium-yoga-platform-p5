@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache"
 export async function saveProgram(data: any, id?: string) {
   const supabase = await createClient()
 
-  // Normalizamos la experiencia: "yoga" -> "Yoga" para que coincida con la base de datos
+  // Normalizamos la experiencia: "yoga" -> "Yoga"
   const expType = data.experience_type.charAt(0).toUpperCase() + data.experience_type.slice(1).toLowerCase();
 
   const programData = {
@@ -36,9 +36,10 @@ export async function saveProgram(data: any, id?: string) {
     return { error: result.error.message }
   }
 
-  // Esto limpia la memoria caché para que el contenido aparezca al instante
+  // LIMPIEZA DE CACHÉ: Esto asegura que el programa aparezca en todas las listas
   revalidatePath("/admin/programas")
   revalidatePath("/(user)/[experience]", "page")
+  revalidatePath(`/${data.experience_type.toLowerCase()}`) // Limpia específicamente /yoga o /meditacion
   
   return { success: true }
 }
