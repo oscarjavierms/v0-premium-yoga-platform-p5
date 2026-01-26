@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
-import Link from "next/link"
-import { ChevronLeft, Clock, Play, Plus, Share2, ThumbsUp } from "lucide-react"
+import { Clock, Play, BarChart } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -9,128 +8,126 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const { slug } = await params
   const supabase = await createClient()
 
+  // 1. Traemos el programa y sus clases relacionadas
   const { data: program, error } = await supabase
     .from("programs")
-    .select(`*, instructors(name, bio, avatar_url)`)
+    .select(`
+      *,
+      instructors (name, avatar_url, bio),
+      classes (*) 
+    `)
     .eq("slug", slug)
     .single()
 
   if (error || !program) return notFound()
 
-  const vimeoId = program.vimeo_url?.split("/").pop()
+  // ID del video de introducción
+  const introVideoId = program.vimeo_url?.split("/").pop()
 
   return (
     <main className="min-h-screen bg-white pb-24">
-      {/* Navegación Minimalista */}
-      <nav className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
-        <Link href="/yoga" className="group flex items-center gap-2 text-zinc-400 hover:text-black transition-all text-[10px] uppercase tracking-[0.3em] font-bold">
-          <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-1" />
-          Volver
-        </Link>
-        <div className="flex gap-6 text-zinc-400">
-          <ThumbsUp size={18} className="hover:text-black cursor-pointer transition-colors" />
-          <Share2 size={18} className="hover:text-black cursor-pointer transition-colors" />
-          <Plus size={18} className="hover:text-black cursor-pointer transition-colors" />
-        </div>
-      </nav>
-
-      {/* Hero Video Section - Dylan Werner Style */}
-      <section className="w-full bg-zinc-50 aspect-video max-h-[75vh] relative shadow-sm border-b border-zinc-100">
-        <iframe
-          src={`https://player.vimeo.com/video/${vimeoId}?h=0&title=0&byline=0&portrait=0`}
-          className="absolute inset-0 w-full h-full"
-          allow="autoplay; fullscreen"
-          allowFullScreen
-        ></iframe>
+      
+      {/* SECCIÓN 1: La "Foto Bonita" (Cover Image) */}
+      <section className="w-full h-[60vh] lg:h-[70vh] relative overflow-hidden">
+        <img 
+          src={program.cover_image_url || "/placeholder-yoga.jpg"} 
+          alt={program.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/20" /> {/* Filtro suave para elegancia */}
       </section>
 
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header Editorial */}
-        <section className="py-16 border-b border-zinc-100">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-            <div className="flex-1 space-y-6">
-              <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-400 block">Santuario Series</span>
-              <h1 className="text-6xl md:text-7xl font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter">
-                {program.title}
-              </h1>
-              <div className="flex items-center gap-4 pt-4">
-                <div className="w-10 h-10 rounded-full bg-zinc-200 overflow-hidden">
-                   {program.instructors?.avatar_url && (
-                     <img src={program.instructors.avatar_url} alt={program.instructors.name} className="w-full h-full object-cover" />
-                   )}
-                </div>
-                <p className="text-lg font-cormorant italic text-zinc-600">Instructor: <span className="text-zinc-900">{program.instructors?.name}</span></p>
-              </div>
-            </div>
-            
-            <div className="w-full md:w-80 space-y-8 bg-zinc-50/50 p-8 rounded-sm">
-              <div>
-                <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Dificultad</h4>
-                <p className="text-sm font-medium uppercase tracking-tight text-zinc-900">{program.difficulty}</p>
-              </div>
-              <div>
-                <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Enfoque</h4>
-                <p className="text-sm font-medium uppercase tracking-tight text-zinc-900">Movimiento Consciente</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        
+        {/* SECCIÓN 2: Título Editorial */}
+        <header className="py-12 border-b border-zinc-100 mb-16">
+          <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-400 block mb-4">
+            Santuario Series
+          </span>
+          <h1 className="text-7xl md:text-8xl font-cormorant italic text-zinc-900 leading-none tracking-tighter">
+            {program.title}
+          </h1>
+        </header>
 
-        {/* Descripción y Metadatos */}
-        <section className="py-20 grid grid-cols-1 lg:grid-cols-12 gap-16">
-          <div className="lg:col-span-8">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] mb-8 text-zinc-900">Descripción</h3>
-            <p className="text-zinc-600 leading-[2] text-xl font-light italic whitespace-pre-wrap">
+        {/* SECCIÓN 3: Descripción e Introducción (Lado a Lado) */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-24 items-start">
+          {/* Izquierda: Descripción */}
+          <div className="lg:col-span-5 space-y-8">
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] text-zinc-900 border-b border-zinc-900 pb-2 w-fit">
+              Sobre el Programa
+            </h3>
+            <p className="text-zinc-600 leading-[1.8] text-xl font-light italic whitespace-pre-wrap">
               {program.description}
             </p>
+            
+            <div className="pt-8 flex items-center gap-6">
+              <div className="space-y-1">
+                <p className="text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Nivel</p>
+                <p className="text-sm font-medium uppercase">{program.difficulty}</p>
+              </div>
+              <div className="space-y-1 border-l border-zinc-200 pl-6">
+                <p className="text-[9px] font-bold uppercase text-zinc-400 tracking-widest">Instructor</p>
+                <p className="text-sm font-medium uppercase">{program.instructors?.name}</p>
+              </div>
+            </div>
           </div>
-          
-          <div className="lg:col-span-4 space-y-12">
-             <div className="p-10 bg-zinc-900 text-white rounded-sm">
-                <h4 className="font-cormorant text-3xl italic mb-4">Comenzar Práctica</h4>
-                <p className="text-zinc-400 text-sm font-light italic mb-8">Únete a {program.instructors?.name} en este viaje de transformación.</p>
-                <button className="w-full border border-white/20 hover:bg-white hover:text-black py-4 text-[10px] font-bold uppercase tracking-[0.3em] transition-all">
-                   Marcar progreso
-                </button>
-             </div>
+
+          {/* Derecha: Video de Introducción */}
+          <div className="lg:col-span-7 bg-zinc-50 aspect-video relative shadow-2xl rounded-sm overflow-hidden">
+             <iframe
+                src={`https://player.vimeo.com/video/${introVideoId}?h=0&title=0&byline=0&portrait=0`}
+                className="absolute inset-0 w-full h-full"
+                allowFullScreen
+              ></iframe>
           </div>
         </section>
 
-        {/* Grilla de Clases / Sesiones (Inspirada en tu imagen de referencia) */}
-        <section className="py-24 border-t border-zinc-100">
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-4xl font-cormorant italic text-zinc-900 tracking-tight">Sesiones del Programa</h2>
-            <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">10 Clases Totales</span>
+        {/* SECCIÓN 4: Grilla de Clases (Dinámica) */}
+        <section className="pt-24 border-t border-zinc-100">
+          <div className="flex items-end justify-between mb-16">
+            <div>
+              <h2 className="text-5xl font-cormorant italic text-zinc-900">Clases del Programa</h2>
+              <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-4">
+                {program.classes?.length || 0} Sesiones Disponibles
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="group cursor-pointer">
-                <div className="aspect-video bg-zinc-100 mb-5 relative overflow-hidden transition-all group-hover:shadow-xl">
-                  {/* Thumbnail Placeholder */}
-                  <div className="absolute inset-0 bg-zinc-200 flex items-center justify-center opacity-50">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Santuario Media</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20">
+            {program.classes?.map((clase: any, index: number) => (
+              <Link 
+                href={`/clases/${clase.slug || clase.id}`} 
+                key={clase.id} 
+                className="group cursor-pointer"
+              >
+                <div className="aspect-video bg-zinc-100 mb-6 relative overflow-hidden transition-transform duration-700 group-hover:scale-[1.02]">
+                  <img 
+                    src={clase.thumbnail_url || "/placeholder-class.jpg"} 
+                    className="w-full h-full object-cover" 
+                    alt={clase.title}
+                  />
+                  <div className="absolute top-4 left-4 bg-white px-2 py-1 text-[10px] font-bold text-zinc-900 shadow-sm">
+                    {index + 1}
                   </div>
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-2 py-1 text-[9px] font-bold text-zinc-900">
-                    {i}
+                  <div className="absolute bottom-4 right-4 bg-black/90 px-2 py-1 text-[9px] font-bold text-white tracking-widest">
+                    {clase.duration || "20:00"}
                   </div>
-                  <div className="absolute bottom-4 right-4 bg-black/80 px-2 py-1 text-[9px] font-bold text-white tracking-widest">
-                    22:15
-                  </div>
-                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Play fill="white" className="text-white" size={40} />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full border border-white flex items-center justify-center">
+                      <Play fill="white" className="text-white ml-1" size={16} />
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium text-zinc-900 leading-tight group-hover:text-zinc-500 transition-colors">
-                    Fuerza y Flexibilidad Parte {i}
+                <div className="space-y-3">
+                  <h3 className="text-xl font-medium text-zinc-900 leading-tight group-hover:text-zinc-500 transition-colors">
+                    {clase.title}
                   </h3>
-                  <div className="flex items-center justify-between text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-                    <span>{program.instructors?.name}</span>
-                    <span className="flex items-center gap-1"><Clock size={10} /> {program.difficulty}</span>
+                  <div className="flex items-center gap-4 text-[9px] text-zinc-400 font-bold uppercase tracking-widest">
+                    <span className="flex items-center gap-1"><Clock size={12} /> {clase.duration}</span>
+                    <span className="flex items-center gap-1"><BarChart size={12} /> {program.difficulty}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
