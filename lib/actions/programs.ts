@@ -1,187 +1,55 @@
-"use client"
+"use server"
 
-import { useForm } from "react-hook-form"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { saveProgram } from "@/lib/actions/programs"
-import { Sparkles } from "lucide-react" // Necesitarás instalar lucide-react o usar un texto
+import { createClient } from "@/lib/supabase/server"
+import { revalidatePath } from "next/cache"
 
-interface ProgramFormProps {
-  program?: any
-  instructors: { id: string; name: string }[]
+export async function saveProgram(data: any, id?: string) {
+  const supabase = await createClient()
+
+  const programData = {
+    title: data.title,
+    slug: data.slug || data.title.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, ""),
+    description: data.description || "",
+    experience_type: data.experience_type,
+    difficulty: data.difficulty,
+    focus_area: data.focus_area,
+    instructor_id: data.instructor_id || null,
+    is_published: data.is_published,
+    // Campos Premium
+    vimeo_url: data.vimeo_url || null,
+    category: data.category || null,
+    is_standalone_class: data.is_standalone_class || false,
+    total_classes: Number(data.total_classes) || 0,
+  }
+
+  let result
+
+  if (id) {
+    result = await supabase
+      .from("programs")
+      .update(programData)
+      .eq("id", id)
+  } else {
+    result = await supabase
+      .from("programs")
+      .insert([programData])
+  }
+
+  if (result.error) {
+    console.error("Supabase Error:", result.error)
+    return { error: result.error.message }
+  }
+
+  revalidatePath("/admin/programas")
+  revalidatePath("/(user)/[experience]", "page")
+  
+  return { success: true }
 }
 
-export function ProgramForm({ program, instructors }: ProgramFormProps) {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const { register, handleSubmit, watch, setValue } = useForm({
-    defaultValues: program || {
-      title: "",
-      slug: "",
-      description: "",
-      experience_type: "Yoga",
-      difficulty: "beginner",
-      focus_area: "",
-      total_classes: 0,
-      vimeo_url: "",
-      category: "",
-      is_standalone_class: false,
-      is_published: false,
-    },
-  })
-
-  const isStandalone = watch("is_standalone_class")
-  const currentTitle = watch("title")
-
-  // Función para autogenerar el Slug
-  const generateSlug = () => {
-    if (!currentTitle) return;
-    const slug = currentTitle
-      .toLowerCase()
-      .trim()
-      .normalize("NFD") // Quita acentos
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9 -]/g, "") // Quita caracteres especiales
-      .replace(/\s+/g, "-") // Cambia espacios por guiones
-      .replace(/-+/g, "-"); // Evita guiones dobles
-    
-    setValue("slug", slug);
-  }
-
-  const onSave = async (data: any) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const result = await saveProgram(data, program?.id)
-      if (result.error) {
-        setError(result.error)
-      } else {
-        router.push("/admin/programas")
-        router.refresh()
-      }
-    } catch (e) {
-      setError("Ocurrió un error inesperado")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit(onSave)} className="space-y-6 bg-white p-8 rounded-xl border shadow-sm">
-      {error && (
-        <div className="bg-red-50 text-red-600 p-3 rounded border border-red-200 text-sm">
-          {error}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Título */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">Título</label>
-          <input 
-            {...register("title")} 
-            className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" 
-            placeholder="Ej: Yoga para el despertar" 
-          />
-        </div>
-
-        {/* Slug con Botón de Autogenerar */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">Slug (URL)</label>
-          <div className="flex gap-2">
-            <input 
-              {...register("slug")} 
-              className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black flex-1" 
-              placeholder="ej-yoga-despertar" 
-            />
-            <button
-              type="button"
-              onClick={generateSlug}
-              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md border flex items-center gap-1 text-sm transition-colors"
-              title="Generar desde el título"
-            >
-              <Sparkles size={16} />
-              Generar
-            </button>
-          </div>
-        </div>
-
-        {/* Experiencia */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">Experiencia</label>
-          <select {...register("experience_type")} className="border p-2 rounded-md bg-white">
-            <option value="Yoga">Yoga</option>
-            <option value="Meditacion">Meditación</option>
-            <option value="Fitness">Fitness</option>
-          </select>
-        </div>
-
-        {/* Categoría */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">Categoría</label>
-          <input {...register("category")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="Ej: Power Yoga" />
-        </div>
-
-        {/* Dificultad */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">Dificultad</label>
-          <select {...register("difficulty")} className="border p-2 rounded-md bg-white">
-            <option value="beginner">Principiante</option>
-            <option value="intermediate">Intermedio</option>
-            <option value="advanced">Avanzado</option>
-          </select>
-        </div>
-
-        {/* URL de Vimeo */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">URL de Vimeo (Principal)</label>
-          <input {...register("vimeo_url")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="https://vimeo.com/..." />
-        </div>
-
-        {/* Área de Enfoque */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">Área de Enfoque</label>
-          <input {...register("focus_area")} className="border p-2 rounded-md outline-none focus:ring-2 focus:ring-black" placeholder="Ej: Flexibilidad" />
-        </div>
-
-        {/* Instructor */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-gray-700">Instructor</label>
-          <select {...register("instructor_id")} className="border p-2 rounded-md bg-white">
-            <option value="">Seleccionar instructor...</option>
-            {instructors.map((ins) => (
-              <option key={ins.id} value={ins.id}>{ins.name}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-        <div className="flex items-center gap-2">
-          <input type="checkbox" {...register("is_standalone_class")} id="standalone" className="w-4 h-4" />
-          <label htmlFor="standalone" className="text-sm font-medium">¿Es una clase individual?</label>
-        </div>
-        {!isStandalone && (
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-700">Total de clases estimadas</label>
-            <input type="number" {...register("total_classes")} className="border p-1 rounded-md w-24 outline-none focus:ring-2 focus:ring-black" />
-          </div>
-        )}
-      </div>
-
-      <div className="flex items-center gap-2">
-        <input type="checkbox" {...register("is_published")} id="published" className="w-4 h-4" />
-        <label htmlFor="published" className="text-sm font-medium">Publicar inmediatamente</label>
-      </div>
-
-      <div className="flex justify-end gap-4 pt-6 border-t">
-        <button type="button" onClick={() => router.back()} className="text-gray-500 hover:text-black">Cancelar</button>
-        <button type="submit" disabled={loading} className="bg-black text-white px-8 py-2 rounded-md disabled:bg-gray-400 font-medium">
-          {loading ? "Guardando..." : program ? "Actualizar" : "Crear Programa Premium"}
-        </button>
-      </div>
-    </form>
-  )
+export async function deleteProgram(id: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from("programs").delete().eq("id", id)
+  if (error) return { error: error.message }
+  revalidatePath("/admin/programas")
+  return { success: true }
 }
