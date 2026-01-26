@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
-import { SectionHero } from "@/components/ui/section-hero"
 import Link from "next/link"
 
 export const dynamic = 'force-dynamic'
@@ -20,43 +19,48 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const introVideoId = program.vimeo_url?.split("/").pop()
 
   return (
-    <div className="relative -mt-32 overflow-x-hidden">
+    /* Eliminamos el -mt-32 para que el contenido empiece debajo del menú con aire limpio */
+    <main className="min-h-screen bg-white pb-24 pt-20">
       
-      {/* SECCIÓN HERO: Actúa como una ventana centrada */}
-      <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] overflow-hidden bg-zinc-50">
-        <SectionHero 
-          title="" 
-          subtitle="" 
-          image={program.cover_image_url || "/placeholder-yoga.jpg"} 
-          /* "center center" asegura que el individuo esté en el medio exacto.
-             Si la persona está un poco más arriba en tus fotos, usa "center 40%".
-          */
-          focusPosition="center center" 
-        />
-      </div>
-
-      {/* CONTENIDO: pt-4 para que el título esté casi pegado a la foto */}
-      <div className="max-w-7xl mx-auto px-6 pt-4 pb-32">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         
-        {/* ENCABEZADO: Título minimalista y muy arriba */}
-        <header className="mb-10 border-b border-zinc-100 pb-6">
-          <h1 className="text-4xl md:text-5xl font-cormorant text-zinc-900 mb-1 tracking-tight">
+        {/* ENCABEZADO: Título y Autor */}
+        <header className="mb-16">
+          <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 tracking-tight">
             {program.title}
           </h1>
-          <p className="text-zinc-400 font-light italic text-sm uppercase tracking-[0.3em]">
-            Con {program.instructors?.name}
+          <div className="h-px w-20 bg-zinc-200 my-6" />
+          <p className="text-xl font-cormorant italic text-zinc-500">
+            Un programa de {program.instructors?.name}
           </p>
         </header>
 
-        {/* RESTO DEL CONTENIDO (Video y Clases) */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-24 items-start">
-          <div className="lg:col-span-5 space-y-6">
-            <h3 className="text-[9px] font-bold uppercase tracking-[0.4em] text-zinc-400">The Experience</h3>
-            <p className="text-zinc-600 leading-[1.7] text-lg font-light italic whitespace-pre-wrap">
-              {program.description}
-            </p>
+        {/* SECCIÓN PRINCIPAL: VIDEO E INTRODUCCIÓN */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-32 items-start">
+          
+          {/* Columna Izquierda: Descripción */}
+          <div className="lg:col-span-5 space-y-8">
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-400">Sobre este programa</h3>
+              <p className="text-zinc-600 leading-[1.8] text-xl font-light italic whitespace-pre-wrap">
+                {program.description}
+              </p>
+            </div>
+            
+            {/* Detalles rápidos (opcional) */}
+            <div className="flex gap-8 pt-4 border-t border-zinc-50">
+               <div>
+                  <span className="block text-[9px] uppercase tracking-widest text-zinc-400 font-bold">Nivel</span>
+                  <span className="text-sm text-zinc-600">{program.difficulty || 'Todos los niveles'}</span>
+               </div>
+               <div>
+                  <span className="block text-[9px] uppercase tracking-widest text-zinc-400 font-bold">Sesiones</span>
+                  <span className="text-sm text-zinc-600">{program.classes?.length || 0} clases</span>
+               </div>
+            </div>
           </div>
 
+          {/* Columna Derecha: Video Intro (Ahora es el protagonista visual) */}
           <div className="lg:col-span-7">
             <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden ring-1 ring-zinc-100 rounded-sm">
               <iframe
@@ -68,22 +72,23 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        <section className="pt-20 border-t border-zinc-100">
-          <h2 className="text-2xl font-cormorant italic text-zinc-900 mb-12 uppercase tracking-widest">Estructura</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+        {/* ESTRUCTURA DE CLASES */}
+        <section className="pt-24 border-t border-zinc-100">
+          <h2 className="text-3xl font-cormorant italic text-zinc-900 mb-16 tracking-tight">Explorar las clases</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
             {program.classes?.map((clase: any, index: number) => (
               <Link href={`/clases/${clase.slug || clase.id}`} key={clase.id} className="group">
-                <div className="aspect-[16/10] bg-zinc-100 mb-4 relative overflow-hidden transition-all group-hover:shadow-lg">
+                <div className="aspect-[16/10] bg-zinc-100 mb-6 relative overflow-hidden transition-all duration-700 group-hover:shadow-2xl">
                   <img 
                     src={clase.thumbnail_url || "/placeholder-yoga.jpg"} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                     alt={clase.title} 
                   />
-                  <div className="absolute top-0 left-0 bg-white px-2 py-1 text-[9px] font-bold text-zinc-400">
+                  <div className="absolute top-0 left-0 bg-white px-3 py-2 text-[10px] font-bold text-zinc-900">
                     {String(index + 1).padStart(2, '0')}
                   </div>
                 </div>
-                <h3 className="text-lg font-medium text-zinc-800 group-hover:text-zinc-500 transition-colors">
+                <h3 className="text-2xl font-cormorant italic text-zinc-900 group-hover:text-zinc-500 transition-colors tracking-tighter">
                   {clase.title}
                 </h3>
               </Link>
@@ -91,6 +96,6 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
       </div>
-    </div>
+    </main>
   )
 }
