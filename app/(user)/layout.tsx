@@ -22,10 +22,8 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
     <main className="min-h-screen bg-white pb-10">
       <div className="w-full">
         
-        {/* Gap mínimo para pegar el texto al video */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-8">
           
-          {/* COLUMNA IZQUIERDA */}
           <div className="lg:col-span-6 pt-0">
             <header className="mb-4">
               <h1 className="text-6xl md:text-7xl font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter mb-2">
@@ -37,7 +35,6 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
             </header>
 
             <div className="space-y-6">
-              {/* DESCRIPCIÓN */}
               <div className="space-y-1">
                 <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">Descripción</h3>
                 <p className="text-zinc-500 leading-relaxed text-[15px] font-light italic whitespace-pre-wrap">
@@ -45,7 +42,6 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
                 </p>
               </div>
 
-              {/* FICHA TÉCNICA CON ESTILOS INVERTIDOS */}
               <div className="grid grid-cols-2 gap-y-5 gap-x-2 pt-6 border-t border-zinc-100">
                  <div>
                     <span className="block text-xl text-zinc-800 font-cormorant italic leading-none mb-1">Experiencia</span>
@@ -67,7 +63,6 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: VIDEO (Pegado al texto) */}
           <div className="lg:col-span-6">
             <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100">
               <iframe
@@ -79,7 +74,6 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* CONTENIDO DE CLASES COMPACTO */}
         <section className="pt-8 border-t border-zinc-100">
           <h2 className="text-xl font-cormorant italic text-zinc-900 mb-6 uppercase tracking-widest">Contenido</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
