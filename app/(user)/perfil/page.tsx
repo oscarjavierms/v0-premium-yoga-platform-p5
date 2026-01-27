@@ -95,67 +95,78 @@ export default function PerfilPage() {
   if (loading) return <div className="p-20 text-center font-cormorant italic">Cargando tu santuario...</div>
 
   return (
-    <main className="max-w-4xl mx-auto p-8 pt-20">
-      <h1 className="text-6xl font-cormorant italic mb-2">Mi Perfil</h1>
-      <p className="text-zinc-400 mb-12 italic">Personaliza tu espacio y presencia en el santuario.</p>
+    /* AJUSTE DE ESPACIO: pt-4 y -mt-4 para subir el contenido */
+    <main className="max-w-4xl mx-auto p-8 pt-4 -mt-4">
+      <div className="mb-10">
+        <h1 className="text-6xl font-cormorant italic mb-2 tracking-tighter text-zinc-900">
+          Mi Perfil
+        </h1>
+        <p className="text-zinc-400 italic text-sm">
+          Personaliza tu espacio y presencia en el santuario.
+        </p>
+      </div>
 
       <form onSubmit={updateProfile} className="space-y-12">
         {/* FOTO DE PERFIL */}
-        <div className="flex items-center gap-8">
-          <div className="w-32 h-32 bg-zinc-100 rounded-full overflow-hidden border border-zinc-200 flex items-center justify-center">
+        <div className="flex items-center gap-8 bg-zinc-50/50 p-6 border border-zinc-100 rounded-sm">
+          <div className="w-24 h-24 bg-white rounded-full overflow-hidden border border-zinc-200 flex items-center justify-center shadow-sm">
             {avatarUrl ? (
               <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-4xl text-zinc-300 font-cormorant italic">{fullName[0]}</span>
+              <span className="text-3xl text-zinc-300 font-cormorant italic">
+                {fullName ? fullName[0] : "?"}
+              </span>
             )}
           </div>
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-widest mb-2 cursor-pointer bg-zinc-900 text-white px-4 py-2 hover:bg-zinc-700 transition-colors">
+            <label className="inline-block text-[10px] font-bold uppercase tracking-widest mb-2 cursor-pointer bg-zinc-900 text-white px-6 py-3 hover:bg-zinc-800 transition-all rounded-sm">
               Cambiar Foto
               <input type="file" className="hidden" onChange={uploadAvatar} disabled={updating} />
             </label>
-            <p className="text-[10px] text-zinc-400 uppercase tracking-tighter">JPG o PNG. Máximo 1MB.</p>
+            <p className="text-[10px] text-zinc-400 uppercase tracking-widest">
+              JPG o PNG. Máximo 1MB.
+            </p>
           </div>
         </div>
 
         {/* DATOS PERSONALES */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Nombre Completo</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="space-y-2 border-b border-zinc-100 pb-2 focus-within:border-zinc-900 transition-colors">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-[0.2em]">Nombre Completo</label>
             <input 
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900 transition-colors bg-transparent" 
-              placeholder="Tu nombre"
+              className="w-full py-1 outline-none bg-transparent text-xl font-cormorant italic text-zinc-800" 
+              placeholder="Tu nombre..."
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Email (No editable)</label>
+          <div className="space-y-2 border-b border-zinc-100 pb-2 opacity-60">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-[0.2em]">Email (Protegido)</label>
             <input 
               value={profile?.email || ""} 
               disabled 
-              className="w-full border-b border-zinc-100 py-2 text-zinc-300 bg-transparent cursor-not-allowed" 
+              className="w-full py-1 bg-transparent cursor-not-allowed text-zinc-500" 
             />
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Sobre mí (Biografía)</label>
+        <div className="space-y-2 border-b border-zinc-100 pb-2 focus-within:border-zinc-900 transition-colors">
+          <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-[0.2em]">Sobre mí (Biografía)</label>
           <textarea 
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            rows={3} 
-            className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900 bg-transparent italic"
-            placeholder="Buscando el equilibrio entre el éxito y la paz interior..."
+            rows={2} 
+            className="w-full py-2 outline-none bg-transparent italic text-zinc-600 resize-none"
+            placeholder="Comparte algo sobre tu camino en el yoga..."
           />
         </div>
 
         <button 
           type="submit" 
           disabled={updating}
-          className="w-full bg-zinc-900 text-white py-6 text-[12px] font-bold uppercase tracking-[0.5em] hover:bg-zinc-800 transition-all"
+          className="w-full bg-zinc-900 text-white py-6 text-[11px] font-bold uppercase tracking-[0.4em] hover:bg-zinc-800 transition-all shadow-xl disabled:opacity-50"
         >
-          {updating ? "Guardando..." : "ACTUALIZAR PERFIL"}
+          {updating ? "Sincronizando..." : "ACTUALIZAR PERFIL"}
         </button>
       </form>
     </main>
