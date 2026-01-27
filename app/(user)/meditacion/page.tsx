@@ -21,7 +21,7 @@ export default async function MeditacionPage() {
       *,
       instructor:instructor_id(name)
     `)
-    .eq("experience_type", "Meditación") 
+    .eq("experience_type", "Meditacion") 
     .eq("is_published", true)
     .order("created_at", { ascending: false })
 
