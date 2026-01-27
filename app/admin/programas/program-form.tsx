@@ -1,75 +1,190 @@
-{/* SECCIÓN 2: GESTIÓN DE CLASES */}
-<section className="space-y-6">
-  <div className="flex justify-between items-end border-b border-zinc-100 pb-4">
-    <div>
-      <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-900">Sesiones del Programa</h2>
-      <p className="text-zinc-400 text-[11px] italic mt-1 font-light tracking-wide">Gestiona el contenido específico de cada clase</p>
-    </div>
-    <button 
-      type="button" 
-      onClick={addClassRow}
-      className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all"
-    >
-      <Plus size={14} /> Agregar Clase
-    </button>
-  </div>
+"use client"
 
-  <div className="space-y-4">
-    {classes.map((clase, index) => (
-      <div key={index} className="bg-white border border-zinc-100 p-6 shadow-sm group relative">
-        <button 
-          type="button" 
-          onClick={() => removeClass(index)}
-          className="absolute top-4 right-4 text-zinc-300 hover:text-red-500 transition-colors"
-        >
-          <Trash2 size={16} />
-        </button>
-        
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Datos de la Sesión: Título, Video y Área de Enfoque */}
-          <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <label className="text-[9px] uppercase text-zinc-400 font-bold tracking-widest">Título de la Sesión</label>
-              <input 
-                placeholder="Ej: Día 1 - Flow de Mañana" 
-                value={clase.title}
-                onChange={(e) => updateClass(index, "title", e.target.value)}
-                className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900 transition-colors"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[9px] uppercase text-zinc-400 font-bold tracking-widest">URL Video (Vimeo/YT)</label>
-              <input 
-                placeholder="vimeo.com/..." 
-                value={clase.vimeo_url}
-                onChange={(e) => updateClass(index, "vimeo_url", e.target.value)}
-                className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900 transition-colors"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[9px] uppercase text-zinc-400 font-bold tracking-widest">Área de Enfoque de la Clase</label>
-              <input 
-                placeholder="Ej: Caderas, Core, Relax" 
-                value={clase.focus_area} // Este campo se guardará en la tabla 'classes'
-                onChange={(e) => updateClass(index, "focus_area", e.target.value)}
-                className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900 transition-colors"
-              />
-            </div>
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { Plus, Trash2 } from "lucide-react"
+
+export function ProgramForm({ program, instructors }: any) {
+  const router = useRouter()
+  const supabase = createClient()
+  const [loading, setLoading] = useState(false)
+  
+  // Estado para las clases vinculadas
+  const [classes, setClasses] = useState<any[]>([])
+
+  useEffect(() => {
+    if (program?.classes) {
+      setClasses(program.classes)
+    }
+  }, [program])
+
+  const addClassRow = () => {
+    setClasses([...classes, { 
+      title: "", 
+      description: "", 
+      vimeo_url: "", 
+      focus_area: "", // Nuevo campo solicitado
+      slug: `clase-${Date.now()}`,
+      order: classes.length + 1 
+    }])
+  }
+
+  const updateClass = (index: number, field: string, value: string) => {
+    const newClasses = [...classes]
+    newClasses[index] = { ...newClasses[index], [field]: value }
+    setClasses(newClasses)
+  }
+
+  const removeClass = (index: number) => {
+    setClasses(classes.filter((_, i) => i !== index))
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setLoading(true)
+    const formData = new FormData(e.currentTarget)
+    
+    const programData = {
+      title: formData.get("title"),
+      slug: formData.get("slug"),
+      description: formData.get("description"),
+      experience_type: formData.get("experience_type"),
+      area_of_focus: formData.get("area_of_focus"),
+      practice_level: formData.get("practice_level"),
+      vimeo_url: formData.get("vimeo_url"),
+      instructor_id: formData.get("instructor_id"),
+    }
+
+    // 1. Guardar Programa
+    const { data: savedProgram, error: pError } = program?.id 
+      ? await supabase.from("programs").update(programData).eq("id", program.id).select().single()
+      : await supabase.from("programs").insert([programData]).select().single()
+
+    if (pError) {
+      alert("Error en programa: " + pError.message)
+      setLoading(false)
+      return
+    }
+
+    // 2. Guardar Clases vinculadas
+    const classesToSave = classes.map(c => ({
+      ...c,
+      program_id: savedProgram.id,
+      instructor_id: programData.instructor_id
+    }))
+
+    const { error: cError } = await supabase.from("classes").upsert(classesToSave)
+
+    if (!cError) {
+      router.push("/admin/programas")
+      router.refresh()
+    } else {
+      alert("Error en clases: " + cError.message)
+    }
+    setLoading(false)
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-5xl mx-auto space-y-12 pb-20">
+      <section className="bg-white p-8 border border-zinc-100 shadow-sm space-y-6">
+        <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-900 border-b border-zinc-100 pb-4">Configuración del Programa</h2>
+        <div className="grid grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Título</label>
+            <input name="title" defaultValue={program?.title} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" required />
           </div>
-
-          {/* Descripción de la clase */}
-          <div className="md:col-span-12 space-y-2">
-            <label className="text-[9px] uppercase text-zinc-400 font-bold tracking-widest">Descripción de la Sesión</label>
-             <textarea 
-              placeholder="¿Qué aprenderá el alumno en esta clase específica?" 
-              value={clase.description}
-              onChange={(e) => updateClass(index, "description", e.target.value)}
-              rows={2}
-              className="w-full border border-zinc-100 p-3 text-sm outline-none focus:border-zinc-900 transition-colors"
-            />
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Slug (URL)</label>
+            <input name="slug" defaultValue={program?.slug} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" required />
           </div>
         </div>
-      </div>
-    ))}
-  </div>
-</section>
+
+        <div className="grid grid-cols-3 gap-8">
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Área de Enfoque</label>
+            <input name="area_of_focus" defaultValue={program?.area_of_focus} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Nivel</label>
+            <select name="practice_level" defaultValue={program?.practice_level} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
+              <option value="Principiante">Principiante</option>
+              <option value="Intermedio">Intermedio</option>
+              <option value="Avanzado">Avanzado</option>
+              <option value="Todos">Todos los niveles</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Instructor</label>
+            <select name="instructor_id" defaultValue={program?.instructor_id} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
+              {instructors.map((ins: any) => (
+                <option key={ins.id} value={ins.id}>{ins.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Video Intro (Vimeo/YT)</label>
+          <input name="vimeo_url" defaultValue={program?.vimeo_url} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Descripción</label>
+          <textarea name="description" defaultValue={program?.description} rows={3} className="w-full border border-zinc-100 p-3 outline-none focus:border-zinc-900" />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <div className="flex justify-between items-end border-b border-zinc-100 pb-4">
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-900">Sesiones (Clases)</h2>
+          <button type="button" onClick={addClassRow} className="bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all">
+            + Agregar Clase
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {classes.map((clase, index) => (
+            <div key={index} className="bg-white border border-zinc-100 p-6 shadow-sm relative">
+              <button type="button" onClick={() => removeClass(index)} className="absolute top-4 right-4 text-zinc-300 hover:text-red-500">
+                <Trash2 size={16} />
+              </button>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                <input 
+                  placeholder="Título de la clase" 
+                  value={clase.title}
+                  onChange={(e) => updateClass(index, "title", e.target.value)}
+                  className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900"
+                />
+                <input 
+                  placeholder="Video URL" 
+                  value={clase.vimeo_url}
+                  onChange={(e) => updateClass(index, "vimeo_url", e.target.value)}
+                  className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900"
+                />
+                <input 
+                  placeholder="Enfoque (Caderas, Core...)" 
+                  value={clase.focus_area}
+                  onChange={(e) => updateClass(index, "focus_area", e.target.value)}
+                  className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900"
+                />
+              </div>
+              <textarea 
+                placeholder="Descripción de la clase..." 
+                value={clase.description}
+                onChange={(e) => updateClass(index, "description", e.target.value)}
+                rows={2}
+                className="w-full border border-zinc-100 p-3 text-sm outline-none focus:border-zinc-900"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <button disabled={loading} className="w-full bg-zinc-900 text-white py-6 text-[12px] font-bold uppercase tracking-[0.5em] hover:bg-zinc-800 transition-all">
+        {loading ? "Guardando..." : "Publicar Programa y Sesiones"}
+      </button>
+    </form>
+  )
+}
