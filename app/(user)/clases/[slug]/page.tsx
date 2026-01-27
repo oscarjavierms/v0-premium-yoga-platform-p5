@@ -21,10 +21,10 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const vimeoId = clase.vimeo_url?.split("/").pop()
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* ✅ VIDEO - SIN ESPACIO BLANCO Y MÁS GRANDE */}
-      <section className="w-full" style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
-        <div className="max-w-7xl mx-auto px-6">
+    <main className="min-h-screen bg-white -mt-4">
+      {/* ✅ VIDEO - COMPLETAMENTE PEGADO AL MENÚ, SIN ESPACIOS */}
+      <section className="w-full px-6 py-0" style={{ marginTop: "-1rem" }}>
+        <div className="max-w-7xl mx-auto px-0">
           <div style={{ maxWidth: "900px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
             <iframe
               src={`https://player.vimeo.com/video/${vimeoId}?h=0&title=0&byline=0&portrait=0`}
@@ -36,7 +36,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
       </section>
 
       {/* ✅ CONTENIDO EN DOS COLUMNAS DEBAJO DEL VIDEO */}
-      <section className="w-full px-6 py-8 pb-20">
+      <section className="w-full px-6 py-12 pb-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
