@@ -33,35 +33,37 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const videoSrc = getVideoEmbedUrl(program.vimeo_url);
 
   return (
-    <main className="min-h-screen bg-white pb-10 px-6">
-      <div className="max-w-7xl mx-auto pt-10">
+    <main className="min-h-screen bg-white pb-10 px-6 -mt-4">
+      {/* SIN ESPACIO EXTRA - PADDING MÍNIMO */}
+      <div className="max-w-7xl mx-auto pt-4">
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-20">
           <div className="lg:col-span-6 space-y-8">
+            {/* TÍTULO 15% MÁS PEQUEÑO */}
             <header>
-              <h1 className="text-7xl md:text-8xl font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter mb-6">
+              <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 leading-[0.9] tracking-tighter mb-4">
                 {program.title}
               </h1>
-              <p className="text-xl font-cormorant italic text-zinc-400">Por {program.instructors?.name}</p>
+              <p className="text-base font-cormorant italic text-zinc-400">Por {program.instructors?.name}</p>
             </header>
 
             <div className="space-y-4">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">Descripción</h3>
-              <p className="text-zinc-500 leading-relaxed text-[16px] font-light italic whitespace-pre-wrap">
+              <p className="text-zinc-500 leading-relaxed text-sm font-light italic whitespace-pre-wrap">
                 {program.description}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-y-10 pt-10 border-t border-zinc-100">
                <div>
-                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Área de Enfoque</span>
+                  <span className="block text-xl text-zinc-800 font-cormorant italic leading-none mb-1">Área de Enfoque</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.focus_area || program.area_of_focus}</span>
                </div>
                <div>
-                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Nivel</span>
+                  <span className="block text-xl text-zinc-800 font-cormorant italic leading-none mb-1">Nivel</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.practice_level}</span>
                </div>
                <div>
-                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Sesiones</span>
+                  <span className="block text-xl text-zinc-800 font-cormorant italic leading-none mb-1">Sesiones</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.classes?.length || 0} Clases</span>
                </div>
             </div>
@@ -76,7 +78,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
         </section>
 
         <section className="pt-20 border-t border-zinc-100">
-          <h2 className="text-xl font-cormorant italic text-zinc-900 mb-12 uppercase tracking-widest">Contenido del Programa</h2>
+          <h2 className="text-lg font-cormorant italic text-zinc-900 mb-12 uppercase tracking-widest">Contenido del Programa</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {program.classes?.map((clase: any, i: number) => (
               <Link href={`/clases/${clase.slug}`} key={clase.id} className="group space-y-4">
@@ -86,7 +88,7 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
                 </div>
                 <div>
                   <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Sesión {i + 1} • {clase.focus_area}</span>
-                  <h3 className="text-lg font-cormorant italic text-zinc-800 leading-tight mt-1">{clase.title}</h3>
+                  <h3 className="text-base font-cormorant italic text-zinc-800 leading-tight mt-1">{clase.title}</h3>
                 </div>
               </Link>
             ))}
