@@ -14,15 +14,16 @@ export function ProgramForm({ program, instructors }: any) {
     setLoading(true)
     const formData = new FormData(e.currentTarget)
     
-    // Asegúrate de que estos nombres coincidan con tus columnas en Supabase
+    // Sincronización exacta con las columnas de tu tabla 'programs'
     const programData = {
       title: formData.get("title"),
       slug: formData.get("slug"),
       description: formData.get("description"),
       experience_type: formData.get("experience_type"),
-      area_of_focus: formData.get("area_of_focus"), // Sincronizado
-      practice_level: formData.get("practice_level"), // Sincronizado
+      area_of_focus: formData.get("area_of_focus"), // Corregido: antes era focus_area
+      practice_level: formData.get("practice_level"), // Conectado a la columna 'practice_level'
       vimeo_url: formData.get("vimeo_url"),
+      cover_image_url: formData.get("cover_image_url"), // Campo para la imagen que vi en tu captura
       instructor_id: formData.get("instructor_id"),
       is_published: formData.get("is_published") === "on",
     }
@@ -45,11 +46,11 @@ export function ProgramForm({ program, instructors }: any) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-2">
           <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Título</label>
-          <input name="title" defaultValue={program?.title} className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900 transition-colors" required />
+          <input name="title" defaultValue={program?.title} className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900" required />
         </div>
         <div className="space-y-2">
           <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Slug (URL)</label>
-          <input name="slug" defaultValue={program?.slug} className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900 transition-colors" required />
+          <input name="slug" defaultValue={program?.slug} className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900" required />
         </div>
       </div>
 
@@ -61,16 +62,16 @@ export function ProgramForm({ program, instructors }: any) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-2">
           <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Nivel</label>
-          <select name="practice_level" defaultValue={program?.practice_level} className="w-full p-3 border border-zinc-100 bg-white outline-none">
-            <option value="Principiante">Principiante</option>
-            <option value="Intermedio">Intermedio</option>
-            <option value="Avanzado">Avanzado</option>
-            <option value="Todos">Todos los niveles</option>
+          <select name="practice_level" defaultValue={program?.practice_level} className="w-full p-3 border-b border-zinc-100 bg-white outline-none">
+            <option value="beginner">Principiante</option>
+            <option value="intermediate">Intermedio</option>
+            <option value="advanced">Avanzado</option>
+            <option value="all">Todos los niveles</option>
           </select>
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Área de Enfoque</label>
-          <input name="area_of_focus" defaultValue={program?.area_of_focus} placeholder="Ej: Piernas, Espalda" className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900" />
+          <label className="text-[10px] font-bold uppercase-tracking-widest text-zinc-400">Área de Enfoque</label>
+          <input name="area_of_focus" defaultValue={program?.area_of_focus} placeholder="Ej: piernas, flexibilidad" className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900" />
         </div>
       </div>
 
@@ -80,17 +81,22 @@ export function ProgramForm({ program, instructors }: any) {
           <input name="vimeo_url" defaultValue={program?.vimeo_url} className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900" />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Instructor</label>
-          <select name="instructor_id" defaultValue={program?.instructor_id} className="w-full p-3 border border-zinc-100 bg-white outline-none">
-            {instructors.map((ins: any) => (
-              <option key={ins.id} value={ins.id}>{ins.name}</option>
-            ))}
-          </select>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Foto de Portada (URL)</label>
+          <input name="cover_image_url" defaultValue={program?.cover_image_url} className="w-full p-3 border-b border-zinc-100 outline-none focus:border-zinc-900" />
         </div>
       </div>
 
-      <button disabled={loading} className="w-full bg-zinc-900 text-white py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-zinc-800 transition-all disabled:opacity-50">
-        {loading ? "Guardando..." : "Actualizar Programa"}
+      <div className="space-y-2">
+        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Instructor</label>
+        <select name="instructor_id" defaultValue={program?.instructor_id} className="w-full p-3 border-b border-zinc-100 bg-white outline-none">
+          {instructors.map((ins: any) => (
+            <option key={ins.id} value={ins.id}>{ins.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <button disabled={loading} className="w-full bg-zinc-900 text-white py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-zinc-800 transition-all">
+        {loading ? "Procesando..." : "Actualizar Programa"}
       </button>
     </form>
   )
