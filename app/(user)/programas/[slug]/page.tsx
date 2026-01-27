@@ -53,8 +53,8 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
 
             <div className="grid grid-cols-2 gap-y-10 pt-10 border-t border-zinc-100">
                <div>
-                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Área</span>
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.area_of_focus}</span>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Área de Enfoque</span>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.focus_area || program.area_of_focus}</span>
                </div>
                <div>
                   <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Nivel</span>
