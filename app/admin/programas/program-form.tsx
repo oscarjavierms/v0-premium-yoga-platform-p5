@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Trash2 } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 
 export function ProgramForm({ program, instructors }: any) {
   const router = useRouter()
@@ -20,6 +20,7 @@ export function ProgramForm({ program, instructors }: any) {
   const addClassRow = () => {
     setClasses([...classes, { 
       title: "", 
+      description: "", 
       vimeo_url: "", 
       focus_area: "",
       slug: `clase-${Date.now()}`,
@@ -63,14 +64,15 @@ export function ProgramForm({ program, instructors }: any) {
       return
     }
 
-    // Sincronización: Cada clase recibe el nivel y experiencia del programa
+    // ✅ MAPEO CORRECTO: Heredar categorías del programa a cada clase
     const classesToSave = classes.map(c => ({
       ...c,
       program_id: savedProgram.id,
       instructor_id: programData.instructor_id,
-      experience_type: programData.experience_type, 
+      is_published: true,
+      // ✅ HEREDAR campos del programa
+      experience_type: programData.experience_type,
       practice_level: programData.practice_level,
-      status: 'published'
     }))
 
     const { error: cError } = await supabase.from("classes").upsert(classesToSave)
@@ -100,10 +102,11 @@ export function ProgramForm({ program, instructors }: any) {
           </div>
         </div>
 
+        {/* CUADRÍCULA DE 4 COLUMNAS PARA LOS SELECTORES */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Experiencia</label>
-            <select name="experience_type" defaultValue={program?.experience_type} className="w-full border-b border-zinc-100 py-2 bg-white outline-none focus:border-zinc-900" required>
+            <select name="experience_type" defaultValue={program?.experience_type || ""} className="w-full border-b border-zinc-100 py-2 bg-white outline-none focus:border-zinc-900" required>
               <option value="">Seleccionar...</option>
               <option value="Yoga">Yoga</option>
               <option value="Meditación">Meditación</option>
@@ -112,13 +115,14 @@ export function ProgramForm({ program, instructors }: any) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Area de enfoque</label>
-            <input name="focus_area" defaultValue={program?.focus_area} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" />
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Área de Enfoque</label>
+            <input name="focus_area" defaultValue={program?.focus_area || ""} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" placeholder="Ej: Espalda" />
           </div>
           
           <div className="space-y-2">
-            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Nivel de experiencia</label>
-            <select name="practice_level" defaultValue={program?.practice_level} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Nivel</label>
+            <select name="practice_level" defaultValue={program?.practice_level || ""} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
+              <option value="">Seleccionar...</option>
               <option value="Principiante">Principiante</option>
               <option value="Intermedio">Intermedio</option>
               <option value="Avanzado">Avanzado</option>
@@ -128,7 +132,8 @@ export function ProgramForm({ program, instructors }: any) {
 
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Instructor</label>
-            <select name="instructor_id" defaultValue={program?.instructor_id} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
+            <select name="instructor_id" defaultValue={program?.instructor_id || ""} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
+              <option value="">Seleccionar...</option>
               {instructors.map((ins: any) => (
                 <option key={ins.id} value={ins.id}>{ins.name}</option>
               ))}
@@ -138,19 +143,19 @@ export function ProgramForm({ program, instructors }: any) {
 
         <div className="space-y-2">
           <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">URL Video Intro</label>
-          <input name="vimeo_url" defaultValue={program?.vimeo_url} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" />
+          <input name="vimeo_url" defaultValue={program?.vimeo_url || ""} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" />
         </div>
 
         <div className="space-y-2">
           <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Descripción</label>
-          <textarea name="description" defaultValue={program?.description} rows={3} className="w-full border border-zinc-100 p-3 outline-none focus:border-zinc-900" />
+          <textarea name="description" defaultValue={program?.description || ""} rows={3} className="w-full border border-zinc-100 p-3 outline-none focus:border-zinc-900" />
         </div>
       </section>
 
       <section className="space-y-6">
         <div className="flex justify-between items-end border-b border-zinc-100 pb-4">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-900">Sesiones del Programa</h2>
-          <button type="button" onClick={addClassRow} className="bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800">
+          <button type="button" onClick={addClassRow} className="bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all">
             + AGREGAR SESIÓN
           </button>
         </div>
@@ -162,19 +167,34 @@ export function ProgramForm({ program, instructors }: any) {
                 <Trash2 size={16} />
               </button>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <input placeholder="Título" value={clase.title} onChange={(e) => updateClass(index, "title", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
-                <input placeholder="Video URL" value={clase.vimeo_url} onChange={(e) => updateClass(index, "vimeo_url", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
+                <input 
+                  placeholder="Título de la sesión" 
+                  value={clase.title} 
+                  onChange={(e) => updateClass(index, "title", e.target.value)} 
+                  className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" 
+                />
+                <input 
+                  placeholder="URL Video Vimeo" 
+                  value={clase.vimeo_url} 
+                  onChange={(e) => updateClass(index, "vimeo_url", e.target.value)} 
+                  className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" 
+                />
               </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase text-zinc-400 font-bold tracking-widest">Area de enfoque</label>
-                <input placeholder="Ej: Apertura de pecho" value={clase.focus_area} onChange={(e) => updateClass(index, "focus_area", e.target.value)} className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
-              </div>
+              <input 
+                placeholder="Área de enfoque de esta sesión (ej: Espalda, Caderas)" 
+                value={clase.focus_area} 
+                onChange={(e) => updateClass(index, "focus_area", e.target.value)} 
+                className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" 
+              />
             </div>
           ))}
         </div>
       </section>
 
-      <button disabled={loading} className="w-full bg-zinc-900 text-white py-6 text-[12px] font-bold uppercase tracking-[0.5em] hover:bg-zinc-800 transition-all">
+      <button 
+        disabled={loading} 
+        className="w-full bg-zinc-900 text-white py-6 text-[12px] font-bold uppercase tracking-[0.5em] hover:bg-zinc-800 transition-all disabled:opacity-50"
+      >
         {loading ? "Sincronizando..." : "PUBLICAR TODO"}
       </button>
     </form>
