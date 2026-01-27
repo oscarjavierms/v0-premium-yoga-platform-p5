@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
+import CommentSection from "@/components/clases/comment-section"
 
 export default async function ClasePage({ params }: { params: { slug: string } }) {
   const { slug } = await params
   const supabase = await createClient()
 
-  // ✅ Obtener datos de la clase con todos los campos necesarios
   const { data: clase } = await supabase
     .from("classes")
     .select(`
@@ -22,10 +22,10 @@ export default async function ClasePage({ params }: { params: { slug: string } }
 
   return (
     <main className="min-h-screen bg-white">
-      {/* ✅ VIDEO - SIN ESPACIO BLANCO Y 8% MÁS GRANDE */}
-      <section className="w-full px-6" style={{ paddingTop: "0.5rem", paddingBottom: "0.5rem" }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="max-w-3xl mx-auto aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
+      {/* ✅ VIDEO - SIN ESPACIO BLANCO Y MÁS GRANDE */}
+      <section className="w-full" style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div style={{ maxWidth: "900px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
             <iframe
               src={`https://player.vimeo.com/video/${vimeoId}?h=0&title=0&byline=0&portrait=0`}
               className="w-full h-full"
@@ -58,6 +58,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                 {clase.description}
               </p>
 
+              {/* ✅ COMPONENTE DE COMENTARIOS */}
               <CommentSection claseId={clase.id} />
             </div>
 
@@ -119,108 +120,5 @@ export default async function ClasePage({ params }: { params: { slug: string } }
         </div>
       </section>
     </main>
-  )
-}
-
-// ✅ COMPONENTE DE COMENTARIOS
-async function CommentSection({ claseId }: { claseId: string }) {
-  const supabase = await createClient()
-
-  const { data: comments } = await supabase
-    .from("class_comments")
-    .select(`
-      id,
-      content,
-      created_at,
-      user:user_id(id, email)
-    `)
-    .eq("class_id", claseId)
-    .order("created_at", { ascending: false })
-
-  return (
-    <section className="pt-8 border-t border-zinc-100">
-      <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6">Comunidad</h3>
-      <CommentForm claseId={claseId} />
-
-      {/* ✅ MOSTRAR COMENTARIOS */}
-      <div className="mt-8 space-y-6">
-        {comments && comments.length > 0 ? (
-          comments.map((comment: any) => (
-            <div key={comment.id} className="border-b border-zinc-100 pb-4 last:border-0">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-sm font-semibold text-zinc-700">
-                  {comment.user?.email || "Anónimo"}
-                </span>
-                <span className="text-[10px] text-zinc-400">
-                  {new Date(comment.created_at).toLocaleDateString("es-ES", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
-              <p className="text-zinc-600 text-sm italic">{comment.content}</p>
-            </div>
-          ))
-        ) : (
-          <p className="text-zinc-400 italic text-sm">Sin comentarios aún. ¡Sé el primero!</p>
-        )}
-      </div>
-    </section>
-  )
-}
-
-// ✅ COMPONENTE PARA PUBLICAR COMENTARIOS
-function CommentForm({ claseId }: { claseId: string }) {
-  return (
-    <form action={async (formData) => {
-      "use server"
-      
-      const supabase = await createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        alert("Debes iniciar sesión para comentar")
-        return
-      }
-
-      const content = formData.get("content") as string
-
-      if (!content.trim()) {
-        alert("El comentario no puede estar vacío")
-        return
-      }
-
-      const { error } = await supabase.from("class_comments").insert([
-        {
-          class_id: claseId,
-          user_id: user.id,
-          content: content.trim(),
-        },
-      ])
-
-      if (error) {
-        alert("Error al publicar comentario: " + error.message)
-      } else {
-        // ✅ Recarga la página para ver el nuevo comentario
-        window.location.reload()
-      }
-    }} className="space-y-4">
-      <textarea 
-        name="content"
-        className="w-full p-4 bg-zinc-50 border border-zinc-100 italic text-sm outline-none mb-4 rounded-sm focus:border-zinc-900" 
-        placeholder="Comparte tu experiencia..." 
-        rows={4} 
-        required
-      />
-      <button 
-        type="submit"
-        className="bg-zinc-900 text-white px-8 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-700 transition-colors rounded-sm"
-      >
-        Publicar
-      </button>
-    </form>
   )
 }
