@@ -6,36 +6,24 @@ export const dynamic = 'force-dynamic'
 
 export default async function MiPracticaPage() {
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect("/login")
-  }
+  if (!user) redirect("/login")
 
-  // Traemos los programas guardados con toda su info anidada
   const { data: savedProgramsData } = await supabase
     .from("user_practice_saved_programs")
     .select(`
       id,
-      created_at,
       programs (
         id,
         title,
         slug,
         thumbnail_url,
-        experience_type,
-        practice_level,
         instructors (name)
       )
     `)
     .eq("user_id", user.id)
 
-  return (
-    <MiPracticaClient 
-      savedPrograms={savedProgramsData || []} 
-      savedClasses={[]} 
-      history={[]} 
-    />
-  )
+  // Enviamos una lista limpia
+  return <MiPracticaClient savedPrograms={savedProgramsData || []} />
 }
