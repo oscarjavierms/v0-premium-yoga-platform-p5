@@ -77,26 +77,19 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* ✅ REDUCIDO: pt-20 → pt-8 (menos espacio) */}
+        {/* ✅ REDUCIDO: pt-8 (espacio muy pequeño) */}
         <section className="pt-8 border-t border-zinc-100">
           <h2 className="text-lg font-cormorant italic text-zinc-900 mb-12 uppercase tracking-widest">Contenido del Programa</h2>
-          
-          {/* ✅ TARJETAS SIN DESCRIPCIÓN - COMO EN YOGA */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {program.classes?.map((clase: any, i: number) => (
               <Link href={`/clases/${clase.slug}`} key={clase.id} className="group space-y-4">
-                {/* IMAGEN */}
                 <div className="relative aspect-video bg-zinc-100 overflow-hidden shadow-sm transition-all duration-700 group-hover:shadow-xl rounded-sm">
                   {clase.thumbnail_url && <img src={clase.thumbnail_url} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" />}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 text-white text-[10px] font-bold uppercase tracking-widest">Ver Clase</div>
                 </div>
-
-                {/* ✅ SIN DESCRIPCIÓN - SOLO SESIÓN + ÁREA + TÍTULO (como Yoga) */}
-                <div className="space-y-1">
+                <div>
                   <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Sesión {i + 1} • {clase.focus_area}</span>
-                  <h3 className="text-base font-cormorant italic text-zinc-800 leading-tight">
-                    {clase.title}
-                  </h3>
+                  <h3 className="text-lg font-cormorant italic text-zinc-800 leading-tight mt-1">{clase.title}</h3>
                 </div>
               </Link>
             ))}
