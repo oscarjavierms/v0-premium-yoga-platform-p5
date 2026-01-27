@@ -76,9 +76,13 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* ✅ CAMBIO: "CONTENIDO DEL PROGRAMA" → "CLASES" */}
-        <section className="pt-2 border-t border-zinc-100">
-          <h2 className="text-lg font-cormorant italic text-zinc-900 mb-4 uppercase tracking-widest">Clases</h2>
+        {/* ✅ SECCIÓN CLASES - MÁS GRANDE Y DESTACADA */}
+        <section className="pt-12 pb-4 border-t border-zinc-100">
+          <h2 className="text-4xl font-cormorant italic text-zinc-900 mb-6 uppercase tracking-widest leading-tight">
+            Clases
+          </h2>
+          <div className="w-16 h-px bg-zinc-200 mb-12"></div>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {program.classes?.map((clase: any, i: number) => (
               <Link href={`/clases/${clase.slug}`} key={clase.id} className="group space-y-4">
