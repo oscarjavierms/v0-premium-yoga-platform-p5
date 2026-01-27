@@ -3,19 +3,34 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Wand2 } from "lucide-react"
 
 export function ProgramForm({ program, instructors }: any) {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [classes, setClasses] = useState<any[]>([])
+  const [slug, setSlug] = useState(program?.slug || "")
+  const [title, setTitle] = useState(program?.title || "")
 
   useEffect(() => {
     if (program?.classes) {
       setClasses(program.classes)
     }
   }, [program])
+
+  // Lógica para generar el Slug automáticamente
+  const generateSlug = () => {
+    const generated = title
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Quita acentos
+      .replace(/[^a-z0-9 -]/g, '') // Quita caracteres especiales
+      .replace(/\s+/g, '-') // Espacios por guiones
+      .replace(/-+/g, '-'); // Quita guiones dobles
+    setSlug(generated);
+  }
 
   const addClassRow = () => {
     setClasses([...classes, { 
@@ -45,7 +60,7 @@ export function ProgramForm({ program, instructors }: any) {
     
     const programData = {
       title: formData.get("title"),
-      slug: formData.get("slug"),
+      slug: slug, // Usamos el estado del slug
       description: formData.get("description"),
       focus_area: formData.get("focus_area"),
       experience_type: formData.get("experience_type"),
@@ -64,13 +79,11 @@ export function ProgramForm({ program, instructors }: any) {
       return
     }
 
-    // ✅ MAPEO CORRECTO: Heredar categorías del programa a cada clase
     const classesToSave = classes.map(c => ({
       ...c,
       program_id: savedProgram.id,
       instructor_id: programData.instructor_id,
       is_published: true,
-      // ✅ HEREDAR campos del programa
       experience_type: programData.experience_type,
       practice_level: programData.practice_level,
     }))
@@ -94,15 +107,35 @@ export function ProgramForm({ program, instructors }: any) {
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Título</label>
-            <input name="title" defaultValue={program?.title} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" required />
+            <input 
+              name="title" 
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" 
+              required 
+            />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Slug (URL)</label>
-            <input name="slug" defaultValue={program?.slug} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" required />
+            <div className="flex gap-2">
+              <input 
+                name="slug" 
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900 font-mono text-xs text-zinc-500" 
+                required 
+              />
+              <button
+                type="button"
+                onClick={generateSlug}
+                className="flex items-center gap-1 px-3 py-1 text-[9px] border border-zinc-200 text-zinc-500 hover:bg-zinc-900 hover:text-white transition-all uppercase font-bold"
+              >
+                <Wand2 size={10} /> Generar
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* CUADRÍCULA DE 4 COLUMNAS PARA LOS SELECTORES */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Experiencia</label>
