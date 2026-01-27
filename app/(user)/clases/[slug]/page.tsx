@@ -22,10 +22,10 @@ export default async function ClasePage({ params }: { params: { slug: string } }
 
   return (
     <main className="min-h-screen bg-white">
-      {/* ✅ VIDEO PEQUEÑO Y CENTRADO - JUSTO DESPUÉS DEL MENÚ */}
-      <section className="w-full px-6 py-8">
+      {/* ✅ VIDEO - SIN FRANJA BLANCA Y MÁS GRANDE */}
+      <section className="w-full px-6 py-2">
         <div className="max-w-6xl mx-auto">
-          <div className="max-w-2xl mx-auto aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
+          <div className="max-w-3xl mx-auto aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
             <iframe
               src={`https://player.vimeo.com/video/${vimeoId}?h=0&title=0&byline=0&portrait=0`}
               className="w-full h-full"
@@ -36,7 +36,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
       </section>
 
       {/* ✅ CONTENIDO EN DOS COLUMNAS DEBAJO DEL VIDEO */}
-      <section className="w-full px-6 pb-20">
+      <section className="w-full px-6 py-8 pb-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
