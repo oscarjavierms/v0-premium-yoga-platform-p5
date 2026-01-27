@@ -50,81 +50,76 @@ export default function PerfilPage() {
     } catch (error: any) { alert(error.message) } finally { setUpdating(false) }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center font-cormorant italic text-zinc-400">Cargando santuario...</div>
+  if (loading) return <div className="min-h-screen flex items-center justify-center font-cormorant italic text-zinc-400">Cargando...</div>
 
   return (
-    <main className="max-w-3xl mx-auto px-6 pt-10 pb-24">
-      {/* HEADER MINIMALISTA */}
-      <header className="mb-16 text-center md:text-left">
-        <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 tracking-tighter mb-3">
-          Cuenta
+    <main className="max-w-2xl mx-auto px-6 pt-4 pb-12">
+      {/* HEADER COMPACTO */}
+      <header className="mb-8">
+        <h1 className="text-4xl font-cormorant italic text-zinc-900 tracking-tighter -mb-1">
+          Mi Perfil
         </h1>
-        <div className="h-[1px] w-12 bg-zinc-900 mx-auto md:mx-0 mb-4" />
-        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-bold">Ajustes del Santuario</p>
+        <p className="text-[11px] text-zinc-400 italic">
+          Personaliza tu espacio y presencia en el santuario.
+        </p>
       </header>
 
-      <form onSubmit={updateProfile} className="space-y-20">
-        {/* SECCIÓN FOTO: Centrada y Limpia */}
-        <section className="flex flex-col items-center justify-center py-4">
-          <div className="relative group">
-            <div className="w-28 h-28 rounded-full overflow-hidden bg-zinc-50 border border-zinc-100 shadow-sm transition-all group-hover:opacity-80">
+      <form onSubmit={updateProfile} className="space-y-8">
+        {/* SECCIÓN FOTO Y DATOS BÁSICOS (LADO A LADO) */}
+        <div className="flex flex-col md:flex-row gap-8 items-start md:items-center pb-8 border-b border-zinc-50">
+          <div className="relative flex-shrink-0">
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-zinc-50 border border-zinc-100 shadow-sm">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-zinc-200 text-3xl font-cormorant italic">
+                <div className="w-full h-full flex items-center justify-center text-zinc-200 text-2xl font-cormorant italic">
                   {fullName ? fullName[0] : "O"}
                 </div>
               )}
             </div>
-            <label className="absolute bottom-0 right-0 bg-white border border-zinc-200 p-2 rounded-full cursor-pointer hover:bg-zinc-900 hover:text-white transition-colors shadow-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <label className="absolute -bottom-1 -right-1 bg-white border border-zinc-200 p-1.5 rounded-full cursor-pointer hover:bg-zinc-900 hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               <input type="file" className="hidden" onChange={uploadAvatar} disabled={updating} />
             </label>
           </div>
-        </section>
 
-        {/* CAMPOS DE TEXTO: Estilo Editorial */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
-          <div className="group relative">
-            <label className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-black mb-4 block">Nombre Completo</label>
-            <input 
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full bg-transparent border-b border-zinc-100 py-2 outline-none focus:border-zinc-900 transition-all font-cormorant italic text-2xl text-zinc-800 placeholder:text-zinc-200"
-              placeholder="Tu nombre..."
-            />
-          </div>
-
-          <div className="relative opacity-50">
-            <label className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-black mb-4 block">Correo Electrónico</label>
-            <div className="py-2 text-zinc-400 font-light text-sm tracking-wide">
-              {profile?.email}
+          <div className="flex-1 w-full space-y-4">
+            <div className="relative">
+              <label className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-bold block mb-1">Nombre Completo</label>
+              <input 
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full bg-transparent border-b border-zinc-100 py-1 outline-none focus:border-zinc-900 transition-all font-cormorant italic text-xl text-zinc-800"
+                placeholder="Nombre..."
+              />
             </div>
-            <div className="absolute right-0 bottom-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div className="relative opacity-60">
+              <label className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-bold block mb-1">Email</label>
+              <div className="text-sm text-zinc-500 font-light">{profile?.email}</div>
             </div>
-          </div>
-
-          <div className="md:col-span-2 group relative">
-            <label className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-black mb-4 block">Biografía Corta</label>
-            <textarea 
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows={1}
-              className="w-full bg-transparent border-b border-zinc-100 py-2 outline-none focus:border-zinc-900 transition-all font-cormorant italic text-xl text-zinc-600 resize-none overflow-hidden"
-              placeholder="Escribe tu intención en el yoga..."
-            />
           </div>
         </div>
 
-        {/* BOTÓN: Refinado */}
-        <div className="pt-10">
+        {/* BIOGRAFÍA COMPACTA */}
+        <div className="relative">
+          <label className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-bold block mb-2">Biografía</label>
+          <textarea 
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={2}
+            className="w-full bg-zinc-50/50 p-3 outline-none border border-zinc-100 focus:border-zinc-900 transition-all font-cormorant italic text-base text-zinc-600 resize-none rounded-sm"
+            placeholder="Tu intención..."
+          />
+        </div>
+
+        {/* BOTÓN MÁS PEQUEÑO Y REFINADO */}
+        <div className="flex justify-end">
           <button 
             type="submit" 
             disabled={updating}
-            className="w-full md:w-auto md:px-16 py-5 bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-[0.5em] hover:bg-zinc-800 transition-all disabled:opacity-30"
+            className="bg-zinc-900 text-white px-10 py-3 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-zinc-800 transition-all disabled:opacity-30 rounded-sm"
           >
-            {updating ? "Guardando..." : "Guardar Perfil"}
+            {updating ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </form>
