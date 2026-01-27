@@ -34,11 +34,9 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
 
   return (
     <main className="min-h-screen bg-white pb-10 px-6 -mt-4">
-      {/* SIN ESPACIO EXTRA - PADDING MÍNIMO */}
       <div className="max-w-7xl mx-auto pt-4">
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-20">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-8">
           <div className="lg:col-span-6 space-y-8">
-            {/* TÍTULO 15% MÁS PEQUEÑO */}
             <header>
               <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 leading-[0.9] tracking-tighter mb-4">
                 {program.title}
@@ -77,9 +75,9 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
-        {/* ✅ REDUCIDO: pt-8 (espacio muy pequeño) */}
-        <section className="pt-8 border-t border-zinc-100">
-          <h2 className="text-lg font-cormorant italic text-zinc-900 mb-12 uppercase tracking-widest">Contenido del Programa</h2>
+        {/* ✅ MUCHO MÁS COMPACTO: pt-2 (espacio mínimo) y mb-4 */}
+        <section className="pt-2 border-t border-zinc-100">
+          <h2 className="text-lg font-cormorant italic text-zinc-900 mb-4 uppercase tracking-widest">Contenido del Programa</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {program.classes?.map((clase: any, i: number) => (
               <Link href={`/clases/${clase.slug}`} key={clase.id} className="group space-y-4">
