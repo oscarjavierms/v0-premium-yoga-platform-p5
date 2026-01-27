@@ -34,12 +34,14 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const videoSrc = getVideoEmbedUrl(program.vimeo_url);
 
   return (
-    <main className="min-h-screen bg-white pb-10 px-6 -mt-4">
-      <div className="max-w-7xl mx-auto pt-4">
+    <main className="min-h-screen bg-white pb-10 px-6 -mt-6">
+      {/* ✅ SIN PADDING TOP - PEGADO AL MENÚ */}
+      <div className="max-w-7xl mx-auto pt-0">
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-8">
           <div className="lg:col-span-6 space-y-8">
-            <header>
-              <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 leading-[0.9] tracking-tighter mb-4">
+            {/* ✅ TÍTULO SUBIDO MÁS */}
+            <header className="-mt-2">
+              <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 leading-[0.9] tracking-tighter mb-2">
                 {program.title}
               </h1>
               <p className="text-base font-cormorant italic text-zinc-400">Por {program.instructors?.name}</p>
@@ -68,7 +70,8 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
             </div>
           </div>
 
-          <div className="lg:col-span-6">
+          {/* ✅ VIDEO SUBIDO MÁS */}
+          <div className="lg:col-span-6 -mt-2">
             <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100 mb-8">
               {videoSrc && <iframe src={videoSrc} className="w-full h-full" allowFullScreen />}
             </div>
