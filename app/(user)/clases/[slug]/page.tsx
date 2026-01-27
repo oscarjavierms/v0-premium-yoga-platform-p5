@@ -5,9 +5,14 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const { slug } = await params
   const supabase = await createClient()
 
+  // ✅ Obtener datos de la clase con todos los campos necesarios
   const { data: clase } = await supabase
     .from("classes")
-    .select(`*`)
+    .select(`
+      *,
+      instructor:instructor_id(name, slug, avatar_url),
+      program:program_id(title, slug)
+    `)
     .eq("slug", slug)
     .single()
 
@@ -27,7 +32,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
         </div>
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 max-w-[1400px] mx-auto px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <div className="lg:col-span-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 tracking-tighter leading-none">
@@ -38,31 +43,76 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               <span className="text-[9px] font-bold uppercase tracking-tighter text-zinc-400">Me gusta</span>
             </button>
           </div>
-          <p className="text-zinc-500 italic font-light text-[17px] leading-relaxed mb-12 max-w-2xl">{clase.description}</p>
+          <p className="text-zinc-500 italic font-light text-[17px] leading-relaxed mb-12 max-w-2xl">
+            {clase.description}
+          </p>
+
+          <section className="pt-10 border-t border-zinc-100">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6">Comunidad</h3>
+            <textarea 
+              className="w-full p-4 bg-zinc-50 border-none italic text-sm outline-none mb-4" 
+              placeholder="Comparte tu experiencia..." 
+              rows={4} 
+            />
+            <button className="bg-zinc-900 text-white px-8 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-700 transition-colors">
+              Publicar
+            </button>
+          </section>
         </div>
 
-        {/* BARRA LATERAL DINÁMICA */}
-        <div className="lg:col-span-4 space-y-10 bg-zinc-50/50 p-8 border border-zinc-100 sticky top-32 h-fit">
-          <div>
-            <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Experiencia</span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-              {clase.experience_type || 'No definido'}
-            </span>
-          </div>
+        {/* ✅ PANEL LATERAL CON DATOS DINÁMICOS */}
+        <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 sticky top-32">
           
-          <div>
-            <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Area de enfoque</span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-              {clase.focus_area || 'No definido'}
-            </span>
-          </div>
+          {/* ✅ TIPO DE EXPERIENCIA (Yoga, Meditación, Fitness) */}
+          {clase.experience_type && (
+            <div>
+              <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Experiencia</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                {clase.experience_type}
+              </span>
+            </div>
+          )}
 
-          <div>
-            <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Nivel de experiencia</span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-              {clase.practice_level || 'No definido'}
-            </span>
-          </div>
+          {/* ✅ ÁREA DE ENFOQUE (Lo más importante - Dinámico) */}
+          {clase.focus_area && (
+            <div>
+              <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Área de Enfoque</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                {clase.focus_area}
+              </span>
+            </div>
+          )}
+
+          {/* ✅ NIVEL DE PRÁCTICA */}
+          {clase.practice_level && (
+            <div>
+              <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Nivel</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                {clase.practice_level}
+              </span>
+            </div>
+          )}
+
+          {/* ✅ INTENSIDAD (Suave, Moderado, Intenso) */}
+          {clase.intensity && (
+            <div>
+              <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Intensidad</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                {clase.intensity.charAt(0).toUpperCase() + clase.intensity.slice(1)}
+              </span>
+            </div>
+          )}
+
+          {/* ✅ DURACIÓN (Opcional pero útil) */}
+          {clase.duration_minutes && (
+            <div>
+              <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Duración</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                {clase.duration_minutes} minutos
+              </span>
+            </div>
+          )}
+
         </div>
       </div>
     </main>
