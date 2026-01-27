@@ -5,7 +5,6 @@ import { SaveProgramButton } from "@/components/programs/save-button"
 
 export const dynamic = 'force-dynamic'
 
-// Función de utilidad para manejar videos de YouTube y Vimeo
 function getVideoEmbedUrl(url: string) {
   if (!url) return null;
   if (url.includes('vimeo.com')) {
@@ -34,76 +33,61 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
   const videoSrc = getVideoEmbedUrl(program.vimeo_url);
 
   return (
-    <main className="min-h-screen bg-white pb-10 px-6 md:px-10">
-      <div className="max-w-7xl mx-auto">
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start mb-12">
-          
-          <div className="lg:col-span-6">
-            <header className="mb-6">
-              <h1 className="text-6xl md:text-7xl font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter mb-4">
+    <main className="min-h-screen bg-white pb-10 px-6">
+      <div className="max-w-7xl mx-auto pt-10">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-20">
+          <div className="lg:col-span-6 space-y-8">
+            <header>
+              <h1 className="text-7xl md:text-8xl font-cormorant italic text-zinc-900 leading-[0.8] tracking-tighter mb-6">
                 {program.title}
               </h1>
-              <p className="text-lg font-cormorant italic text-zinc-400">
-                Por {program.instructors?.name}
-              </p>
+              <p className="text-xl font-cormorant italic text-zinc-400">Por {program.instructors?.name}</p>
             </header>
 
-            <div className="space-y-8">
-              <div className="space-y-2">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">Descripción</h3>
-                <p className="text-zinc-500 leading-relaxed text-[15px] font-light italic whitespace-pre-wrap">
-                  {program.description}
-                </p>
-              </div>
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">Descripción</h3>
+              <p className="text-zinc-500 leading-relaxed text-[16px] font-light italic whitespace-pre-wrap">
+                {program.description}
+              </p>
+            </div>
 
-              <div className="grid grid-cols-2 gap-y-8 pt-8 border-t border-zinc-100">
-                 <div>
-                    <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Experiencia</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.experience_type || 'Yoga'}</span>
-                 </div>
-                 <div>
-                    <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Área de enfoque</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.area_of_focus || 'Bienestar'}</span>
-                 </div>
-                 <div>
-                    <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Nivel</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.practice_level || 'Todos'}</span>
-                 </div>
-                 <div>
-                    <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Sesiones</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.classes?.length || 0} Clases</span>
-                 </div>
-              </div>
+            <div className="grid grid-cols-2 gap-y-10 pt-10 border-t border-zinc-100">
+               <div>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Área</span>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.area_of_focus}</span>
+               </div>
+               <div>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Nivel</span>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.practice_level}</span>
+               </div>
+               <div>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic leading-none mb-1">Sesiones</span>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">{program.classes?.length || 0} Clases</span>
+               </div>
             </div>
           </div>
 
           <div className="lg:col-span-6">
-            <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100 mb-6">
-              {videoSrc ? (
-                <iframe
-                  src={videoSrc}
-                  className="w-full h-full"
-                  allowFullScreen
-                ></iframe>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest">Video no disponible</div>
-              )}
+            <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100 mb-8">
+              {videoSrc && <iframe src={videoSrc} className="w-full h-full" allowFullScreen />}
             </div>
             <SaveProgramButton programId={program.id} />
           </div>
         </section>
 
-        <section className="pt-12 border-t border-zinc-100">
-          <h2 className="text-xl font-cormorant italic text-zinc-900 mb-8 uppercase tracking-widest">Contenido del Programa</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {program.classes?.map((clase: any) => (
-              <Link href={`/clases/${clase.slug}`} key={clase.id} className="group">
-                <div className="aspect-[16/10] bg-zinc-100 mb-3 overflow-hidden shadow-sm transition-all duration-700 group-hover:shadow-lg">
-                  {clase.thumbnail_url && (
-                    <img src={clase.thumbnail_url} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" alt={clase.title} />
-                  )}
+        <section className="pt-20 border-t border-zinc-100">
+          <h2 className="text-xl font-cormorant italic text-zinc-900 mb-12 uppercase tracking-widest">Contenido del Programa</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
+            {program.classes?.map((clase: any, i: number) => (
+              <Link href={`/clases/${clase.slug}`} key={clase.id} className="group space-y-4">
+                <div className="relative aspect-video bg-zinc-100 overflow-hidden shadow-sm transition-all duration-700 group-hover:shadow-xl">
+                  {clase.thumbnail_url && <img src={clase.thumbnail_url} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" />}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 text-white text-[10px] font-bold uppercase tracking-widest">Ver Clase</div>
                 </div>
-                <h3 className="text-[11px] font-medium text-zinc-800 uppercase tracking-tight leading-tight">{clase.title}</h3>
+                <div>
+                  <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Sesión {i + 1} • {clase.focus_area}</span>
+                  <h3 className="text-lg font-cormorant italic text-zinc-800 leading-tight mt-1">{clase.title}</h3>
+                </div>
               </Link>
             ))}
           </div>
