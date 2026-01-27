@@ -1,42 +1,95 @@
 "use client"
-// ... otros imports
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 
 export function ProgramForm({ program, instructors }: any) {
+  const router = useRouter()
+  const supabase = createClient()
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setLoading(true)
+    const formData = new FormData(e.currentTarget)
+    
+    const programData = {
+      title: formData.get("title"),
+      slug: formData.get("slug"),
+      description: formData.get("description"),
+      experience_type: formData.get("experience_type"),
+      focus_area: formData.get("focus_area"), // Nuevo
+      practice_level: formData.get("practice_level"), // Nuevo
+      vimeo_url: formData.get("vimeo_url"),
+      instructor_id: formData.get("instructor_id"),
+      is_published: formData.get("is_published") === "on",
+    }
+
+    const { error } = program?.id 
+      ? await supabase.from("programs").update(programData).eq("id", program.id)
+      : await supabase.from("programs").insert([programData])
+
+    if (!error) {
+      router.push("/admin/programas")
+      router.refresh()
+    } else {
+      alert("Error al guardar: " + error.message)
+    }
+    setLoading(false)
+  }
+
   return (
-    <form action={saveProgramAction} className="space-y-8">
-      <input type="hidden" name="id" value={program?.id || "new"} />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* NIVEL DE PRÁCTICA */}
+    <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 border border-zinc-100 shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest font-bold">Nivel de Práctica</label>
-          <select 
-            name="practice_level" 
-            defaultValue={program?.practice_level || "Todos los niveles"}
-            className="w-full p-3 border border-zinc-100 rounded-sm text-sm bg-white"
-          >
+          <label className="text-[10px] font-bold uppercase tracking-widest">Título</label>
+          <input name="title" defaultValue={program?.title} className="w-full p-3 border border-zinc-100 outline-none focus:border-zinc-900" required />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest">Slug (URL)</label>
+          <input name="slug" defaultValue={program?.slug} className="w-full p-3 border border-zinc-100 outline-none focus:border-zinc-900" required />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-[10px] font-bold uppercase tracking-widest">Descripción</label>
+        <textarea name="description" defaultValue={program?.description} rows={4} className="w-full p-3 border border-zinc-100 outline-none focus:border-zinc-900" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest">Nivel</label>
+          <select name="practice_level" defaultValue={program?.practice_level} className="w-full p-3 border border-zinc-100 bg-white">
             <option value="Principiante">Principiante</option>
             <option value="Intermedio">Intermedio</option>
             <option value="Avanzado">Avanzado</option>
             <option value="Todos los niveles">Todos los niveles</option>
           </select>
         </div>
-
-        {/* ÁREA DE ENFOQUE */}
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest font-bold">Área de Enfoque</label>
-          <input 
-            name="focus_area" 
-            defaultValue={program?.focus_area}
-            placeholder="Ej: Bienestar Integral, Flexibilidad"
-            className="w-full p-3 border border-zinc-100 rounded-sm text-sm focus:border-zinc-900 outline-none"
-          />
+          <label className="text-[10px] font-bold uppercase tracking-widest">Área de Enfoque</label>
+          <input name="focus_area" defaultValue={program?.focus_area} placeholder="Ej: Piernas, Espalda" className="w-full p-3 border border-zinc-100 outline-none focus:border-zinc-900" />
         </div>
       </div>
 
-      {/* Aquí van los demás campos: título, descripción, instructor... */}
-      <button type="submit" className="bg-zinc-900 text-white px-8 py-3 text-xs uppercase tracking-widest hover:bg-zinc-800 transition-colors">
-        Guardar Programa
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest">URL Video (Vimeo o YouTube)</label>
+          <input name="vimeo_url" defaultValue={program?.vimeo_url} className="w-full p-3 border border-zinc-100 outline-none focus:border-zinc-900" />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest">Instructor</label>
+          <select name="instructor_id" defaultValue={program?.instructor_id} className="w-full p-3 border border-zinc-100 bg-white">
+            {instructors.map((ins: any) => (
+              <option key={ins.id} value={ins.id}>{ins.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <button disabled={loading} className="w-full bg-zinc-900 text-white py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-zinc-800 transition-all">
+        {loading ? "Guardando..." : "Actualizar Programa"}
       </button>
     </form>
   )
