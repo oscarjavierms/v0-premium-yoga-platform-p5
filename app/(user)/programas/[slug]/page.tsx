@@ -45,10 +45,9 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
               <p className="text-base font-cormorant italic text-zinc-400">Por {program.instructors?.name}</p>
             </header>
 
-            {/* ✅ USAR COMPONENTE EXPANDABLE */}
             <div className="space-y-4">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-900">Descripción</h3>
-              <ExpandableText maxLines={3}>
+              <ExpandableText maxLines={5}>
                 {program.description}
               </ExpandableText>
             </div>
@@ -77,8 +76,9 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
           </div>
         </section>
 
+        {/* ✅ CAMBIO: "CONTENIDO DEL PROGRAMA" → "CLASES" */}
         <section className="pt-2 border-t border-zinc-100">
-          <h2 className="text-lg font-cormorant italic text-zinc-900 mb-4 uppercase tracking-widest">Contenido del Programa</h2>
+          <h2 className="text-lg font-cormorant italic text-zinc-900 mb-4 uppercase tracking-widest">Clases</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {program.classes?.map((clase: any, i: number) => (
               <Link href={`/clases/${clase.slug}`} key={clase.id} className="group space-y-4">
