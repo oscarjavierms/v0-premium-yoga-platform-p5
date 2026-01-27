@@ -22,7 +22,7 @@ export function ProgramForm({ program, instructors }: any) {
       title: "", 
       description: "", 
       vimeo_url: "", 
-      focus_area: "", // Nombre correcto según tu tabla
+      focus_area: "",
       slug: `clase-${Date.now()}`,
       order: classes.length + 1 
     }])
@@ -43,12 +43,12 @@ export function ProgramForm({ program, instructors }: any) {
     setLoading(true)
     const formData = new FormData(e.currentTarget)
     
-    // AQUÍ ESTÁ EL CAMBIO: Usamos 'focus_area' para que coincida con tu Supabase
     const programData = {
       title: formData.get("title"),
       slug: formData.get("slug"),
       description: formData.get("description"),
-      focus_area: formData.get("focus_area"), // <--- CAMBIADO
+      focus_area: formData.get("focus_area"),
+      experience_type: formData.get("experience_type"), // <--- CAPTURA DE EXPERIENCIA
       practice_level: formData.get("practice_level"),
       vimeo_url: formData.get("vimeo_url"),
       instructor_id: formData.get("instructor_id"),
@@ -67,7 +67,8 @@ export function ProgramForm({ program, instructors }: any) {
     const classesToSave = classes.map(c => ({
       ...c,
       program_id: savedProgram.id,
-      instructor_id: programData.instructor_id
+      instructor_id: programData.instructor_id,
+      status: 'published' // Forzamos publicación
     }))
 
     const { error: cError } = await supabase.from("classes").upsert(classesToSave)
@@ -97,11 +98,23 @@ export function ProgramForm({ program, instructors }: any) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-8">
+        {/* CUADRÍCULA DE 4 COLUMNAS PARA LOS SELECTORES */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Experiencia</label>
+            <select name="experience_type" defaultValue={program?.experience_type} className="w-full border-b border-zinc-100 py-2 bg-white outline-none focus:border-zinc-900" required>
+              <option value="">Seleccionar...</option>
+              <option value="Yoga">Yoga</option>
+              <option value="Meditación">Meditación</option>
+              <option value="Fitness">Fitness</option>
+            </select>
+          </div>
+
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Área de Enfoque</label>
-            <input name="focus_area" defaultValue={program?.focus_area} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" />
+            <input name="focus_area" defaultValue={program?.focus_area} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" placeholder="Ej: Espalda" />
           </div>
+          
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Nivel</label>
             <select name="practice_level" defaultValue={program?.practice_level} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
@@ -111,6 +124,7 @@ export function ProgramForm({ program, instructors }: any) {
               <option value="Todos">Todos</option>
             </select>
           </div>
+
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Instructor</label>
             <select name="instructor_id" defaultValue={program?.instructor_id} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
@@ -132,11 +146,10 @@ export function ProgramForm({ program, instructors }: any) {
         </div>
       </section>
 
-      {/* GESTIÓN DE CLASES */}
       <section className="space-y-6">
         <div className="flex justify-between items-end border-b border-zinc-100 pb-4">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-900">Sesiones del Programa</h2>
-          <button type="button" onClick={addClassRow} className="bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800">
+          <button type="button" onClick={addClassRow} className="bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all">
             + AGREGAR SESIÓN
           </button>
         </div>
@@ -148,16 +161,16 @@ export function ProgramForm({ program, instructors }: any) {
                 <Trash2 size={16} />
               </button>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <input placeholder="Título" value={clase.title} onChange={(e) => updateClass(index, "title", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none" />
-                <input placeholder="Video URL" value={clase.vimeo_url} onChange={(e) => updateClass(index, "vimeo_url", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none" />
+                <input placeholder="Título" value={clase.title} onChange={(e) => updateClass(index, "title", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
+                <input placeholder="Video URL" value={clase.vimeo_url} onChange={(e) => updateClass(index, "vimeo_url", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
               </div>
-              <input placeholder="Enfoque de esta clase" value={clase.focus_area} onChange={(e) => updateClass(index, "focus_area", e.target.value)} className="w-full border-b border-zinc-100 py-2 text-sm outline-none" />
+              <input placeholder="Enfoque de esta clase" value={clase.focus_area} onChange={(e) => updateClass(index, "focus_area", e.target.value)} className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
             </div>
           ))}
         </div>
       </section>
 
-      <button disabled={loading} className="w-full bg-zinc-900 text-white py-6 text-[12px] font-bold uppercase tracking-[0.5em] hover:bg-zinc-800">
+      <button disabled={loading} className="w-full bg-zinc-900 text-white py-6 text-[12px] font-bold uppercase tracking-[0.5em] hover:bg-zinc-800 transition-all">
         {loading ? "Sincronizando..." : "PUBLICAR TODO"}
       </button>
     </form>
