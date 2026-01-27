@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Trash2 } from "lucide-react"
+import { Trash2 } from "lucide-react"
 
 export function ProgramForm({ program, instructors }: any) {
   const router = useRouter()
@@ -20,7 +20,6 @@ export function ProgramForm({ program, instructors }: any) {
   const addClassRow = () => {
     setClasses([...classes, { 
       title: "", 
-      description: "", 
       vimeo_url: "", 
       focus_area: "",
       slug: `clase-${Date.now()}`,
@@ -64,13 +63,13 @@ export function ProgramForm({ program, instructors }: any) {
       return
     }
 
-    // MAPEO IMPORTANTE: Pasamos experiencia y nivel del programa a cada clase
+    // Sincronización: Cada clase recibe el nivel y experiencia del programa
     const classesToSave = classes.map(c => ({
       ...c,
       program_id: savedProgram.id,
       instructor_id: programData.instructor_id,
-      experience_type: programData.experience_type, // <--- Sincronizado
-      practice_level: programData.practice_level,   // <--- Sincronizado
+      experience_type: programData.experience_type, 
+      practice_level: programData.practice_level,
       status: 'published'
     }))
 
@@ -114,7 +113,7 @@ export function ProgramForm({ program, instructors }: any) {
 
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Area de enfoque</label>
-            <input name="focus_area" defaultValue={program?.focus_area} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" placeholder="Ej: Espalda" />
+            <input name="focus_area" defaultValue={program?.focus_area} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" />
           </div>
           
           <div className="space-y-2">
@@ -151,7 +150,7 @@ export function ProgramForm({ program, instructors }: any) {
       <section className="space-y-6">
         <div className="flex justify-between items-end border-b border-zinc-100 pb-4">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-900">Sesiones del Programa</h2>
-          <button type="button" onClick={addClassRow} className="bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all">
+          <button type="button" onClick={addClassRow} className="bg-zinc-900 text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800">
             + AGREGAR SESIÓN
           </button>
         </div>
@@ -167,8 +166,8 @@ export function ProgramForm({ program, instructors }: any) {
                 <input placeholder="Video URL" value={clase.vimeo_url} onChange={(e) => updateClass(index, "vimeo_url", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
               </div>
               <div className="space-y-2">
-                <label className="text-[9px] uppercase text-zinc-400 font-bold">Area de enfoque</label>
-                <input placeholder="Ej: Flexibilidad de cadera" value={clase.focus_area} onChange={(e) => updateClass(index, "focus_area", e.target.value)} className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
+                <label className="text-[9px] uppercase text-zinc-400 font-bold tracking-widest">Area de enfoque</label>
+                <input placeholder="Ej: Apertura de pecho" value={clase.focus_area} onChange={(e) => updateClass(index, "focus_area", e.target.value)} className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
               </div>
             </div>
           ))}
