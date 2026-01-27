@@ -11,7 +11,6 @@ export default function CommentSection({ claseId }: { claseId: string }) {
 
   const supabase = createClient()
 
-  // ✅ Cargar comentarios y usuario
   useEffect(() => {
     loadComments()
     loadUser()
@@ -23,13 +22,17 @@ export default function CommentSection({ claseId }: { claseId: string }) {
   }
 
   const loadComments = async () => {
+    // CAMBIO CLAVE: Pedimos full_name y avatar_url de la tabla profiles
     const { data } = await supabase
       .from("class_comments")
       .select(`
         id,
         content,
         created_at,
-        user:user_id(email)
+        profiles:user_id (
+          full_name,
+          avatar_url
+        )
       `)
       .eq("class_id", claseId)
       .order("created_at", { ascending: false })
@@ -41,16 +44,11 @@ export default function CommentSection({ claseId }: { claseId: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!user) {
       alert("Debes iniciar sesión para comentar")
       return
     }
-
-    if (!content.trim()) {
-      alert("El comentario no puede estar vacío")
-      return
-    }
+    if (!content.trim()) return
 
     setLoading(true)
 
@@ -66,9 +64,8 @@ export default function CommentSection({ claseId }: { claseId: string }) {
       alert("Error al publicar comentario: " + error.message)
     } else {
       setContent("")
-      loadComments() // ✅ Recargar comentarios sin refrescar la página
+      loadComments()
     }
-
     setLoading(false)
   }
 
@@ -76,7 +73,6 @@ export default function CommentSection({ claseId }: { claseId: string }) {
     <section className="pt-8 border-t border-zinc-100">
       <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6">Comunidad</h3>
 
-      {/* ✅ FORMULARIO PARA COMENTAR */}
       {user ? (
         <form onSubmit={handleSubmit} className="space-y-4 mb-8">
           <textarea
@@ -96,36 +92,38 @@ export default function CommentSection({ claseId }: { claseId: string }) {
           </button>
         </form>
       ) : (
-        <div className="bg-zinc-50 p-4 mb-8 rounded-sm border border-zinc-100">
-          <p className="text-sm text-zinc-600 italic">
-            <a href="/auth/login" className="font-bold text-zinc-900 hover:underline">
-              Inicia sesión
-            </a>{" "}
-            para compartir tu experiencia
-          </p>
+        <div className="bg-zinc-50 p-4 mb-8 rounded-sm border border-zinc-100 text-sm italic">
+          <a href="/auth/login" className="font-bold text-zinc-900 hover:underline">Inicia sesión</a> para comentar.
         </div>
       )}
 
-      {/* ✅ MOSTRAR COMENTARIOS */}
       <div className="space-y-6">
         {comments && comments.length > 0 ? (
           comments.map((comment: any) => (
             <div key={comment.id} className="border-b border-zinc-100 pb-4 last:border-0">
               <div className="flex justify-between items-start mb-2">
-                <span className="text-sm font-semibold text-zinc-700">
-                  {comment.user?.email || "Anónimo"}
-                </span>
-                <span className="text-[10px] text-zinc-400">
-                  {new Date(comment.created_at).toLocaleDateString("es-ES", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                <div className="flex items-center gap-3">
+                  {/* Foto de perfil pequeña */}
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 overflow-hidden flex-shrink-0 border border-zinc-200">
+                    {comment.profiles?.avatar_url ? (
+                      <img src={comment.profiles.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-zinc-400">
+                        {comment.profiles?.full_name?.charAt(0) || "U"}
+                      </div>
+                    )}
+                  </div>
+                  {/* Nombre Real */}
+                  <span className="text-sm font-bold text-zinc-900 font-cormorant italic">
+                    {comment.profiles?.full_name || "Miembro del Santuario"}
+                  </span>
+                </div>
+                
+                <span className="text-[9px] text-zinc-400 uppercase tracking-tighter">
+                  {new Date(comment.created_at).toLocaleDateString("es-ES")}
                 </span>
               </div>
-              <p className="text-zinc-600 text-sm italic">{comment.content}</p>
+              <p className="text-zinc-600 text-sm italic ml-11">{comment.content}</p>
             </div>
           ))
         ) : (
