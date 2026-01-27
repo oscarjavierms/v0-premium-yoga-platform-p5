@@ -48,7 +48,7 @@ export function ProgramForm({ program, instructors }: any) {
       slug: formData.get("slug"),
       description: formData.get("description"),
       focus_area: formData.get("focus_area"),
-      experience_type: formData.get("experience_type"), // <--- CAPTURA DE EXPERIENCIA
+      experience_type: formData.get("experience_type"),
       practice_level: formData.get("practice_level"),
       vimeo_url: formData.get("vimeo_url"),
       instructor_id: formData.get("instructor_id"),
@@ -64,11 +64,14 @@ export function ProgramForm({ program, instructors }: any) {
       return
     }
 
+    // MAPEO IMPORTANTE: Pasamos experiencia y nivel del programa a cada clase
     const classesToSave = classes.map(c => ({
       ...c,
       program_id: savedProgram.id,
       instructor_id: programData.instructor_id,
-      status: 'published' // Forzamos publicación
+      experience_type: programData.experience_type, // <--- Sincronizado
+      practice_level: programData.practice_level,   // <--- Sincronizado
+      status: 'published'
     }))
 
     const { error: cError } = await supabase.from("classes").upsert(classesToSave)
@@ -98,7 +101,6 @@ export function ProgramForm({ program, instructors }: any) {
           </div>
         </div>
 
-        {/* CUADRÍCULA DE 4 COLUMNAS PARA LOS SELECTORES */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="space-y-2">
             <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Experiencia</label>
@@ -111,12 +113,12 @@ export function ProgramForm({ program, instructors }: any) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Área de Enfoque</label>
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Area de enfoque</label>
             <input name="focus_area" defaultValue={program?.focus_area} className="w-full border-b border-zinc-100 py-2 outline-none focus:border-zinc-900" placeholder="Ej: Espalda" />
           </div>
           
           <div className="space-y-2">
-            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Nivel</label>
+            <label className="text-[10px] uppercase text-zinc-400 font-bold tracking-widest">Nivel de experiencia</label>
             <select name="practice_level" defaultValue={program?.practice_level} className="w-full border-b border-zinc-100 py-2 bg-white outline-none">
               <option value="Principiante">Principiante</option>
               <option value="Intermedio">Intermedio</option>
@@ -164,7 +166,10 @@ export function ProgramForm({ program, instructors }: any) {
                 <input placeholder="Título" value={clase.title} onChange={(e) => updateClass(index, "title", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
                 <input placeholder="Video URL" value={clase.vimeo_url} onChange={(e) => updateClass(index, "vimeo_url", e.target.value)} className="border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
               </div>
-              <input placeholder="Enfoque de esta clase" value={clase.focus_area} onChange={(e) => updateClass(index, "focus_area", e.target.value)} className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
+              <div className="space-y-2">
+                <label className="text-[9px] uppercase text-zinc-400 font-bold">Area de enfoque</label>
+                <input placeholder="Ej: Flexibilidad de cadera" value={clase.focus_area} onChange={(e) => updateClass(index, "focus_area", e.target.value)} className="w-full border-b border-zinc-100 py-2 text-sm outline-none focus:border-zinc-900" />
+              </div>
             </div>
           ))}
         </div>
