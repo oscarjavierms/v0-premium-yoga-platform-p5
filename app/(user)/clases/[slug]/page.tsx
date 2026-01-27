@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import CommentSection from "@/components/clases/comment-section"
+import { ExpandableText } from "@/components/ui/expandable-text"
 
 export default async function ClasePage({ params }: { params: { slug: string } }) {
   const { slug } = await params
@@ -22,7 +23,6 @@ export default async function ClasePage({ params }: { params: { slug: string } }
 
   return (
     <main className="min-h-screen bg-white -mt-4">
-      {/* VIDEO - PEGADO AL MENÚ, SIN ESPACIOS */}
       <section className="w-full" style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div style={{ maxWidth: "900px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
@@ -35,16 +35,13 @@ export default async function ClasePage({ params }: { params: { slug: string } }
         </div>
       </section>
 
-      {/* CONTENIDO EN DOS COLUMNAS */}
       <section className="w-full px-6 py-8 pb-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
-            {/* COLUMNA IZQUIERDA */}
             <div className="lg:col-span-8">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex-1">
-                  {/* TÍTULO 15% MÁS PEQUEÑO */}
                   <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-none mb-4">
                     {clase.title}
                   </h1>
@@ -55,14 +52,14 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                 </button>
               </div>
               
-              <p className="text-zinc-500 italic font-light text-sm leading-relaxed mb-8">
+              {/* ✅ USAR COMPONENTE EXPANDABLE */}
+              <ExpandableText maxLines={3}>
                 {clase.description}
-              </p>
+              </ExpandableText>
 
               <CommentSection claseId={clase.id} />
             </div>
 
-            {/* COLUMNA DERECHA - PANEL LATERAL */}
             <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
               
               {clase.experience_type && (
