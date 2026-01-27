@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { MeditacionClient } from "./meditacion-client"
-// 1. Importamos el componente Hero
 import { SectionHero } from "@/components/ui/section-hero"
+
+// ✅ Forzamos datos frescos
+export const revalidate = 0
 
 export default async function MeditacionPage() {
   const supabase = await createClient()
@@ -13,16 +15,29 @@ export default async function MeditacionPage() {
     redirect("/auth/login")
   }
 
-  // Fetch meditation classes
-  const { data: classes } = await supabase
-    .from("classes")
+  /**
+   * ✅ CORRECCIÓN CLAVE: 
+   * Buscamos en 'programs' donde 'experience_type' es 'Meditación'
+   * Incluimos las clases de cada programa para que MeditacionClient las reciba
+   */
+  const { data: programs } = await supabase
+    .from("programs")
     .select(`
       *,
-      instructor:instructors(name, avatar_url)
+      instructor:instructor_id(name, avatar_url),
+      classes (*)
     `)
-    .eq("pillar", "mindfulness")
-    .eq("is_published", true)
+    .eq("experience_type", "Meditación") // Coincide con tu Formulario Admin
     .order("created_at", { ascending: false })
+
+  // Aplanamos las clases de todos los programas para pasárselas al Client Component
+  // si es que tu MeditacionClient espera una lista de clases sueltas.
+  const allMeditationClasses = programs?.flatMap(p => 
+    p.classes.map((c: any) => ({
+      ...c,
+      instructor: p.instructor // Le pasamos el instructor del programa a la clase
+    }))
+  ) || []
 
   // Fetch user's bookmarks
   const { data: bookmarks } = await supabase
@@ -33,25 +48,20 @@ export default async function MeditacionPage() {
   const bookmarkedIds = new Set(bookmarks?.map(b => b.class_id) || [])
 
   return (
-    /* -mt-32: Anula el padding del layout para pegar la imagen al Header blanco.
-       relative: Mantiene el flujo correcto de la página.
-    */
     <div className="relative -mt-32">
-      
-      {/* Contenedor de lado a lado (Full Width) */}
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] overflow-hidden">
         <SectionHero 
           title="Meditación" 
           subtitle="EL SILENCIO ES EL LENGUAJE DEL ALMA" 
           image="/minimalista-me.png" 
-          align="center" // <--- Esto asegura el centrado de la persona
+          align="center" 
         />
       </div>
 
-      {/* Contenido de las clases centrado con espacio elegante */}
       <div className="max-w-7xl mx-auto px-4 py-12">
+        {/* ✅ Ahora 'classes' contiene las que subiste desde Programas */}
         <MeditacionClient 
-          classes={classes || []} 
+          classes={allMeditationClasses} 
           bookmarkedIds={bookmarkedIds} 
           userId={user.id} 
         />
