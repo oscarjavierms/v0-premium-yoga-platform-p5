@@ -22,10 +22,10 @@ export default async function ClasePage({ params }: { params: { slug: string } }
 
   return (
     <main className="min-h-screen bg-white">
-      {/* ✅ VIDEO - COMIENZA JUSTO DESPUÉS DEL MENÚ, SIN PADDING TOP */}
-      <section className="w-full bg-black">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
+      {/* ✅ VIDEO PEQUEÑO Y CENTRADO - JUSTO DESPUÉS DEL MENÚ */}
+      <section className="w-full px-6 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-2xl mx-auto aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
             <iframe
               src={`https://player.vimeo.com/video/${vimeoId}?h=0&title=0&byline=0&portrait=0`}
               className="w-full h-full"
@@ -35,14 +35,16 @@ export default async function ClasePage({ params }: { params: { slug: string } }
         </div>
       </section>
 
-      {/* ✅ CONTENIDO - DEBAJO DEL VIDEO */}
-      <section className="w-full bg-white py-12 px-6">
+      {/* ✅ CONTENIDO EN DOS COLUMNAS DEBAJO DEL VIDEO */}
+      <section className="w-full px-6 pb-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            
+            {/* ✅ COLUMNA IZQUIERDA - DESCRIPCIÓN Y COMUNIDAD */}
             <div className="lg:col-span-8">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex-1">
-                  <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 tracking-tighter leading-none mb-4">
+                  <h1 className="text-4xl md:text-5xl font-cormorant italic text-zinc-900 tracking-tighter leading-none mb-4">
                     {clase.title}
                   </h1>
                 </div>
@@ -52,14 +54,14 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                 </button>
               </div>
               
-              <p className="text-zinc-500 italic font-light text-[17px] leading-relaxed mb-12 max-w-2xl">
+              <p className="text-zinc-500 italic font-light text-base leading-relaxed mb-8">
                 {clase.description}
               </p>
 
-              <section className="pt-10 border-t border-zinc-100">
+              <section className="pt-8 border-t border-zinc-100">
                 <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6">Comunidad</h3>
                 <textarea 
-                  className="w-full p-4 bg-zinc-50 border-none italic text-sm outline-none mb-4 rounded-sm" 
+                  className="w-full p-4 bg-zinc-50 border border-zinc-100 italic text-sm outline-none mb-4 rounded-sm focus:border-zinc-900" 
                   placeholder="Comparte tu experiencia..." 
                   rows={4} 
                 />
@@ -69,13 +71,13 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               </section>
             </div>
 
-            {/* ✅ PANEL LATERAL CON DATOS DINÁMICOS */}
-            <div className="lg:col-span-4 space-y-6 bg-zinc-50/50 p-8 border border-zinc-100">
+            {/* ✅ COLUMNA DERECHA - PANEL LATERAL CON INFO */}
+            <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
               
               {/* ✅ TIPO DE EXPERIENCIA */}
               {clase.experience_type && (
                 <div>
-                  <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Experiencia</span>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Experiencia</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
                     {clase.experience_type}
                   </span>
@@ -85,7 +87,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               {/* ✅ ÁREA DE ENFOQUE */}
               {clase.focus_area && (
                 <div>
-                  <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Área de Enfoque</span>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Área de Enfoque</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
                     {clase.focus_area}
                   </span>
@@ -95,7 +97,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               {/* ✅ NIVEL DE PRÁCTICA */}
               {clase.practice_level && (
                 <div>
-                  <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Nivel</span>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Nivel</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
                     {clase.practice_level}
                   </span>
@@ -105,7 +107,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               {/* ✅ INTENSIDAD */}
               {clase.intensity && (
                 <div>
-                  <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Intensidad</span>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Intensidad</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
                     {clase.intensity.charAt(0).toUpperCase() + clase.intensity.slice(1)}
                   </span>
@@ -115,7 +117,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               {/* ✅ DURACIÓN */}
               {clase.duration_minutes && (
                 <div>
-                  <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Duración</span>
+                  <span className="block text-2xl text-zinc-800 font-cormorant italic mb-1">Duración</span>
                   <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
                     {clase.duration_minutes} minutos
                   </span>
