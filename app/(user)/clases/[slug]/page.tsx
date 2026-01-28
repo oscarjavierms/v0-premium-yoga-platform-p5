@@ -40,28 +40,29 @@ export default async function ClasePage({ params }: { params: { slug: string } }
 
   return (
     <div className="bg-white min-h-screen">
-      {/* 1. ESPACIADOR: En móvil es pequeño para que el video suba, en escritorio es 0 */}
-      <div className="h-[64px] md:h-0" />
+      {/* 1. ESPACIADOR DINÁMICO: 
+          En móvil (h-20) evita que el video se corte con el menú.
+          En escritorio (md:h-0) permite que el video suba con el margen negativo. */}
+      <div className="h-20 md:h-0" />
 
       <main>
-        {/* 2. SECCIÓN DE VIDEO: Eliminamos alturas fijas (px) para evitar franjas negras */}
+        {/* 2. SECCIÓN DE VIDEO: Centrado y sin barras laterales */}
         <section className="w-full bg-black md:-mt-32">
-          <div className="max-w-7xl mx-auto md:px-6">
-            <div className="max-w-[1100px] mx-auto">
-              <div className="relative w-full pb-[56.25%] h-0">
-                {videoSrc ? (
-                  <iframe
-                    src={videoSrc}
-                    className="absolute top-0 left-0 w-full h-full border-0"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  ></iframe>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-zinc-500 bg-zinc-900 italic text-xs uppercase tracking-widest">
-                    Cargando práctica...
-                  </div>
-                )}
-              </div>
+          <div className="max-w-5xl mx-auto md:px-6">
+             {/* Este contenedor obliga a mantener la proporción 16:9 exacta del video */}
+            <div className="relative w-full aspect-video">
+              {videoSrc ? (
+                <iframe
+                  src={videoSrc}
+                  className="absolute top-0 left-0 w-full h-full border-0"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                ></iframe>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-zinc-500 bg-zinc-900 italic text-xs uppercase tracking-widest">
+                  Cargando práctica...
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -95,7 +96,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               </div>
             </div>
 
-            {/* PANEL LATERAL */}
+            {/* 4. PANEL LATERAL */}
             <div className="lg:col-span-4">
               <aside className="lg:sticky lg:top-32 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 rounded-sm">
                 {[
