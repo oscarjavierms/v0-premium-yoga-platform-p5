@@ -25,7 +25,6 @@ function getVideoEmbedUrl(url: string) {
     return `https://www.youtube.com/embed/${id}`;
   }
 
-  // ✅ Si es un embed directo o URL desconocida, devuelve tal cual
   return url;
 }
 
@@ -50,7 +49,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     <div className="-mt-32">
       <main className="min-h-screen bg-white">
-        {/* ✅ VIDEO - CUALQUIER PROVEEDOR */}
+        {/* ✅ SECCIÓN VIDEO */}
         <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
           <div className="max-w-7xl mx-auto px-6">
             <div style={{ maxWidth: "1000px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
@@ -76,72 +75,79 @@ export default async function ClasePage({ params }: { params: { slug: string } }
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
               
               <div className="lg:col-span-8">
-                {/* ✅ TÍTULO + BOTÓN - MISMA LÍNEA, DERECHA */}
-                <div className="flex items-start justify-between gap-4 mb-8">
-                  <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight">
+                {/* ✅ TÍTULO Y BOTÓN ALINEADOS (UX MEJORADA) */}
+                <div className="flex items-start justify-between gap-8 mb-8 border-b border-zinc-50 pb-6">
+                  <h1 className="text-3xl md:text-5xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight">
                     {clase.title}
                   </h1>
-                  <button className="flex flex-col items-center group flex-shrink-0 pt-2">
-                    <span className="text-2xl text-zinc-300 group-hover:text-red-400 transition-colors cursor-pointer">❤</span>
-                    <span className="text-[9px] font-bold uppercase tracking-tighter text-zinc-400 mt-1">Me gusta</span>
+                  
+                  <button className="flex flex-col items-center group flex-shrink-0 pt-2 transition-transform active:scale-95">
+                    <span className="text-2xl text-zinc-300 group-hover:text-red-400 transition-colors cursor-pointer italic">
+                      ❤
+                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 mt-1">
+                      Me gusta
+                    </span>
                   </button>
                 </div>
                 
-                <ExpandableText maxLines={5}>
-                  {clase.description}
-                </ExpandableText>
+                <div className="mb-12">
+                  <ExpandableText maxLines={5}>
+                    {clase.description}
+                  </ExpandableText>
+                </div>
 
                 <CommentSection claseId={clase.id} />
               </div>
 
-              {/* ✅ PANEL LATERAL */}
-              <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
-                
-                {clase.experience_type && (
-                  <div>
-                    <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Experiencia</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-                      {clase.experience_type}
-                    </span>
-                  </div>
-                )}
+              {/* ✅ PANEL LATERAL (DETALLES) */}
+              <div className="lg:col-span-4">
+                <div className="space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
+                  {clase.experience_type && (
+                    <div>
+                      <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Experiencia</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                        {clase.experience_type}
+                      </span>
+                    </div>
+                  )}
 
-                {clase.focus_area && (
-                  <div>
-                    <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Área de Enfoque</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-                      {clase.focus_area}
-                    </span>
-                  </div>
-                )}
+                  {clase.focus_area && (
+                    <div>
+                      <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Área de Enfoque</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                        {clase.focus_area}
+                      </span>
+                    </div>
+                  )}
 
-                {clase.practice_level && (
-                  <div>
-                    <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Nivel</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-                      {clase.practice_level}
-                    </span>
-                  </div>
-                )}
+                  {clase.practice_level && (
+                    <div>
+                      <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Nivel</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                        {clase.practice_level}
+                      </span>
+                    </div>
+                  )}
 
-                {clase.intensity && (
-                  <div>
-                    <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Intensidad</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-                      {clase.intensity.charAt(0).toUpperCase() + clase.intensity.slice(1)}
-                    </span>
-                  </div>
-                )}
+                  {clase.intensity && (
+                    <div>
+                      <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Intensidad</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                        {clase.intensity.charAt(0).toUpperCase() + clase.intensity.slice(1)}
+                      </span>
+                    </div>
+                  )}
 
-                {clase.duration_minutes && (
-                  <div>
-                    <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Duración</span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
-                      {clase.duration_minutes} minutos
-                    </span>
-                  </div>
-                )}
-
+                  {clase.duration_minutes && (
+                    <div>
+                      <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Duración</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                        {clase.duration_minutes} minutos
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
