@@ -22,9 +22,9 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const vimeoId = clase.vimeo_url?.split("/").pop()
 
   return (
-    <main className="min-h-screen bg-white pt-20">
-      {/* ✅ VIDEO PEGADO AL MENÚ (con pt-20 del main) */}
-      <section className="w-full" style={{ paddingTop: "0px", paddingBottom: "1rem", marginTop: "-5rem" }}>
+    <main className="min-h-screen bg-white">
+      {/* ✅ VIDEO - SIN ESPACIOS EXTRAS */}
+      <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div style={{ maxWidth: "900px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
             <iframe
