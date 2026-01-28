@@ -46,19 +46,20 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     <div className="-mt-32">
       <main className="min-h-screen bg-white">
-        {/* ✅ VIDEO - SIN RESTRICCIÓN DE PROPORCIÓN */}
+        {/* ✅ VIDEO - ALTURA NATURAL SIN ESPACIOS NEGROS */}
         <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
           <div className="max-w-7xl mx-auto px-6">
-            <div style={{ maxWidth: "1000px", margin: "0 auto", minHeight: "600px" }} className="bg-black shadow-lg overflow-hidden rounded-sm">
+            <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
               {videoSrc ? (
                 <iframe
                   src={videoSrc}
-                  className="w-full h-full"
+                  className="w-full"
+                  style={{ minHeight: "500px" }}
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 ></iframe>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-white text-center">
+                <div className="w-full bg-black text-white text-center py-32">
                   <p>No hay video disponible</p>
                 </div>
               )}
