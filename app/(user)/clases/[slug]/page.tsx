@@ -22,9 +22,9 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const vimeoId = clase.vimeo_url?.split("/").pop()
 
   return (
-    <main className="min-h-screen bg-white -mt-6">
-      {/* ✅ VIDEO PEGADO AL MENÚ - MISMO TAMAÑO */}
-      <section className="w-full" style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
+    <main className="min-h-screen bg-white">
+      {/* ✅ VIDEO SUBIDO AL MENÚ - MISMO TAMAÑO */}
+      <section className="w-full -mt-6" style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div style={{ maxWidth: "900px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
             <iframe
@@ -36,16 +36,15 @@ export default async function ClasePage({ params }: { params: { slug: string } }
         </div>
       </section>
 
-      {/* ✅ CONTENIDO - TÍTULO VISIBLE EN PANTALLA INICIAL */}
-      <section className="w-full px-6 py-6 pb-20">
+      {/* ✅ CONTENIDO - TÍTULO VISIBLE */}
+      <section className="w-full px-6 py-8 pb-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
             <div className="lg:col-span-8">
-              {/* ✅ TÍTULO VISIBLE Y GRANDE */}
-              <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start mb-8">
                 <div className="flex-1">
-                  <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight mb-2">
+                  <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight mb-4">
                     {clase.title}
                   </h1>
                 </div>
@@ -62,7 +61,6 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               <CommentSection claseId={clase.id} />
             </div>
 
-            {/* ✅ PANEL LATERAL */}
             <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
               
               {clase.experience_type && (
