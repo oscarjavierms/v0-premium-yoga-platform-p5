@@ -46,10 +46,10 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     <div className="-mt-32">
       <main className="min-h-screen bg-white">
-        {/* ✅ VIDEO - PADDING MÍN EN MÓVIL */}
+        {/* ✅ VIDEO - RESPONSIVE HEIGHT MÓVIL */}
         <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
-          <div className="max-w-7xl mx-auto px-2 md:px-6">
-            <div style={{ maxWidth: "1000px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
+          <div className="max-w-7xl mx-auto px-3 md:px-6">
+            <div className="md:aspect-video bg-black shadow-lg overflow-hidden rounded-sm" style={{ height: "280px", minHeight: "280px" }}>
               {videoSrc ? (
                 <iframe
                   src={videoSrc}
