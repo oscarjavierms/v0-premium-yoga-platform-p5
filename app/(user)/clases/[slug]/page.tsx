@@ -58,7 +58,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                   ></iframe>
                 </div>
               ) : (
-                <div className="w-full bg-black text-white text-center py-30">
+                <div className="w-full bg-black text-white text-center py-32">
                   <p>No hay video disponible</p>
                 </div>
               )}
@@ -90,7 +90,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               </div>
 
               {/* PANEL LATERAL (Sin cambios) */}
-              <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
+              <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-30">
                 {clase.experience_type && (
                   <div>
                     <span className="block text-lg text-zinc-800 font-cormorant italic mb-1">Experiencia</span>
