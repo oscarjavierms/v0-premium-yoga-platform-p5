@@ -126,7 +126,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
           iframe { min-height: auto !important; aspect-ratio: 16/9; }
         }
         @media (min-width: 768px) {
-          iframe { min-height: 700px !important; }
+          iframe { min-height: 650px !important; }
         }
       `}} />
     </div>
