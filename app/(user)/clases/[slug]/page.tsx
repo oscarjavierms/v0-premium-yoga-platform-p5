@@ -6,26 +6,22 @@ import { ExpandableText } from "@/components/ui/expandable-text"
 function getVideoEmbedUrl(url: string) {
   if (!url) return null;
 
-  // ✅ VIMEO
   if (url.includes('vimeo.com')) {
     const id = url.split('/').pop()?.split('?')[0];
     return `https://player.vimeo.com/video/${id}?h=0&title=0&byline=0&portrait=0`;
   }
 
-  // ✅ YOUTUBE (short links)
   if (url.includes('youtu.be')) {
     const id = url.split('/').pop()?.split('?')[0];
     return `https://www.youtube.com/embed/${id}`;
   }
 
-  // ✅ YOUTUBE (long links)
   if (url.includes('youtube.com')) {
     const urlObj = new URL(url);
     const id = urlObj.searchParams.get('v');
     return `https://www.youtube.com/embed/${id}`;
   }
 
-  // ✅ Si es un embed directo o URL desconocida, devuelve tal cual
   return url;
 }
 
@@ -50,9 +46,9 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     <div className="-mt-32">
       <main className="min-h-screen bg-white">
-        {/* ✅ VIDEO - PEQUEÑO, ELEGANTE, PEGADO AL MENÚ */}
+        {/* ✅ VIDEO - RESPONSIVE MÓVIL CORREGIDO */}
         <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-3 md:px-6">
             <div style={{ maxWidth: "1000px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
               {videoSrc ? (
                 <iframe
