@@ -1,8 +1,8 @@
 {/* Video Player Section */}
-      <section className="bg-black py-4 md:py-6 lg:py-8">
-        <div className="max-w-6xl mx-auto px-4 md:px-6">
+      <section className="bg-black py-0 md:py-6 lg:py-8">
+        <div className="max-w-6xl mx-auto px-0 md:px-4 lg:px-6">
           {classData.vimeo_id ? (
-            <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-border shadow-sm">
+            <div className="relative w-full aspect-video overflow-hidden md:rounded-lg border-0 md:border md:border-border md:shadow-sm">
               <iframe
                 id="vimeo-player"
                 src={`https://player.vimeo.com/video/${classData.vimeo_id}?title=0&byline=0&portrait=0&color=000000`}
@@ -12,7 +12,7 @@
               />
             </div>
           ) : (
-            <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-border shadow-sm bg-muted">
+            <div className="relative w-full aspect-video overflow-hidden md:rounded-lg border-0 md:border md:border-border md:shadow-sm bg-muted">
               <div className="absolute inset-0 flex items-center justify-center">
                 <p className="text-muted-foreground text-center px-4">No hay video disponible</p>
               </div>
