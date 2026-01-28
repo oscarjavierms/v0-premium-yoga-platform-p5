@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import CommentSection from "@/components/clases/comment-section"
 import { ExpandableText } from "@/components/ui/expandable-text"
+import LikeButton from "@/components/clases/like-button" // ✅ Nuevo
 
 function getVideoEmbedUrl(url: string) {
   if (!url) return null;
@@ -25,6 +26,9 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const { slug } = await params
   const supabase = await createClient()
 
+  // ✅ Obtenemos el usuario para el Like
+  const { data: { user } } = await supabase.auth.getUser()
+
   const { data: clase } = await supabase
     .from("classes")
     .select(`
@@ -39,7 +43,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const videoSrc = getVideoEmbedUrl(clase.vimeo_url)
 
   return (
-    /* ✅ Escritorio intacto con md:-mt-32. 
+    /* ✅ Escritorio intacto con md:-mt-24. 
        ✅ Móvil ahora tiene -mt-10 para succionar el video hacia arriba y quitar el hueco blanco. */
     <div className="md:-mt-24 -mt-10">
       <main className="min-h-screen bg-white">
@@ -76,10 +80,9 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                   <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight">
                     {clase.title}
                   </h1>
-                  <button className="flex flex-col items-center group flex-shrink-0 pt-2">
-                    <span className="text-2xl text-zinc-300 group-hover:text-red-400 transition-colors cursor-pointer">❤</span>
-                    <span className="text-[9px] font-bold uppercase tracking-tighter text-zinc-400 mt-1">Me gusta</span>
-                  </button>
+                  
+                  {/* ✅ Botón de Like conectado a Supabase */}
+                  <LikeButton classId={clase.id} userId={user?.id} />
                 </div>
                 
                 <ExpandableText maxLines={5}>
