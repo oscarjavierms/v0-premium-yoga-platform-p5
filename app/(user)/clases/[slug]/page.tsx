@@ -46,10 +46,10 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     <div className="-mt-32">
       <main className="min-h-screen bg-white">
-        {/* ✅ VIDEO - COMO ESTABA ANTES */}
+        {/* ✅ VIDEO - SIN RESTRICCIÓN DE PROPORCIÓN */}
         <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
           <div className="max-w-7xl mx-auto px-6">
-            <div style={{ maxWidth: "1000px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
+            <div style={{ maxWidth: "1000px", margin: "0 auto", minHeight: "600px" }} className="bg-black shadow-lg overflow-hidden rounded-sm">
               {videoSrc ? (
                 <iframe
                   src={videoSrc}
