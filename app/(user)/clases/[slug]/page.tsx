@@ -41,7 +41,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     /* ✅ Escritorio intacto con md:-mt-32. 
        ✅ Móvil ahora tiene -mt-10 para succionar el video hacia arriba y quitar el hueco blanco. */
-    <div className="md:-mt-26 -mt-10">
+    <div className="md:-mt-24 -mt-10">
       <main className="min-h-screen bg-white">
         
         {/* ✅ Sección de Video */}
