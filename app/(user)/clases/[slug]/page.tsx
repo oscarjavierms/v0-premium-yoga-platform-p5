@@ -76,12 +76,12 @@ export default async function ClasePage({ params }: { params: { slug: string } }
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
               
               <div className="lg:col-span-8">
-                {/* ✅ TÍTULO + BOTÓN ME GUSTA EN LA MISMA LÍNEA */}
-                <div className="flex justify-between items-start mb-8">
-                  <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight flex-1">
+                {/* ✅ TÍTULO + BOTÓN - MISMA LÍNEA, DERECHA */}
+                <div className="flex items-start justify-between gap-4 mb-8">
+                  <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight">
                     {clase.title}
                   </h1>
-                  <button className="flex flex-col items-center group ml-4 flex-shrink-0 pt-1">
+                  <button className="flex flex-col items-center group flex-shrink-0 pt-2">
                     <span className="text-2xl text-zinc-300 group-hover:text-red-400 transition-colors cursor-pointer">❤</span>
                     <span className="text-[9px] font-bold uppercase tracking-tighter text-zinc-400 mt-1">Me gusta</span>
                   </button>
