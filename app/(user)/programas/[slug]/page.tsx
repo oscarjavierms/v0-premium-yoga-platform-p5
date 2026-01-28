@@ -35,12 +35,23 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
 
   return (
     <main className="min-h-screen bg-white pb-10 px-6 -mt-6">
-      {/* pt-16 en móvil para separar del menú, pt-0 en escritorio */}
-      <div className="max-w-7xl mx-auto pt-16 md:pt-0">
+      {/* ✅ AJUSTE: pt-2 en móvil para que suba casi al tope, md:pt-0 se mantiene para PC */}
+      <div className="max-w-7xl mx-auto pt-2 md:pt-0">
         
-        {/* Usamos flex-col y order para que el video suba en móvil */}
         <section className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-16 items-start mb-8">
           
+          {/* ✅ COLUMNA DE VIDEO (Sube en móvil con order-1) */}
+          <div className="lg:col-span-6 w-full order-1 lg:order-2">
+            {/* -mt-2 adicional para "succionar" el video hacia el menú en móvil */}
+            <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden -mx-6 w-[calc(100%+3rem)] md:mx-0 md:w-full md:rounded-sm ring-1 ring-zinc-100 mb-8 -mt-2 md:mt-0">
+              {videoSrc && <iframe src={videoSrc} className="w-full h-full border-0" allowFullScreen />}
+            </div>
+            
+            <div className="px-0 md:px-0 mb-8 lg:mb-0">
+              <SaveProgramButton programId={program.id} />
+            </div>
+          </div>
+
           {/* ✅ COLUMNA DE TEXTO (Baja en móvil con order-2) */}
           <div className="lg:col-span-6 space-y-8 order-2 lg:order-1">
             <header className="-mt-2">
@@ -72,24 +83,6 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
                </div>
             </div>
           </div>
-
-          {/* ✅ COLUMNA DE VIDEO (Sube en móvil con order-1) */}
-          <div className="lg:col-span-6 w-full order-1 lg:order-2">
-            {/* AJUSTE PARA AGRANDAR:
-                -mx-6: Elimina el margen lateral del contenedor padre en móvil.
-                w-[calc(100%+3rem)]: Expande el video para que toque los bordes.
-                md:mx-0 y md:w-full: Resetea estos cambios para que en PC se vea perfecto.
-            */}
-            <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden -mx-6 w-[calc(100%+3rem)] md:mx-0 md:w-full md:rounded-sm ring-1 ring-zinc-100 mb-8">
-              {videoSrc && <iframe src={videoSrc} className="w-full h-full border-0" allowFullScreen />}
-            </div>
-            
-            {/* El botón de guardar se queda dentro de los márgenes normales */}
-            <div className="px-0 md:px-0">
-              <SaveProgramButton programId={program.id} />
-            </div>
-          </div>
-
         </section>
 
         {/* ✅ SECCIÓN CLASES (Sin cambios) */}
