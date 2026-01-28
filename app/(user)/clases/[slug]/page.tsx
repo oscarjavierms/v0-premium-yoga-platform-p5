@@ -58,7 +58,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                   ></iframe>
                 </div>
               ) : (
-                <div className="w-full bg-black text-white text-center py-32">
+                <div className="w-full bg-black text-white text-center py-30">
                   <p>No hay video disponible</p>
                 </div>
               )}
