@@ -24,10 +24,10 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     <div className="-mt-32">
       <main className="min-h-screen bg-white">
-        {/* ✅ VIDEO MÁS ANCHO - 1100px */}
+        {/* ✅ VIDEO - PUNTO MEDIO 1000px */}
         <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
           <div className="max-w-7xl mx-auto px-6">
-            <div style={{ maxWidth: "1100px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
+            <div style={{ maxWidth: "1000px", margin: "0 auto" }} className="aspect-video bg-black shadow-lg overflow-hidden rounded-sm">
               <iframe
                 src={`https://player.vimeo.com/video/${vimeoId}?h=0&title=0&byline=0&portrait=0`}
                 className="w-full h-full"
