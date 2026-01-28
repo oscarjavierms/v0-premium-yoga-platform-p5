@@ -15,20 +15,24 @@ export function ProgramForm({ program, instructors }: any) {
 
   useEffect(() => {
     if (program?.classes) {
-      setClasses(program.classes)
+      // ✅ MIGRACIÓN: Si tiene vimeo_id pero no vimeo_url, copia el valor
+      const migratedClasses = program.classes.map((clase: any) => ({
+        ...clase,
+        vimeo_url: clase.vimeo_url || clase.vimeo_id || "", // Usa vimeo_url, si no hay usa vimeo_id
+      }))
+      setClasses(migratedClasses)
     }
   }, [program])
 
-  // Lógica para generar el Slug automáticamente
   const generateSlug = () => {
     const generated = title
       .toLowerCase()
       .trim()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Quita acentos
-      .replace(/[^a-z0-9 -]/g, '') // Quita caracteres especiales
-      .replace(/\s+/g, '-') // Espacios por guiones
-      .replace(/-+/g, '-'); // Quita guiones dobles
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9 -]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
     setSlug(generated);
   }
 
@@ -60,7 +64,7 @@ export function ProgramForm({ program, instructors }: any) {
     
     const programData = {
       title: formData.get("title"),
-      slug: slug, // Usamos el estado del slug
+      slug: slug,
       description: formData.get("description"),
       focus_area: formData.get("focus_area"),
       experience_type: formData.get("experience_type"),
@@ -86,6 +90,7 @@ export function ProgramForm({ program, instructors }: any) {
       is_published: true,
       experience_type: programData.experience_type,
       practice_level: programData.practice_level,
+      vimeo_url: c.vimeo_url || c.vimeo_id, // ✅ Asegurar que siempre use vimeo_url
     }))
 
     const { error: cError } = await supabase.from("classes").upsert(classesToSave)
