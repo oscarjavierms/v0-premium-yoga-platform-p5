@@ -54,7 +54,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                 <iframe
                   src={videoSrc}
                   className="w-full"
-                  style={{ minHeight: "720px" }}
+                  style={{ minHeight: "730px" }}
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 ></iframe>
