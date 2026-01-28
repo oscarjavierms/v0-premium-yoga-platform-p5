@@ -39,14 +39,13 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const videoSrc = getVideoEmbedUrl(clase.vimeo_url)
 
   return (
-    /* ✅ Mantenemos el margen negativo solo en escritorio */
-    <div className="md:-mt-32 mt-0">
+    /* ✅ Escritorio intacto con md:-mt-32. 
+       ✅ Móvil ahora tiene -mt-10 para succionar el video hacia arriba y quitar el hueco blanco. */
+    <div className="md:-mt-32 -mt-10">
       <main className="min-h-screen bg-white">
         
-        {/* ✅ AJUSTE QUIRÚRGICO: 
-            En móvil cambiamos pt-20 por pt-[60px] (o menos) para que suba.
-            En escritorio (md) vuelve a pt-0 para no mover nada. */}
-        <section className="pt-[60px] md:pt-0 pb-4">
+        {/* ✅ Sección de Video */}
+        <section className="pt-0 pb-4">
           <div className="max-w-7xl mx-auto px-0 md:px-6">
             <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
               {videoSrc ? (
@@ -67,7 +66,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
           </div>
         </section>
 
-        {/* ✅ CONTENIDO (Código original intacto) */}
+        {/* ✅ CONTENIDO (Sin cambios) */}
         <section className="w-full px-6 py-8 pb-20">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -90,7 +89,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                 <CommentSection claseId={clase.id} />
               </div>
 
-              {/* PANEL LATERAL (Código original intacto) */}
+              {/* PANEL LATERAL (Sin cambios) */}
               <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
                 {clase.experience_type && (
                   <div>
@@ -122,7 +121,6 @@ export default async function ClasePage({ params }: { params: { slug: string } }
         </section>
       </main>
 
-      {/* ✅ Estilos inyectados para escritorio (700px) vs móvil (Auto) */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 767px) {
           iframe { min-height: auto !important; aspect-ratio: 16/9; }
