@@ -46,7 +46,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   return (
     <div className="-mt-32">
       <main className="min-h-screen bg-white">
-        {/* ✅ VIDEO - ALTURA NATURAL SIN ESPACIOS NEGROS */}
+        {/* ✅ VIDEO - ALTURA CORRECTA */}
         <section style={{ paddingTop: "0px", paddingBottom: "1rem" }}>
           <div className="max-w-7xl mx-auto px-6">
             <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
@@ -54,7 +54,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                 <iframe
                   src={videoSrc}
                   className="w-full"
-                  style={{ minHeight: "500px" }}
+                  style={{ minHeight: "600px" }}
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 ></iframe>
