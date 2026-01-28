@@ -40,40 +40,37 @@ export default async function ClasePage({ params }: { params: { slug: string } }
 
   return (
     <div className="bg-white min-h-screen">
-      {/* 1. ESPACIADOR: Controla cuánto sube el video */}
-      {/* En móvil 'h-16' para que toque el menú, en escritorio 'md:h-0' porque usamos margen negativo */}
-      <div className="h-16 md:h-0" />
+      {/* 1. ESPACIADOR: En móvil es pequeño para que el video suba, en escritorio es 0 */}
+      <div className="h-[64px] md:h-0" />
 
       <main>
-        {/* 2. SECCIÓN DE VIDEO: Edge-to-edge en móvil, centrado en escritorio */}
-        <section className="w-full bg-black overflow-hidden md:-mt-32">
+        {/* 2. SECCIÓN DE VIDEO: Eliminamos alturas fijas (px) para evitar franjas negras */}
+        <section className="w-full bg-black md:-mt-32">
           <div className="max-w-7xl mx-auto md:px-6">
-            {/* Móvil: aspect-video (proporción natural) 
-               Escritorio: md:h-[720px] (tu altura preferida)
-            */}
-            <div className="relative w-full aspect-video md:aspect-none md:h-[720px] max-w-[1280px] mx-auto">
-              {videoSrc ? (
-                <iframe
-                  src={videoSrc}
-                  className="absolute top-0 left-0 w-full h-full border-0"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                ></iframe>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-zinc-500 italic text-xs tracking-widest uppercase bg-zinc-900">
-                  Procesando video...
-                </div>
-              )}
+            <div className="max-w-[1100px] mx-auto">
+              <div className="relative w-full pb-[56.25%] h-0">
+                {videoSrc ? (
+                  <iframe
+                    src={videoSrc}
+                    className="absolute top-0 left-0 w-full h-full border-0"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  ></iframe>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-zinc-500 bg-zinc-900 italic text-xs uppercase tracking-widest">
+                    Cargando práctica...
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* 3. CONTENIDO: Título y Detalles */}
+        {/* 3. CONTENIDO: Título y Like */}
         <section className="max-w-6xl mx-auto px-6 py-10 md:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
             <div className="lg:col-span-8">
-              {/* Cabecera Responsiva */}
               <div className="flex justify-between items-start gap-6 mb-8 border-b border-zinc-100 pb-8">
                 <div className="flex-1">
                   <h1 className="text-3xl md:text-5xl font-cormorant italic text-zinc-900 leading-[1.1] tracking-tighter">
