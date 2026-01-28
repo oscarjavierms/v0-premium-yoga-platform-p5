@@ -35,11 +35,14 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
 
   return (
     <main className="min-h-screen bg-white pb-10 px-6 -mt-6">
-      {/* ✅ SIN PADDING TOP - PEGADO AL MENÚ */}
-      <div className="max-w-7xl mx-auto pt-0">
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-8">
-          <div className="lg:col-span-6 space-y-8">
-            {/* ✅ TÍTULO SUBIDO MÁS */}
+      {/* Ajustamos el padding top para que en móvil el video no choque con el menú */}
+      <div className="max-w-7xl mx-auto pt-16 md:pt-0">
+        
+        {/* Cambiamos a flex-col en móvil y usamos order para mover el video arriba */}
+        <section className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-16 items-start mb-8">
+          
+          {/* ✅ COLUMNA DE TEXTO: Ahora es order-2 en móvil (baja) y vuelve a order-1 en escritorio */}
+          <div className="lg:col-span-6 space-y-8 order-2 lg:order-1">
             <header className="-mt-2">
               <h1 className="text-5xl md:text-6xl font-cormorant italic text-zinc-900 leading-[0.9] tracking-tighter mb-2">
                 {program.title}
@@ -70,16 +73,17 @@ export default async function ProgramDetailPage({ params }: { params: { slug: st
             </div>
           </div>
 
-          {/* ✅ VIDEO SUBIDO MÁS */}
-          <div className="lg:col-span-6 -mt-2">
+          {/* ✅ COLUMNA DE VIDEO: Ahora es order-1 en móvil (sube al principio) y vuelve a order-2 en escritorio */}
+          <div className="lg:col-span-6 w-full -mt-2 order-1 lg:order-2">
             <div className="aspect-video bg-zinc-50 shadow-2xl overflow-hidden rounded-sm ring-1 ring-zinc-100 mb-8">
               {videoSrc && <iframe src={videoSrc} className="w-full h-full" allowFullScreen />}
             </div>
             <SaveProgramButton programId={program.id} />
           </div>
+
         </section>
 
-        {/* ✅ SECCIÓN CLASES - MÁS GRANDE Y DESTACADA */}
+        {/* ✅ SECCIÓN CLASES (Sin cambios) */}
         <section className="pt-12 pb-4 border-t border-zinc-100">
           <h2 className="text-4xl font-cormorant italic text-zinc-900 mb-6 uppercase tracking-widest leading-tight">
             Clases
