@@ -76,15 +76,14 @@ export default async function ClasePage({ params }: { params: { slug: string } }
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
               
               <div className="lg:col-span-8">
+                {/* ✅ TÍTULO + BOTÓN ME GUSTA EN LA MISMA LÍNEA */}
                 <div className="flex justify-between items-start mb-8">
-                  <div className="flex-1">
-                    <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight mb-4">
-                      {clase.title}
-                    </h1>
-                  </div>
-                  <button className="flex flex-col items-center group ml-4 flex-shrink-0">
+                  <h1 className="text-3xl md:text-4xl font-cormorant italic text-zinc-900 tracking-tighter leading-tight flex-1">
+                    {clase.title}
+                  </h1>
+                  <button className="flex flex-col items-center group ml-4 flex-shrink-0 pt-1">
                     <span className="text-2xl text-zinc-300 group-hover:text-red-400 transition-colors cursor-pointer">❤</span>
-                    <span className="text-[9px] font-bold uppercase tracking-tighter text-zinc-400">Me gusta</span>
+                    <span className="text-[9px] font-bold uppercase tracking-tighter text-zinc-400 mt-1">Me gusta</span>
                   </button>
                 </div>
                 
@@ -95,6 +94,7 @@ export default async function ClasePage({ params }: { params: { slug: string } }
                 <CommentSection claseId={clase.id} />
               </div>
 
+              {/* ✅ PANEL LATERAL */}
               <div className="lg:col-span-4 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 h-fit sticky top-32">
                 
                 {clase.experience_type && (
