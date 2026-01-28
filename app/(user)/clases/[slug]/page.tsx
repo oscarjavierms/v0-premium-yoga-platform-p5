@@ -39,27 +39,28 @@ export default async function ClasePage({ params }: { params: { slug: string } }
   const videoSrc = getVideoEmbedUrl(clase.vimeo_url)
 
   return (
-    /* ✅ Ajuste crítico: Quitamos el margen negativo global que rompía todo */
     <div className="bg-white min-h-screen">
-      
+      {/* 1. ESPACIADOR: Controla cuánto sube el video */}
+      {/* En móvil 'h-16' para que toque el menú, en escritorio 'md:h-0' porque usamos margen negativo */}
+      <div className="h-16 md:h-0" />
+
       <main>
-        {/* ✅ SECCIÓN DE VIDEO: Optimizada para tocar el menú en móvil */}
-        <section className="w-full bg-black overflow-hidden mt-0 md:-mt-32">
+        {/* 2. SECCIÓN DE VIDEO: Edge-to-edge en móvil, centrado en escritorio */}
+        <section className="w-full bg-black overflow-hidden md:-mt-32">
           <div className="max-w-7xl mx-auto md:px-6">
-            <div className="max-w-[1000px] mx-auto relative w-full aspect-video">
+            {/* Móvil: aspect-video (proporción natural) 
+               Escritorio: md:h-[720px] (tu altura preferida)
+            */}
+            <div className="relative w-full aspect-video md:aspect-none md:h-[720px] max-w-[1280px] mx-auto">
               {videoSrc ? (
                 <iframe
                   src={videoSrc}
                   className="absolute top-0 left-0 w-full h-full border-0"
-                  style={{ 
-                    /* En escritorio mantenemos tu altura preferida, en móvil es automático */
-                    minHeight: "var(--video-height, auto)" 
-                  }}
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 ></iframe>
               ) : (
-                <div className="w-full aspect-video flex items-center justify-center text-zinc-500 italic text-xs tracking-widest uppercase">
+                <div className="w-full h-full flex items-center justify-center text-zinc-500 italic text-xs tracking-widest uppercase bg-zinc-900">
                   Procesando video...
                 </div>
               )}
@@ -67,13 +68,13 @@ export default async function ClasePage({ params }: { params: { slug: string } }
           </div>
         </section>
 
-        {/* ✅ CONTENIDO: Título, Like y Descripción */}
-        <section className="max-w-6xl mx-auto px-6 py-8 md:py-16">
+        {/* 3. CONTENIDO: Título y Detalles */}
+        <section className="max-w-6xl mx-auto px-6 py-10 md:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
             <div className="lg:col-span-8">
-              {/* Cabecera: Título a la izquierda, Like a la derecha */}
-              <div className="flex justify-between items-start gap-6 mb-8 border-b border-zinc-50 pb-8">
+              {/* Cabecera Responsiva */}
+              <div className="flex justify-between items-start gap-6 mb-8 border-b border-zinc-100 pb-8">
                 <div className="flex-1">
                   <h1 className="text-3xl md:text-5xl font-cormorant italic text-zinc-900 leading-[1.1] tracking-tighter">
                     {clase.title}
@@ -97,14 +98,13 @@ export default async function ClasePage({ params }: { params: { slug: string } }
               </div>
             </div>
 
-            {/* PANEL LATERAL: Detalles de la clase */}
+            {/* PANEL LATERAL */}
             <div className="lg:col-span-4">
               <aside className="lg:sticky lg:top-32 space-y-8 bg-zinc-50/50 p-8 border border-zinc-100 rounded-sm">
                 {[
                   { label: "Experiencia", value: clase.experience_type },
                   { label: "Área de Enfoque", value: clase.focus_area },
                   { label: "Nivel", value: clase.practice_level },
-                  { label: "Intensidad", value: clase.intensity },
                   { label: "Duración", value: clase.duration_minutes ? `${clase.duration_minutes} min` : null }
                 ].map((item, i) => item.value && (
                   <div key={i} className="border-b border-zinc-100 last:border-0 pb-4 last:pb-0">
@@ -118,15 +118,6 @@ export default async function ClasePage({ params }: { params: { slug: string } }
           </div>
         </section>
       </main>
-
-      {/* Estilos CSS locales para manejar el min-height sin romper el móvil */}
-      <style jsx>{`
-        @media (min-width: 768px) {
-          iframe {
-            min-height: 720px;
-          }
-        }
-      `}</style>
     </div>
   )
 }
