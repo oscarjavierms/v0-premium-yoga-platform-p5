@@ -43,7 +43,7 @@ interface InstructorFormProps {
 
 export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: InstructorFormProps) {
   const [loading, setLoading] = useState(false)
-  const [specialties, setSpecialties] = useState<string[]>(instructor?.specialty || [])
+  const [specialties, setSpecialties] = useState<string[]>([])
   const [newSpecialty, setNewSpecialty] = useState("")
   const [tempId] = useState(() => instructor?.id || `temp-${Date.now()}`)
 
@@ -57,25 +57,30 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
   } = useForm<InstructorFormValues>({
     resolver: zodResolver(InstructorSchema),
     defaultValues: {
-      name: instructor?.name || "",
-      slug: instructor?.slug || "",
-      bio: instructor?.bio || "",
-      avatar_url: instructor?.avatar_url || "",
-      instagram_url: instructor?.instagram_url || "",
+      name: "",
+      slug: "",
+      bio: "",
+      avatar_url: "",
+      instagram_url: "",
     },
   })
 
   const nameValue = watch("name")
-  const avatarUrl = watch("avatar_url")
 
-  // Actualizar especialidades cuando cambia el instructor
+  // ✅ CARGAR DATOS AL ABRIR/EDITAR
   useEffect(() => {
     if (instructor) {
+      setValue("name", instructor.name)
+      setValue("slug", instructor.slug)
+      setValue("bio", instructor.bio || "")
+      setValue("avatar_url", instructor.avatar_url || "")
+      setValue("instagram_url", instructor.instagram_url || "")
       setSpecialties(instructor.specialty || [])
     } else {
+      reset()
       setSpecialties([])
     }
-  }, [instructor])
+  }, [instructor, setValue, reset])
 
   const generateSlug = () => {
     const slug = nameValue
