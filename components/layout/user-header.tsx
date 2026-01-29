@@ -114,7 +114,7 @@ export function UserHeader() {
                 key={item.href} 
                 href={item.href} 
                 onClick={() => setIsMenuOpen(false)}
-                className="text-2xl font-serif text-black tracking-tight hover:opacity-40 transition-opacity lowercase"
+                className="text-2xl font-serif text-black tracking-tight hover:opacity-40 transition-opacity uppercase"
               >
                 {item.name}
               </Link>
@@ -128,7 +128,7 @@ export function UserHeader() {
                 key={item.href} 
                 href={item.href} 
                 onClick={() => setIsMenuOpen(false)}
-                className="text-2xl font-serif text-black tracking-tight italic hover:opacity-40 transition-opacity lowercase"
+                className="text-2xl font-serif text-black tracking-tight italic hover:opacity-40 transition-opacity uppercase"
               >
                 {item.name}
               </Link>
