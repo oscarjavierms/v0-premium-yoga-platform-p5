@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -11,13 +11,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { toast } from "sonner"
 import { createInstructor, updateInstructor } from "@/lib/actions/instructors"
+import { InstructorAvatarUpload } from "@/components/admin/instructor-avatar-upload"
 import { X, Plus } from "lucide-react"
 
 const InstructorSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   slug: z.string().min(2, "El slug debe tener al menos 2 caracteres"),
   bio: z.string().optional(),
-  avatar_url: z.string().url("URL inválida").optional().or(z.literal("")),
+  avatar_url: z.string().optional().or(z.literal("")),
   instagram_url: z.string().url("URL inválida").optional().or(z.literal("")),
 })
 
@@ -44,6 +45,7 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
   const [loading, setLoading] = useState(false)
   const [specialties, setSpecialties] = useState<string[]>(instructor?.specialty || [])
   const [newSpecialty, setNewSpecialty] = useState("")
+  const [tempId] = useState(() => instructor?.id || `temp-${Date.now()}`)
 
   const {
     register,
@@ -64,6 +66,16 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
   })
 
   const nameValue = watch("name")
+  const avatarUrl = watch("avatar_url")
+
+  // Actualizar especialidades cuando cambia el instructor
+  useEffect(() => {
+    if (instructor) {
+      setSpecialties(instructor.specialty || [])
+    } else {
+      setSpecialties([])
+    }
+  }, [instructor])
 
   const generateSlug = () => {
     const slug = nameValue
@@ -91,7 +103,9 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
     try {
       const formData = { ...data, specialty: specialties }
 
-      const result = instructor ? await updateInstructor(instructor.id, formData) : await createInstructor(formData)
+      const result = instructor 
+        ? await updateInstructor(instructor.id, formData) 
+        : await createInstructor(formData)
 
       if (result.error) {
         toast.error(result.error)
@@ -102,8 +116,9 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
         onOpenChange(false)
         onSuccess?.()
       }
-    } catch {
+    } catch (error) {
       toast.error("Error al guardar el instructor")
+      console.error(error)
     } finally {
       setLoading(false)
     }
@@ -120,12 +135,22 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
         </SheetHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
+          
+          {/* Upload de Foto */}
+          <InstructorAvatarUpload
+            instructorId={tempId}
+            currentAvatarUrl={instructor?.avatar_url}
+            onAvatarChange={(url) => setValue("avatar_url", url)}
+          />
+
+          {/* Nombre */}
           <div className="space-y-2">
             <Label htmlFor="name">Nombre *</Label>
             <Input id="name" {...register("name")} placeholder="Nombre completo" />
             {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
           </div>
 
+          {/* Slug */}
           <div className="space-y-2">
             <Label htmlFor="slug">Slug *</Label>
             <div className="flex gap-2">
@@ -137,18 +162,20 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
             {errors.slug && <p className="text-sm text-red-500">{errors.slug.message}</p>}
           </div>
 
+          {/* Biografía */}
           <div className="space-y-2">
             <Label htmlFor="bio">Biografía</Label>
             <Textarea id="bio" {...register("bio")} placeholder="Descripción del instructor..." rows={4} />
           </div>
 
+          {/* Especialidades */}
           <div className="space-y-2">
             <Label>Especialidades</Label>
             <div className="flex gap-2">
               <Input
                 value={newSpecialty}
                 onChange={(e) => setNewSpecialty(e.target.value)}
-                placeholder="Añadir especialidad"
+                placeholder="Ej: Yoga, Meditación, Fitness"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault()
@@ -174,18 +201,14 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="avatar_url">URL de Foto</Label>
-            <Input id="avatar_url" {...register("avatar_url")} placeholder="https://..." />
-            {errors.avatar_url && <p className="text-sm text-red-500">{errors.avatar_url.message}</p>}
-          </div>
-
+          {/* Instagram */}
           <div className="space-y-2">
             <Label htmlFor="instagram_url">Instagram URL</Label>
             <Input id="instagram_url" {...register("instagram_url")} placeholder="https://instagram.com/..." />
             {errors.instagram_url && <p className="text-sm text-red-500">{errors.instagram_url.message}</p>}
           </div>
 
+          {/* Botones */}
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancelar
