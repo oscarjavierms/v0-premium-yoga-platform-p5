@@ -8,27 +8,17 @@ export function CTASection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="relative overflow-hidden bg-black p-12 lg:p-20 rounded-3xl">
           <div className="relative z-10 max-w-2xl">
-            <h2 className="font-serif text-4xl md:text-5xl tracking-tight text-white">
-              Comienza tu transformación hoy
+            <h2 className="font-serif text-4xl md:text-5xl tracking-tight text-white text-balance">
+              El bienestar no debería sentirse como una obligación.
             </h2>
             <p className="mt-6 text-lg text-white/60 leading-relaxed font-light italic">
-              7 días de prueba gratuita. Sin compromiso. Cancela cuando quieras.
+              Debería sentirse como un lugar al que quieres volver.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              {/* RUTA CORREGIDA AQUÍ */}
               <Link href="/auth/registro">
                 <Button size="lg" className="px-8 py-6 text-[10px] tracking-[0.2em] uppercase font-bold bg-white text-black hover:bg-white/90 rounded-full">
-                  Comenzar gratis
+                  Conocer la plataforma
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/clases">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="px-8 py-6 text-[10px] tracking-[0.2em] uppercase font-bold border-white/20 text-white bg-transparent hover:bg-white/10 rounded-full"
-                >
-                  Explorar clases
                 </Button>
               </Link>
             </div>
