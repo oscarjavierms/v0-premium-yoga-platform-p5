@@ -63,3 +63,32 @@ export function useSubscription() {
     isLoading: status === "loading",
   }
 }
+
+/**
+ * Create a founder access subscription (3 months for $30)
+ */
+export async function createFounderSubscription(userId: string) {
+  const supabase = createClient()
+
+  // Calculate dates
+  const now = new Date()
+  const periodEnd = new Date()
+  periodEnd.setMonth(periodEnd.getMonth() + 3) // 3 months
+
+  const { data, error } = await supabase.from("subscriptions").insert({
+    user_id: userId,
+    status: "active",
+    plan_type: "founder",
+    current_period_start: now.toISOString(),
+    current_period_end: periodEnd.toISOString(),
+    price_paid: 30.0,
+  }).select().single()
+
+  if (error) {
+    console.error("[v0] Error creating founder subscription:", error)
+    throw error
+  }
+
+  console.log("[v0] Founder subscription created successfully:", data)
+  return data
+}

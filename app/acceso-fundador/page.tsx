@@ -1,28 +1,94 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Check, ArrowRight } from "lucide-react"
+import { Check, ArrowRight, AlertCircle, Loader2 } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { createFounderSubscription } from "@/hooks/use-subscription"
 
-export default async function AccesoFundadorPage() {
-  const supabase = await createClient()
+export default function AccesoFundadorPage() {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<any>(null)
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-  // Only registered users can see this page
-  if (!user) {
-    redirect("/auth/registro")
+      if (!user) {
+        router.push("/auth/registro")
+        return
+      }
+
+      setUser(user)
+
+      // Check if user has active subscription
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .single()
+
+      if (subscription) {
+        router.push("/mi-santuario")
+        return
+      }
+
+      setIsChecking(false)
+    }
+
+    checkUser()
+  }, [router])
+
+  const handleActivateAccess = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push("/auth/login?redirect=/acceso-fundador")
+        return
+      }
+
+      // Check if user email is verified
+      if (!user.email_confirmed_at) {
+        setError("Por favor verifica tu email antes de continuar. Revisa tu bandeja de entrada.")
+        setIsLoading(false)
+        return
+      }
+
+      // Create founder subscription
+      await createFounderSubscription(user.id)
+
+      // Redirect to dashboard
+      console.log("[v0] Founder access activated, redirecting to dashboard")
+      router.push("/mi-santuario")
+    } catch (err: any) {
+      console.error("[v0] Error activating founder access:", err)
+      setError(err.message || "Error al activar el acceso. Por favor, intenta de nuevo.")
+      setIsLoading(false)
+    }
   }
 
-  // Check if user has active subscription
-  // TODO: Replace with real subscription check when Stripe is integrated
-  const hasSubscription = false
-
-  // If user has subscription, redirect to dashboard
-  if (hasSubscription) {
-    redirect("/mi-santuario")
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
 
   return (
@@ -37,6 +103,14 @@ export default async function AccesoFundadorPage() {
       </header>
 
       <main className="mx-auto max-w-4xl px-6 lg:px-8 py-16 lg:py-24">
+        {/* Error Display */}
+        {error && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        )}
+
         {/* Hero - Oferta */}
         <div className="text-center mb-16">
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-tight text-balance mb-6">
@@ -50,10 +124,27 @@ export default async function AccesoFundadorPage() {
             <p className="text-3xl md:text-4xl font-light mb-2">USD 30</p>
             <p className="text-muted-foreground">acceso por 3 meses</p>
           </div>
-          <Button size="lg" className="px-8 py-6 text-sm tracking-wider rounded-full">
-            Unirme como fundador
-            <ArrowRight className="ml-2 h-4 w-4" />
+          <Button 
+            size="lg" 
+            className="px-8 py-6 text-sm tracking-wider rounded-full"
+            onClick={handleActivateAccess}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Activando acceso...
+              </>
+            ) : (
+              <>
+                Unirme como fundador
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
           </Button>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {user?.email_confirmed_at ? "✓ Email verificado" : "⚠️ Necesitas verificar tu email primero"}
+          </p>
         </div>
 
         {/* Qué incluye */}
@@ -114,9 +205,23 @@ export default async function AccesoFundadorPage() {
 
         {/* CTA Final */}
         <div className="text-center">
-          <Button size="lg" className="px-8 py-6 text-sm tracking-wider rounded-full mb-4">
-            Acceder ahora · USD 30 / 3 meses
-            <ArrowRight className="ml-2 h-4 w-4" />
+          <Button 
+            size="lg" 
+            className="px-8 py-6 text-sm tracking-wider rounded-full mb-4"
+            onClick={handleActivateAccess}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Activando...
+              </>
+            ) : (
+              <>
+                Acceder ahora · USD 30 / 3 meses
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
           </Button>
           <p className="text-sm text-muted-foreground">
             Sin contratos largos · Acceso inmediato · Cancela cuando quieras
