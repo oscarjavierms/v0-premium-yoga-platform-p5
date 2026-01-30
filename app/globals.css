@@ -76,10 +76,7 @@
 }
 
 @theme inline {
-  /* ASIGNACIÓN DE FUENTES SEGÚN LA IMAGEN */
-  --font-sans: "Montserrat", system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-mono: "Geist Mono", monospace;
+  /* Font variables are set in layout.tsx via Next.js font system */
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

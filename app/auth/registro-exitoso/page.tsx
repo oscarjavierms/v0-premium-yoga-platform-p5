@@ -27,12 +27,21 @@ export default function RegistroExitosoPage() {
           </Button>
         </div>
 
-        <Link href="/">
-          <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
-            Volver al inicio
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
+        <div className="space-y-4">
+          <Link href="/acceso-fundador" className="block">
+            <Button className="w-full gap-2">
+              Explorar acceso fundador
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+
+          <Link href="/">
+            <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+              Volver al inicio
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   )

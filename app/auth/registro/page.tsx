@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Eye, EyeOff, Check } from "lucide-react"
 
 export default function RegistroPage() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -24,7 +25,23 @@ export default function RegistroPage() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+
+  // Check if user already has active session
+  useEffect(() => {
+    const checkSession = async () => {
+      const supabase = createClient()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (session) {
+        console.log("[v0] User already has active session, redirecting to dashboard")
+        router.push("/mi-santuario")
+      }
+    }
+
+    checkSession()
+  }, [router])
 
   const passwordRequirements = [
     { label: "Mínimo 8 caracteres", met: formData.password.length >= 8 },
