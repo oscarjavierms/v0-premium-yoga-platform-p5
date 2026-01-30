@@ -1,8 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* 1. IMPORTACIÓN DE FUENTES DE LUJO (Playfair para Títulos y Montserrat para Menús) */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@theme inline {
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui;
+  --font-serif: var(--font-playfair), ui-serif, Georgia;
+}
 
 @custom-variant dark (&:is(.dark *));
 

@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowLeft, Check, CreditCard, AlertCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
+import { ResendVerificationButton } from "./resend-verification-button"
 
 export const metadata = {
   title: "Suscripción | Wellness Platform",
@@ -19,6 +20,9 @@ export default async function SuscripcionPage() {
   if (!user) {
     redirect("/auth/login?redirect=/suscripcion")
   }
+
+  // Check if email is verified
+  const isEmailVerified = user.email_confirmed_at !== null
 
   // For now, show a placeholder since Stripe is not connected
   const hasSubscription = false
@@ -40,6 +44,19 @@ export default async function SuscripcionPage() {
       </div>
 
       <div className="container mx-auto px-4 py-12">
+        {!isEmailVerified && (
+          <div className="max-w-4xl mb-8 bg-red-50 border border-red-200 rounded-xl p-6 flex items-start gap-4">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-red-900 mb-1">Verifica tu email para continuar</h3>
+              <p className="text-sm text-red-700 mb-3">
+                Debes verificar tu dirección de email antes de poder suscribirte. Revisa tu bandeja de entrada y haz clic en el enlace de verificación.
+              </p>
+              <ResendVerificationButton email={user.email!} />
+            </div>
+          </div>
+        )}
+        
         {hasSubscription ? (
           // Active subscription view
           <div className="max-w-2xl">
@@ -123,7 +140,12 @@ export default async function SuscripcionPage() {
                   ))}
                 </ul>
 
-                <Button variant="outline" className="w-full bg-transparent">
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-transparent" 
+                  disabled={!isEmailVerified}
+                  title={!isEmailVerified ? "Verifica tu email para continuar" : ""}
+                >
                   Elegir mensual
                 </Button>
               </div>
@@ -155,7 +177,13 @@ export default async function SuscripcionPage() {
                   ))}
                 </ul>
 
-                <Button className="w-full">Elegir anual</Button>
+                <Button 
+                  className="w-full" 
+                  disabled={!isEmailVerified}
+                  title={!isEmailVerified ? "Verifica tu email para continuar" : ""}
+                >
+                  Elegir anual
+                </Button>
               </div>
             </div>
 
