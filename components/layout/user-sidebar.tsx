@@ -1,12 +1,41 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Settings, CreditCard, History, User, LogOut, Layout, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
 
 export function UserSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const supabase = createClient()
+      
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error("[v0] Logout error:", error)
+        alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+        setIsLoggingOut(false)
+        return
+      }
+
+      console.log("[v0] User signed out successfully")
+      
+      router.push("/auth/login")
+      router.refresh()
+    } catch (error) {
+      console.error("[v0] Logout error:", error)
+      alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <>
@@ -57,13 +86,14 @@ export function UserSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         </nav>
 
         <div className="p-10">
-          <Link
-            href="/auth/logout"
-            className="w-full flex items-center justify-between px-6 py-5 border border-black/5 rounded-2xl text-[9px] tracking-[0.3em] uppercase font-bold text-red-500 hover:bg-red-50 transition-all duration-500"
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full flex items-center justify-between px-6 py-5 border border-black/5 rounded-2xl text-[9px] tracking-[0.3em] uppercase font-bold text-red-500 hover:bg-red-50 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span>Cerrar Sesión</span>
+            <span>{isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}</span>
             <LogOut size={14} />
-          </Link>
+          </button>
         </div>
       </aside>
     </>

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   Video,
@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -33,6 +34,33 @@ const navItems = [
 
 function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const supabase = createClient()
+      
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error("[v0] Logout error:", error)
+        alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+        setIsLoggingOut(false)
+        return
+      }
+
+      console.log("[v0] Admin user signed out successfully")
+      
+      router.push("/auth/login")
+      router.refresh()
+    } catch (error) {
+      console.error("[v0] Logout error:", error)
+      alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <>
@@ -80,15 +108,14 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
           <ChevronLeft className="w-5 h-5" />
           Volver al sitio
         </Link>
-        <form action="/auth/logout" method="POST">
-          <button
-            type="submit"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-background/70 hover:text-background hover:bg-background/10 transition-colors w-full"
-          >
-            <LogOut className="w-5 h-5" />
-            Cerrar sesión
-          </button>
-        </form>
+        <button
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-background/70 hover:text-background hover:bg-background/10 transition-colors w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <LogOut className="w-5 h-5" />
+          {isLoggingOut ? "Cerrando sesión..." : "Cerrar sesión"}
+        </button>
       </div>
     </>
   )

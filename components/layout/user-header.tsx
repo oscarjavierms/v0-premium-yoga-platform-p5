@@ -2,14 +2,44 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { User, LogOut, Settings, CreditCard, UserCircle, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
 
 export function UserHeader() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserOpen, setIsUserOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const supabase = createClient()
+      
+      // Sign out from Supabase - invalidates session and clears cookies
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error("[v0] Logout error:", error)
+        alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+        setIsLoggingOut(false)
+        return
+      }
+
+      console.log("[v0] User signed out successfully")
+      
+      // Redirect to login page
+      router.push("/auth/login")
+      router.refresh()
+    } catch (error) {
+      console.error("[v0] Logout error:", error)
+      alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+      setIsLoggingOut(false)
+    }
+  }
 
   const navItems = [
     { name: "YOGA", href: "/yoga" },
@@ -96,8 +126,12 @@ export function UserHeader() {
                   <Settings className="mr-3 h-4 w-4 opacity-40" /> Ajustes
                 </Link>
                 <div className="h-px bg-black/5 my-2" />
-                <button className="w-full flex items-center p-3 text-[10px] font-bold tracking-widest text-red-600 hover:bg-red-50 rounded-lg transition-colors uppercase text-black">
-                  <LogOut className="mr-3 h-4 w-4" /> Cerrar Sesión
+                <button 
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-full flex items-center p-3 text-[10px] font-bold tracking-widest text-red-600 hover:bg-red-50 rounded-lg transition-colors uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <LogOut className="mr-3 h-4 w-4" /> {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
                 </button>
               </div>
             </>
