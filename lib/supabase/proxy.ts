@@ -103,9 +103,20 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Si el usuario está autenticado y accede a rutas protegidas, verificar subscripción
+  // ✅ NUEVO: Verificar si es admin PRIMERO (antes de verificar subscription)
   if (user && PROTECTED_ROUTES.some(route => path.startsWith(route))) {
-    // Verificar si el usuario tiene subscripción activa
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    // Si es admin, permitir acceso sin verificar subscription
+    if (profile?.role === 'admin') {
+      return supabaseResponse
+    }
+
+    // Si no es admin, verificar subscription
     const { data: subscription } = await supabase
       .from('subscriptions')
       .select('*')
