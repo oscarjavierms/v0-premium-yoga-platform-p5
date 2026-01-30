@@ -8,12 +8,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect, Suspense } from "react"
 import { ArrowLeft, Eye, EyeOff, Check } from "lucide-react"
+import { createTrialSubscription } from "@/hooks/use-subscription"
 
-export default function RegistroPage() {
+function RegistroForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isTrial = searchParams.get("trial") === "true"
+  
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -94,6 +98,20 @@ export default function RegistroPage() {
       if (error) throw error
 
       console.log("[v0] Signup successful, user:", data.user?.id)
+
+      // If coming from trial, create trial subscription
+      if (isTrial && data.user?.id) {
+        try {
+          await createTrialSubscription(data.user.id)
+          console.log("[v0] Trial subscription created")
+          router.push("/trial/activo")
+          return
+        } catch (trialError) {
+          console.error("[v0] Error creating trial:", trialError)
+          // Continue to success page even if trial creation fails
+        }
+      }
+
       router.push("/auth/registro-exitoso")
     } catch (error: unknown) {
       console.error("[v0] Signup error:", error)
@@ -370,5 +388,13 @@ export default function RegistroPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegistroPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}>
+      <RegistroForm />
+    </Suspense>
   )
 }

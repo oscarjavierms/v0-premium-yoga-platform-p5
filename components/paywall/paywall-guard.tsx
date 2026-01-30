@@ -30,12 +30,26 @@ export function PaywallGuard({ children, redirectTo = "/acceso-fundador" }: Payw
         return
       }
 
+      // Check if user is admin - admins bypass paywall
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .single()
+
+      if (profile?.role === "admin") {
+        console.log("[v0] Admin user detected, bypassing paywall")
+        setHasAccess(true)
+        setIsChecking(false)
+        return
+      }
+
       // Check if user has active subscription
       const { data: subscription, error } = await supabase
         .from("subscriptions")
         .select("*")
         .eq("user_id", session.user.id)
-        .eq("status", "active")
+        .in("status", ["active", "trial"])
         .single()
 
       if (error && error.code !== "PGRST116") {
@@ -57,7 +71,7 @@ export function PaywallGuard({ children, redirectTo = "/acceso-fundador" }: Payw
         return
       }
 
-      console.log("[v0] User has active subscription, allowing access")
+      console.log("[v0] User has active subscription/trial, allowing access")
       setHasAccess(true)
       setIsChecking(false)
     }
