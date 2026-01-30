@@ -22,6 +22,11 @@ export async function GET(request: Request) {
       } = await supabase.auth.getUser()
 
       if (user) {
+        // OAuth providers (Google, Facebook) automatically verify emails
+        const isOAuthProvider = user.app_metadata?.provider !== 'email'
+        
+        console.log("[v0] Auth callback - provider:", user.app_metadata?.provider, "email_confirmed:", user.email_confirmed_at !== null)
+        
         // Check if profile exists, create if not (fallback for trigger)
         const { data: existingProfile } = await supabase.from("profiles").select("id").eq("id", user.id).single()
 
@@ -30,13 +35,14 @@ export async function GET(request: Request) {
           const fullName =
             [user.user_metadata?.first_name, user.user_metadata?.last_name].filter(Boolean).join(" ") ||
             user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
             ""
 
           const { error: insertError } = await supabase.from("profiles").insert({
             id: user.id,
             email: user.email,
             full_name: fullName,
-            avatar_url: user.user_metadata?.avatar_url || "",
+            avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || "",
             role: "user",
           })
 
