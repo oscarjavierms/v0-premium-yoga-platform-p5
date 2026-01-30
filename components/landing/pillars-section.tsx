@@ -1,35 +1,20 @@
-import { Brain, Wind, Move, Dumbbell, Heart, Sparkles } from "lucide-react"
+import { Brain, Wind, Move } from "lucide-react"
 
 const pillars = [
   {
     icon: Move,
-    title: "Yoga Funcional",
-    description: "Secuencias diseñadas para contrarrestar los efectos del trabajo sedentario.",
-  },
-  {
-    icon: Brain,
-    title: "Meditación Aplicada",
-    description: "Técnicas prácticas para claridad mental y toma de decisiones.",
+    title: "Yoga",
+    description: "Movimiento consciente para fuerza, movilidad y presencia.",
   },
   {
     icon: Wind,
-    title: "Respiración Consciente",
-    description: "Protocolos de respiración para regular el sistema nervioso.",
+    title: "Respiración & Meditación",
+    description: "Prácticas para regular el sistema nervioso y enfocar la mente.",
   },
   {
-    icon: Sparkles,
-    title: "Movilidad Inteligente",
-    description: "Rutinas cortas para desbloquear caderas, espalda y cuello.",
-  },
-  {
-    icon: Dumbbell,
-    title: "Fitness Consciente",
-    description: "Entrenamiento que fortalece sin agotar, sostenible a largo plazo.",
-  },
-  {
-    icon: Heart,
-    title: "Hábitos & Regulación",
-    description: "Sistema nervioso equilibrado para sostener el rendimiento.",
+    icon: Brain,
+    title: "Fitness consciente",
+    description: "Entrenamiento funcional que acompaña al cuerpo, no lo castiga.",
   },
 ]
 
@@ -39,17 +24,22 @@ export function PillarsSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto">
-          <p className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-4">El método</p>
           <h2 className="font-serif text-4xl md:text-5xl tracking-tight text-balance">
-            Un sistema completo de bienestar funcional
+            Aquí no tienes que elegir entre cientos de clases.
           </h2>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-            No es hacer ejercicio. Es recalibrar cuerpo y mente para sostener el rendimiento a largo plazo.
+            Todo está pensado para que entres, practiques<br/>
+            y sigas con tu día.
+          </p>
+          <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+            Prácticas guiadas, programas claros<br/>
+            y un enfoque que prioriza la constancia,<br/>
+            no la exigencia.
           </p>
         </div>
 
         {/* Pillars Grid */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           {pillars.map((pillar, index) => (
             <div
               key={index}
@@ -61,6 +51,10 @@ export function PillarsSection() {
             </div>
           ))}
         </div>
+
+        <p className="mt-12 text-center text-sm text-muted-foreground italic">
+          (La plataforma crecerá con nuevas prácticas y experiencias)
+        </p>
       </div>
     </section>
   )
