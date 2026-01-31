@@ -15,48 +15,89 @@ const InstructorSchema = z.object({
 
 export type InstructorFormData = z.infer<typeof InstructorSchema>
 
+// ✅ MEJORADO: Upload con eliminación de avatar anterior
 export async function uploadInstructorAvatar(file: File, instructorId: string) {
   const supabase = await createClient()
-  
+
   // Validar que sea imagen
   if (!file.type.startsWith("image/")) {
     return { error: "El archivo debe ser una imagen" }
   }
-  
+
   // Validar tamaño (máx 5MB)
   if (file.size > 5 * 1024 * 1024) {
     return { error: "La imagen no debe superar 5MB" }
   }
-  
-  // Crear nombre único con timestamp
-  const filename = `${instructorId}-${Date.now()}`
-  const { data, error } = await supabase.storage
-    .from("avatars")
-    .upload(`instructors/${filename}`, file, {
-      cacheControl: "3600",
-      upsert: false,
-    })
-  
-  if (error) {
-    return { error: error.message }
+
+  try {
+    // ✅ NUEVO: Obtener avatar actual para eliminarlo
+    const { data: instructor } = await supabase
+      .from("instructors")
+      .select("avatar_url")
+      .eq("id", instructorId)
+      .single()
+
+    // Si existe avatar anterior, eliminarlo de Storage
+    if (instructor?.avatar_url) {
+      const oldPath = instructor.avatar_url.split("/avatars/instructors/")[1]
+      if (oldPath) {
+        await supabase.storage
+          .from("avatars")
+          .remove([`instructors/${oldPath}`])
+          .catch((err) => {
+            // No fallar si no se puede eliminar el viejo
+            console.warn("[Avatar Upload] No se pudo eliminar avatar anterior:", err)
+          })
+      }
+    }
+
+    // Crear nombre único con timestamp
+    const filename = `${instructorId}-${Date.now()}.jpg`
+
+    // Subir nueva imagen
+    const { data, error } = await supabase.storage
+      .from("avatars")
+      .upload(`instructors/${filename}`, file, {
+        cacheControl: "3600",
+        upsert: false,
+      })
+
+    if (error) {
+      return { error: error.message }
+    }
+
+    // Obtener URL pública
+    const { data: urlData } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(`instructors/${filename}`)
+
+    const publicUrl = urlData.publicUrl
+
+    // ✅ NUEVO: Actualizar avatar_url en la tabla de instructores
+    const { error: updateError } = await supabase
+      .from("instructors")
+      .update({ avatar_url: publicUrl })
+      .eq("id", instructorId)
+
+    if (updateError) {
+      return { error: "Error al actualizar el perfil del instructor" }
+    }
+
+    return { data: publicUrl }
+  } catch (error) {
+    console.error("[Avatar Upload] Error:", error)
+    return { error: "Error al procesar la imagen" }
   }
-  
-  // Obtener URL pública
-  const { data: urlData } = supabase.storage
-    .from("avatars")
-    .getPublicUrl(`instructors/${filename}`)
-  
-  return { data: urlData.publicUrl }
 }
 
 export async function createInstructor(formData: InstructorFormData) {
   const supabase = await createClient()
-  
+
   const validation = InstructorSchema.safeParse(formData)
   if (!validation.success) {
     return { error: validation.error.errors[0].message }
   }
-  
+
   const { data, error } = await supabase
     .from("instructors")
     .insert({
@@ -69,26 +110,26 @@ export async function createInstructor(formData: InstructorFormData) {
     })
     .select()
     .single()
-  
+
   if (error) {
     if (error.code === "23505") {
       return { error: "Ya existe un instructor con ese slug" }
     }
     return { error: error.message }
   }
-  
+
   revalidatePath("/admin/instructores")
   return { data }
 }
 
 export async function updateInstructor(id: string, formData: InstructorFormData) {
   const supabase = await createClient()
-  
+
   const validation = InstructorSchema.safeParse(formData)
   if (!validation.success) {
     return { error: validation.error.errors[0].message }
   }
-  
+
   const { data, error } = await supabase
     .from("instructors")
     .update({
@@ -102,27 +143,27 @@ export async function updateInstructor(id: string, formData: InstructorFormData)
     .eq("id", id)
     .select()
     .single()
-  
+
   if (error) {
     if (error.code === "23505") {
       return { error: "Ya existe un instructor con ese slug" }
     }
     return { error: error.message }
   }
-  
+
   revalidatePath("/admin/instructores")
   return { data }
 }
 
 export async function deleteInstructor(id: string) {
   const supabase = await createClient()
-  
+
   const { error } = await supabase.from("instructors").delete().eq("id", id)
-  
+
   if (error) {
     return { error: error.message }
   }
-  
+
   revalidatePath("/admin/instructores")
   return { success: true }
 }
