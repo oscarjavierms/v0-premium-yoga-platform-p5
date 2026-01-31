@@ -5,7 +5,6 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      // Esta configuración es la que acepta Next.js 15/16 y arregla Safari
       cookies: {
         getAll() {
           return typeof window !== 'undefined' 
@@ -18,9 +17,18 @@ export function createClient() {
         setAll(cookiesToSet) {
           if (typeof window !== 'undefined') {
             cookiesToSet.forEach(({ name, value, options }) => {
-              // Aquí forzamos 'Lax' para que tu Proxy y Safari se lleven bien
-              let cookieStr = `${name}=${value}; Path=/; SameSite=Lax; Secure`
-              document.cookie = cookieStr
+              // 1. Obtenemos el dominio actual para "anclar" la cookie
+              const domain = window.location.hostname;
+              
+              // 2. Construimos la cookie con Domain, Secure y SameSite=Lax
+              // Esto es lo que Safari exige para confiar en el Proxy
+              let cookieStr = `${name}=${value}; Path=/; SameSite=Lax; Secure; Max-Age=31536000;`;
+              
+              if (!domain.includes('localhost')) {
+                cookieStr += ` Domain=${domain};`;
+              }
+              
+              document.cookie = cookieStr;
             })
           }
         },
