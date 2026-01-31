@@ -15,7 +15,7 @@ const InstructorSchema = z.object({
 
 export type InstructorFormData = z.infer<typeof InstructorSchema>
 
-// ✅ UPLOAD CON RECORTE CIRCULAR AUTOMÁTICO
+// ✅ SIMPLE: Solo subir archivo ya procesado del cliente
 export async function uploadInstructorAvatar(file: File, instructorId: string) {
   const supabase = await createClient()
 
@@ -50,16 +50,13 @@ export async function uploadInstructorAvatar(file: File, instructorId: string) {
       }
     }
 
-    // Procesar imagen - recortar al círculo automáticamente
-    const processedFile = await processImageToCircle(file)
-
     // Crear nombre único con timestamp
     const filename = `${instructorId}-${Date.now()}.jpg`
 
-    // Subir imagen procesada
+    // Subir imagen (ya procesada en cliente)
     const { data, error } = await supabase.storage
       .from("avatars")
-      .upload(`instructors/${filename}`, processedFile, {
+      .upload(`instructors/${filename}`, file, {
         cacheControl: "3600",
         upsert: false,
       })
@@ -90,77 +87,6 @@ export async function uploadInstructorAvatar(file: File, instructorId: string) {
     console.error("[Avatar Upload] Error:", error)
     return { error: "Error al procesar la imagen" }
   }
-}
-
-// Función para procesar imagen a círculo automáticamente
-async function processImageToCircle(file: File): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.onload = (event) => {
-      const img = new Image()
-
-      img.onload = () => {
-        const CIRCLE_SIZE = 400 // Tamaño final de la foto circular
-
-        // Crear canvas
-        const canvas = document.createElement("canvas")
-        canvas.width = CIRCLE_SIZE
-        canvas.height = CIRCLE_SIZE
-
-        const ctx = canvas.getContext("2d")
-        if (!ctx) {
-          reject(new Error("No se pudo obtener contexto del canvas"))
-          return
-        }
-
-        // Dibujar fondo transparente
-        ctx.clearRect(0, 0, CIRCLE_SIZE, CIRCLE_SIZE)
-
-        // Calcular dimensiones para llenar el círculo manteniendo proporción
-        const scale = Math.max(CIRCLE_SIZE / img.width, CIRCLE_SIZE / img.height)
-        const scaledWidth = img.width * scale
-        const scaledHeight = img.height * scale
-        const x = (CIRCLE_SIZE - scaledWidth) / 2
-        const y = (CIRCLE_SIZE - scaledHeight) / 2
-
-        // Dibujar imagen escalada
-        ctx.drawImage(img, x, y, scaledWidth, scaledHeight)
-
-        // Aplicar máscara circular
-        ctx.globalCompositeOperation = "destination-in"
-        ctx.fillStyle = "white"
-        ctx.beginPath()
-        ctx.arc(CIRCLE_SIZE / 2, CIRCLE_SIZE / 2, CIRCLE_SIZE / 2, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Convertir a blob
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve(blob)
-            } else {
-              reject(new Error("No se pudo crear el blob"))
-            }
-          },
-          "image/jpeg",
-          0.95
-        )
-      }
-
-      img.onerror = () => {
-        reject(new Error("No se pudo cargar la imagen"))
-      }
-
-      img.src = event.target?.result as string
-    }
-
-    reader.onerror = () => {
-      reject(new Error("No se pudo leer el archivo"))
-    }
-
-    reader.readAsDataURL(file)
-  })
 }
 
 export async function createInstructor(formData: InstructorFormData) {
