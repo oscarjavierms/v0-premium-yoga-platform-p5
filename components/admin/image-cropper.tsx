@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
-import { X, ZoomIn, RotateCw } from "lucide-react"
+import { X, RotateCw } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -107,8 +106,11 @@ export function ImageCropper({ open, onOpenChange, imageSrc, onCropComplete }: I
     setIsDragging(false)
   }
 
-  const handleZoomChange = (value: number[]) => {
-    setZoom(value[0])
+  // ✅ NUEVO: Zoom con rueda de mouse
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? -0.1 : 0.1
+    setZoom((prev) => Math.max(0.5, Math.min(3, prev + delta)))
   }
 
   const handleRotate = () => {
@@ -193,6 +195,7 @@ export function ImageCropper({ open, onOpenChange, imageSrc, onCropComplete }: I
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
+              onWheel={handleWheel}
               className="border-2 border-border rounded-lg cursor-move bg-black"
             />
             <img
@@ -203,19 +206,27 @@ export function ImageCropper({ open, onOpenChange, imageSrc, onCropComplete }: I
             />
           </div>
 
-          {/* Zoom slider */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Zoom: {zoom.toFixed(2)}x
-            </label>
-            <Slider
-              value={[zoom]}
-              onValueChange={handleZoomChange}
-              min={0.5}
-              max={3}
-              step={0.1}
-              className="w-full"
-            />
+          {/* Controles de zoom */}
+          <div className="flex gap-2 justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.2))}
+              className="gap-2"
+            >
+              −
+            </Button>
+            <div className="px-4 py-2 border border-border rounded-md text-center min-w-[80px]">
+              {zoom.toFixed(2)}x
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setZoom((prev) => Math.min(3, prev + 0.2))}
+              className="gap-2"
+            >
+              +
+            </Button>
           </div>
 
           {/* Botones de control */}
@@ -233,7 +244,7 @@ export function ImageCropper({ open, onOpenChange, imageSrc, onCropComplete }: I
 
           {/* Instrucciones */}
           <p className="text-xs text-muted-foreground text-center">
-            Arrastra la foto para mover · Usa el zoom para ampliar · Rota si necesitas
+            Arrastra la foto para mover · Usa +/− para zoom · Rueda del mouse también funciona
           </p>
         </div>
 
