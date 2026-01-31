@@ -5,12 +5,26 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      // Esto evita que Vercel explote durante el build al generar /perfil
+      // Esta configuración es la que acepta Next.js 15/16 y arregla Safari
       cookies: {
-        get(name: string) { return "" },
-        set(name: string, value: string, options: any) {},
-        remove(name: string, options: any) {},
-      }
+        getAll() {
+          return typeof window !== 'undefined' 
+            ? document.cookie.split('; ').map(c => {
+                const [name, ...v] = c.split('=')
+                return { name, value: v.join('=') }
+              })
+            : []
+        },
+        setAll(cookiesToSet) {
+          if (typeof window !== 'undefined') {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              // Aquí forzamos 'Lax' para que tu Proxy y Safari se lleven bien
+              let cookieStr = `${name}=${value}; Path=/; SameSite=Lax; Secure`
+              document.cookie = cookieStr
+            })
+          }
+        },
+      },
     }
   )
 }
