@@ -1,21 +1,17 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
+  // Solo configuramos cookies si estamos en el navegador
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
+      cookies: typeof window !== 'undefined' ? {
         name: 'sb-auth-token',
-        sameSite: 'lax', // ✅ Crucial para que Safari no te rebote
+        sameSite: 'lax',
         secure: true,
         path: '/',
-      },
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      }
+      } : {}, // En el servidor (build) enviamos un objeto vacío para que no explote
     }
   )
 }
