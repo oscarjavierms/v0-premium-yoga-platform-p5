@@ -27,7 +27,7 @@ function LoginForm() {
       } = await supabase.auth.getSession()
 
       if (session) {
-        console.log("[v0] User already has active session, redirecting to dashboard")
+        console.log("[Login] Usuario ya tiene sesión activa")
         router.push("/mi-santuario")
       }
     }
@@ -42,20 +42,42 @@ function LoginForm() {
     setError(null)
 
     try {
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      
-      if (loginError) throw loginError
-
-      if (data?.user) {
-        window.location.href = "/mi-santuario"
+      // Validar que no estén vacíos
+      if (!email || !password) {
+        setError("Email y contraseña son requeridos")
+        setIsLoading(false)
         return
       }
+
+      console.log("[Login] Intentando login con:", email)
+
+      const { data, error: loginError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
+      })
+
+      console.log("[Login] Respuesta de Supabase:", { data, loginError })
+
+      if (loginError) {
+        console.error("[Login] Error de Supabase:", loginError)
+        setError(loginError.message || "Credenciales inválidas")
+        setIsLoading(false)
+        return
+      }
+
+      if (!data?.user) {
+        setError("No se pudo iniciar sesión. Intenta de nuevo.")
+        setIsLoading(false)
+        return
+      }
+
+      console.log("[Login] Login exitoso, redirigiendo a /mi-santuario")
+      // Usar router.push en lugar de window.location.href para mejor compatibilidad
+      router.push("/mi-santuario")
       
     } catch (error: any) {
-      setError(error.message || "Error al ingresar")
+      console.error("[Login] Error general:", error)
+      setError(error?.message || "Error al ingresar. Intenta de nuevo.")
       setIsLoading(false)
     }
   }
@@ -76,8 +98,8 @@ function LoginForm() {
 
       if (error) throw error
     } catch (error: any) {
-      console.error(`[v0] ${provider} login error:`, error)
-      setError(error.message || "Error al ingresar")
+      console.error(`[Login] Error OAuth ${provider}:`, error)
+      setError(error?.message || `Error al ingresar con ${provider}`)
       setIsLoading(false)
     }
   }
@@ -86,19 +108,45 @@ function LoginForm() {
     <form onSubmit={handleLogin} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" placeholder="tu@email.com" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-12" />
+        <Input 
+          id="email" 
+          type="email" 
+          placeholder="tu@email.com" 
+          required 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          className="h-12"
+          disabled={isLoading}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Contraseña</Label>
         <div className="relative">
-          <Input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 pr-12" />
-          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2">
+          <Input 
+            id="password" 
+            type={showPassword ? "text" : "password"} 
+            required 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            className="h-12 pr-12"
+            disabled={isLoading}
+          />
+          <button 
+            type="button" 
+            onClick={() => setShowPassword(!showPassword)} 
+            className="absolute right-4 top-1/2 -translate-y-1/2"
+            disabled={isLoading}
+          >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
       </div>
       {error && <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">{error}</p>}
-      <Button type="submit" className="w-full h-12 bg-black text-white hover:bg-black/90" disabled={isLoading}>
+      <Button 
+        type="submit" 
+        className="w-full h-12 bg-black text-white hover:bg-black/90" 
+        disabled={isLoading}
+      >
         {isLoading ? "Ingresando..." : "Ingresar"}
       </Button>
       
