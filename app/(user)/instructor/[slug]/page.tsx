@@ -100,7 +100,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
           </div>
         )}
 
-        {/* INSTAGRAM */}
+       {/* INSTAGRAM */}
         {instructor.instagram_url && (
           <div className="mt-8">
             
