@@ -1,24 +1,47 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import { Instagram } from 'lucide-react'
+import { getInstructor } from '@/lib/actions/instructors'
 
-export default function InstructorPage({ instructor }) {
+// ⚠️ IMPORTANTE: NO es 'use client' porque necesita hacer fetch en servidor
+
+export default async function InstructorPage({ params }) {
+  // 1. OBTENER DATOS DEL INSTRUCTOR
+  const instructor = await getInstructor(params.slug)
+
+  // 2. VALIDAR QUE EXISTA
+  if (!instructor) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Instructor no encontrado</h1>
+          <Link href="/instructores" className="text-blue-500 hover:underline">
+            Volver a instructores
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // 3. RENDERIZAR LA PÁGINA CON LOS DATOS
   return (
     <div className="min-h-screen bg-white">
       {/* PORTADA + FOTO DE PERFIL EN OVERLAP */}
       <div className="pt-0">
         <div className="relative w-full aspect-[21/9] bg-gradient-to-b from-black/5 to-black/20">
           {/* PORTADA */}
-          <Image
-            src={instructor.cover_url}
-            alt={`${instructor.name} - Portada`}
-            fill
-            className="object-cover"
-            priority
-            unoptimized
-          />
+          {instructor.cover_url ? (
+            <Image
+              src={instructor.cover_url}
+              alt={`${instructor.name} - Portada`}
+              fill
+              className="object-cover"
+              priority
+              unoptimized
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-b from-blue-100 to-blue-50" />
+          )}
 
           {/* FOTO DE PERFIL EN OVERLAP - CAMBIO 2 */}
           {instructor.avatar_url && (
@@ -102,6 +125,16 @@ export default function InstructorPage({ instructor }) {
             Explora las clases y programas que ofrece {instructor.name}.
             Reserva tu sesión y comienza tu viaje hacia el bienestar.
           </p>
+        </div>
+
+        {/* VOLVER */}
+        <div className="mt-12">
+          <Link 
+            href="/instructores"
+            className="text-blue-500 hover:text-blue-700 font-medium"
+          >
+            ← Volver a instructores
+          </Link>
         </div>
       </div>
     </div>
