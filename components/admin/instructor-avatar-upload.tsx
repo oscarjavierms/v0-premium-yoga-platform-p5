@@ -34,9 +34,9 @@ export function InstructorAvatarUpload({ instructorId, currentAvatarUrl, onAvata
       })
 
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error)
-
-      onAvatarChange(data.url) // ESTO actualiza el formulario y la imagen aparece
+      if (response.ok) {
+  // 1. Primero avisamos al formulario
+  onAvatarChange(data.url) // ESTO actualiza el formulario y la imagen aparece
       toast.success("Subida con éxito", { id: toastId })
     } catch (error) {
       toast.error("Error al subir", { id: toastId })
