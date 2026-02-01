@@ -33,7 +33,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
   return (
     <div className="min-h-screen bg-white">
       <div className="w-screen relative -ml-[calc((100vw-100%)/2)]">
-        <div className="relative w-full aspect-[16/9] bg-gradient-to-b from-black/5 to-black/20">
+        <div className="relative w-full aspect-[21/9] bg-gradient-to-b from-black/5 to-black/20">
           {instructor.cover_url ? (
             <Image
               src={instructor.cover_url}
