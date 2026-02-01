@@ -36,38 +36,40 @@ export function InstructorAvatarUpload({ instructorId, currentAvatarUrl, onAvata
       const data = await response.json()
       if (!response.ok) throw new Error(data.error)
 
+      // Actualizamos el valor en el formulario inmediatamente
       onAvatarChange(data.url)
-      toast.success("Subida con éxito", { id: toastId })
+      toast.success("Imagen actualizada", { id: toastId })
     } catch (error) {
       toast.error("Error al subir", { id: toastId })
     } finally {
       setLoading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
     }
   }
 
   return (
     <div 
-      className={`relative overflow-hidden bg-zinc-100 border-2 border-dashed hover:border-black cursor-pointer transition-all ${
-        variant === "circle" ? "w-24 h-24 rounded-full mx-auto" : "w-full aspect-[21/9] rounded-xl"
+      className={`relative overflow-hidden bg-zinc-100 border-2 border-dashed border-zinc-200 hover:border-black cursor-pointer transition-all ${
+        variant === "circle" ? "w-20 h-20 rounded-full" : "w-full aspect-[21/9] rounded-xl"
       }`}
       onClick={() => fileInputRef.current?.click()}
     >
       {currentAvatarUrl ? (
         <Image 
-          key={currentAvatarUrl} // Esto fuerza a que la imagen se actualice si la URL cambia
           src={currentAvatarUrl} 
           alt="Preview" 
           fill 
           className="object-cover" 
+          priority
         />
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400">
           <Upload className="w-5 h-5 mb-1" />
-          <span className="text-[10px] font-bold uppercase">Subir</span>
+          <span className="text-[8px] font-bold uppercase">Subir</span>
         </div>
       )}
       
-      {loading && <div className="absolute inset-0 bg-white/60 flex items-center justify-center text-xs">...</div>}
+      {loading && <div className="absolute inset-0 bg-white/80 flex items-center justify-center text-[10px] font-bold">...</div>}
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
     </div>
   )
