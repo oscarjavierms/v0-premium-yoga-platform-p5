@@ -2,15 +2,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Instagram } from 'lucide-react'
 import { getInstructor } from '@/lib/actions/instructors'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function InstructorPage({ params }: { params: Promise<{ slug: string }> }) {
-  // 1. AWAIT PARAMS PRIMERO
+  // ✅ AWAIT params porque es una Promise
   const { slug } = await params
-
-  // 2. OBTENER DATOS DEL INSTRUCTOR
+  
+  // Obtener instructor
   const instructor = await getInstructor(slug)
 
-  // 3. VALIDAR QUE EXISTA
   if (!instructor) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -24,7 +24,15 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
     )
   }
 
-  // 4. RENDERIZAR LA PÁGINA CON LOS DATOS
+  // ✅ OBTENER PROGRAMAS DEL INSTRUCTOR
+  const supabase = await createClient()
+  const { data: programs } = await supabase
+    .from('programs')
+    .select('id, title, slug, thumbnail_url, duration_weeks, description')
+    .eq('instructor_id', instructor.id)
+    .eq('is_published', true)
+    .order('created_at', { ascending: false })
+
   return (
     <div className="min-h-screen bg-white">
       {/* PORTADA + FOTO DE PERFIL EN OVERLAP */}
@@ -51,9 +59,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
               alt={instructor.name}
               width={128}
               height={128}
-              className="absolute bottom-0 translate-y-1/2 left-6
-                         w-32 h-32 rounded-full border-4 border-white
-                         shadow-lg object-cover"
+              className="absolute bottom-0 translate-y-1/2 left-6 w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
               unoptimized
             />
           )}
@@ -85,9 +91,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
               {instructor.specialty.map((specialty: string, index: number) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-3 py-1
-                             bg-black text-white text-sm font-medium
-                             rounded-full hover:bg-gray-800 transition"
+                  className="inline-flex items-center px-3 py-1 bg-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition"
                 >
                   {specialty}
                 </span>
@@ -103,10 +107,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
               href={instructor.instagram_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2
-                         bg-gradient-to-r from-purple-500 to-pink-500
-                         text-white font-medium rounded-lg
-                         hover:opacity-90 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:opacity-90 transition"
             >
               <Instagram className="w-5 h-5" />
               Sígueme en Instagram
@@ -117,15 +118,58 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
         {/* DIVIDER */}
         <div className="border-t border-gray-200 my-12" />
 
-        {/* SECCIÓN ADICIONAL */}
+        {/* SECCIÓN DE PROGRAMAS */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Sobre esta clase
+            Programas de {instructor.name} ({programs?.length || 0})
           </h2>
-          <p className="text-gray-600 leading-relaxed">
-            Explora las clases y programas que ofrece {instructor.name}.
-            Reserva tu sesión y comienza tu viaje hacia el bienestar.
-          </p>
+
+          {programs && programs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {programs.map((program: any) => (
+                <Link
+                  key={program.id}
+                  href={`/programas/${program.slug || program.id}`}
+                  className="group cursor-pointer"
+                >
+                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100 rounded-lg mb-4">
+                    {program.thumbnail_url ? (
+                      <Image
+                        src={program.thumbnail_url}
+                        alt={program.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <span className="text-gray-500 text-sm">Sin imagen</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition">
+                    {program.title}
+                  </h3>
+                  {program.duration_weeks && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      {program.duration_weeks} semanas
+                    </p>
+                  )}
+                  {program.description && (
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                      {program.description}
+                    </p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">
+                Próximamente {instructor.name} lanzará sus programas.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* VOLVER */}
