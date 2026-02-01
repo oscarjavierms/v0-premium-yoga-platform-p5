@@ -31,9 +31,8 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="pt-0">
-        <div className="relative w-full aspect-[21/9] bg-gradient-to-b from-black/5 to-black/20">
+<div className="w-screen relative -ml-[calc((100vw-100%)/2)]">
+        <div className="relative w-full aspect-[16/9] bg-gradient-to-b from-black/5 to-black/20">
           {instructor.cover_url ? (
             <Image
               src={instructor.cover_url}
@@ -51,8 +50,8 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
             <Image
               src={instructor.avatar_url}
               alt={instructor.name}
-              width={128}
-              height={128}
+              width={160}
+              height={160}
               className="absolute bottom-0 translate-y-1/2 left-6 w-40 h-40 rounded-full border-4 border-white shadow-lg object-cover"
               unoptimized
             />
