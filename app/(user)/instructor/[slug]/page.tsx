@@ -5,10 +5,8 @@ import { getInstructor } from '@/lib/actions/instructors'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function InstructorPage({ params }: { params: Promise<{ slug: string }> }) {
-  // ✅ AWAIT params porque es una Promise
   const { slug } = await params
   
-  // Obtener instructor
   const instructor = await getInstructor(slug)
 
   if (!instructor) {
@@ -24,7 +22,6 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
     )
   }
 
-  // ✅ OBTENER PROGRAMAS DEL INSTRUCTOR
   const supabase = await createClient()
   const { data: programs } = await supabase
     .from('programs')
@@ -35,10 +32,8 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
 
   return (
     <div className="min-h-screen bg-white">
-      {/* PORTADA + FOTO DE PERFIL EN OVERLAP */}
       <div className="pt-0">
         <div className="relative w-full aspect-[21/9] bg-gradient-to-b from-black/5 to-black/20">
-          {/* PORTADA */}
           {instructor.cover_url ? (
             <Image
               src={instructor.cover_url}
@@ -52,7 +47,6 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
             <div className="w-full h-full bg-gradient-to-b from-blue-100 to-blue-50" />
           )}
 
-          {/* FOTO DE PERFIL EN OVERLAP */}
           {instructor.avatar_url && (
             <Image
               src={instructor.avatar_url}
@@ -66,22 +60,18 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
         </div>
       </div>
 
-      {/* CONTENIDO - Con espacio para la foto de perfil */}
       <div className="mt-20 px-6 md:px-12 py-8 max-w-4xl mx-auto">
         
-        {/* NOMBRE */}
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
           {instructor.name}
         </h1>
 
-        {/* BIO */}
         {instructor.bio && (
           <p className="text-lg text-gray-600 mt-4 leading-relaxed max-w-2xl">
             {instructor.bio}
           </p>
         )}
 
-        {/* ESPECIALIDADES */}
         {instructor.specialty && instructor.specialty.length > 0 && (
           <div className="mt-6">
             <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">
@@ -100,16 +90,6 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
           </div>
         )}
 
-       {/* INSTAGRAM */}
-        {instructor.instagram_url && (
-          <div className="mt-8">
-            
-              href={instructor.instagram_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:opacity-90 transition"
-            >
-              {/* INSTAGRAM */}
         {instructor.instagram_url && (
           <div className="mt-8">
             <a href={instructor.instagram_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:opacity-90 transition">
@@ -119,7 +99,8 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
           </div>
         )}
 
-        {/* SECCIÓN DE PROGRAMAS */}
+        <div className="border-t border-gray-200 my-12" />
+
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Programas de {instructor.name} ({programs?.length || 0})
@@ -173,7 +154,6 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
           )}
         </div>
 
-        {/* VOLVER */}
         <div className="mt-12">
           <Link 
             href="/instructores"
