@@ -60,7 +60,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
         </div>
       </div>
 
-  <div className="absolute inset-0 flex items-start justify-center pt-12">
+  <div className="absolute inset-0 flex items-start justify-center pt-6">
         <h1 className="text-4xl md:text-5xl font-bold text-white text-center drop-shadow-lg">
           {instructor.name}
         </h1>
