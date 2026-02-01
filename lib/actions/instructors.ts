@@ -14,14 +14,6 @@ const InstructorSchema = z.object({
 })
 
 export type InstructorFormData = z.infer<typeof InstructorSchema>
-
-export async function uploadInstructorAvatar(file: File, instructorId: string) {
-  const supabase = await createClient()
-  
-  // Validar que sea imagen
-  if (!file.type.startsWith("image/")) {
-    return { error: "El archivo debe ser una imagen" }
-  }
   
   // Validar tamaño (máx 5MB)
   if (file.size > 5 * 1024 * 1024) {
