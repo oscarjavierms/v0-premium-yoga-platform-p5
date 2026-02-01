@@ -29,7 +29,12 @@ export function InstructorAvatarUpload({ instructorId, currentImageUrl, onImageC
       // Usamos un sufijo para que no se pisen en el storage
       formData.append("instructorId", variant === "cover" ? `${instructorId}-cover` : instructorId)
 
-      const response = await fetch("/api/upload-instructor-avatar", {
+      // ✅ ACTUALIZADO: Usa el endpoint correcto según el variant
+      const endpoint = variant === "cover" 
+        ? "/api/upload-instructor-cover"
+        : "/api/upload-instructor-avatar"
+
+      const response = await fetch(endpoint, {
         method: "POST",
         body: formData,
       })
