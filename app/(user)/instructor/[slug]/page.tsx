@@ -53,17 +53,20 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
               alt={instructor.name}
               width={160}
               height={160}
-              className="absolute bottom-0 translate-y-1/2 left-1/3 w-50 h-50 rounded-full border-4 border-white shadow-lg object-cover"
+              className="absolute bottom-0 translate-y-1/2 left-1/6 w-50 h-50 rounded-full border-4 border-white shadow-lg object-cover"
               unoptimized
             />
           )}
         </div>
       </div>
 
-      <div className="mt-20 px-6 md:px-12 py-8 max-w-4xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <h1 className="text-5xl md:text-7xl font-bold text-white text-center drop-shadow-lg">
           {instructor.name}
         </h1>
+      </div>
+
+      <div className="mt-20 px-6 md:px-12 py-8 max-w-4xl mx-auto">
 
         {instructor.bio && (
           <p className="text-lg text-gray-600 mt-4 leading-relaxed max-w-2xl">
