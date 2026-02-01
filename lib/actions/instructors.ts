@@ -14,41 +14,15 @@ const InstructorSchema = z.object({
 })
 
 export type InstructorFormData = z.infer<typeof InstructorSchema>
-  
-  // Validar tamaño (máx 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    return { error: "La imagen no debe superar 5MB" }
-  }
-  
-  // Crear nombre único con timestamp
-  const filename = `${instructorId}-${Date.now()}`
-  const { data, error } = await supabase.storage
-    .from("avatars")
-    .upload(`instructors/${filename}`, file, {
-      cacheControl: "3600",
-      upsert: false,
-    })
-  
-  if (error) {
-    return { error: error.message }
-  }
-  
-  // Obtener URL pública
-  const { data: urlData } = supabase.storage
-    .from("avatars")
-    .getPublicUrl(`instructors/${filename}`)
-  
-  return { data: urlData.publicUrl }
-}
 
 export async function createInstructor(formData: InstructorFormData) {
   const supabase = await createClient()
-  
+
   const validation = InstructorSchema.safeParse(formData)
   if (!validation.success) {
     return { error: validation.error.errors[0].message }
   }
-  
+
   const { data, error } = await supabase
     .from("instructors")
     .insert({
@@ -61,26 +35,26 @@ export async function createInstructor(formData: InstructorFormData) {
     })
     .select()
     .single()
-  
+
   if (error) {
     if (error.code === "23505") {
       return { error: "Ya existe un instructor con ese slug" }
     }
     return { error: error.message }
   }
-  
+
   revalidatePath("/admin/instructores")
   return { data }
 }
 
 export async function updateInstructor(id: string, formData: InstructorFormData) {
   const supabase = await createClient()
-  
+
   const validation = InstructorSchema.safeParse(formData)
   if (!validation.success) {
     return { error: validation.error.errors[0].message }
   }
-  
+
   const { data, error } = await supabase
     .from("instructors")
     .update({
@@ -94,27 +68,27 @@ export async function updateInstructor(id: string, formData: InstructorFormData)
     .eq("id", id)
     .select()
     .single()
-  
+
   if (error) {
     if (error.code === "23505") {
       return { error: "Ya existe un instructor con ese slug" }
     }
     return { error: error.message }
   }
-  
+
   revalidatePath("/admin/instructores")
   return { data }
 }
 
 export async function deleteInstructor(id: string) {
   const supabase = await createClient()
-  
+
   const { error } = await supabase.from("instructors").delete().eq("id", id)
-  
+
   if (error) {
     return { error: error.message }
   }
-  
+
   revalidatePath("/admin/instructores")
   return { success: true }
 }
