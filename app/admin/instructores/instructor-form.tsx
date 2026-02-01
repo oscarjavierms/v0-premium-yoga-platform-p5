@@ -12,7 +12,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { toast } from "sonner"
 import { createInstructor, updateInstructor } from "@/lib/actions/instructors"
 import { InstructorAvatarUpload } from "@/components/admin/instructor-avatar-upload"
-import { X, Plus, Image as ImageIcon, User } from "lucide-react"
+import { InstructorCoverUpload } from "@/components/admin/instructor-cover-upload"
+import { X, Plus } from "lucide-react"
 
 const InstructorSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -34,6 +35,7 @@ interface Instructor {
   avatar_url: string | null
   cover_url: string | null
   instagram_url: string | null
+  display_order: number | null
 }
 
 interface InstructorFormProps {
@@ -47,8 +49,6 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
   const [loading, setLoading] = useState(false)
   const [specialties, setSpecialties] = useState<string[]>([])
   const [newSpecialty, setNewSpecialty] = useState("")
-  
-  // Estados para las imágenes
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
 
@@ -73,6 +73,7 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
 
   const nameValue = watch("name")
 
+  // ✅ CARGAR DATOS AL ABRIR/EDITAR
   useEffect(() => {
     if (instructor) {
       setValue("name", instructor.name)
@@ -132,11 +133,15 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
       } else {
         toast.success(instructor ? "Instructor actualizado" : "Instructor creado")
         reset()
+        setSpecialties([])
+        setAvatarUrl(null)
+        setCoverUrl(null)
         onOpenChange(false)
         onSuccess?.()
       }
     } catch (error) {
       toast.error("Error al guardar el instructor")
+      console.error(error)
     } finally {
       setLoading(false)
     }
@@ -144,105 +149,121 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{instructor ? "Editar Instructor" : "Nuevo Instructor"}</SheetTitle>
-          <SheetDescription>Configura el perfil premium del instructor.</SheetDescription>
+          <SheetDescription>
+            {instructor ? "Modifica los datos del instructor" : "Completa los datos del nuevo instructor"}
+          </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 mt-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
           
-          {/* SECCIÓN DE IMÁGENES (Solo en edición) */}
+          {/* Upload de Foto Avatar - SOLO para edición */}
           {instructor && (
-            <div className="grid grid-cols-2 gap-4 border-b pb-8">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold uppercase flex items-center gap-2">
-                  <User className="w-3 h-3" /> Foto Perfil
-                </Label>
-                <InstructorAvatarUpload
-                  instructorId={instructor.id}
-                  currentAvatarUrl={instructor.avatar_url}
-                  onAvatarChange={(url) => {
-                    setAvatarUrl(url)
-                    setValue("avatar_url", url)
-                  }}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-bold uppercase flex items-center gap-2">
-                  <ImageIcon className="w-3 h-3" /> Foto Portada
-                </Label>
-                <InstructorAvatarUpload
-                  instructorId={`${instructor.id}-cover`} // ID diferente para la carpeta
-                  currentAvatarUrl={instructor.cover_url}
-                  onAvatarChange={(url) => {
-                    setCoverUrl(url)
-                    setValue("cover_url", url)
-                  }}
-                />
-              </div>
-            </div>
+            <InstructorAvatarUpload
+              instructorId={instructor.id}
+              currentAvatarUrl={instructor.avatar_url}
+              onAvatarChange={(url) => {
+                setAvatarUrl(url)
+                setValue("avatar_url", url)
+              }}
+            />
           )}
 
-          {/* Nombre y Slug */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nombre *</Label>
-              <Input id="name" {...register("name")} placeholder="Ej: Julian Yoga" />
-              {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="slug">Slug *</Label>
-              <div className="flex gap-2">
-                <Input id="slug" {...register("slug")} />
-                <Button type="button" variant="outline" onClick={generateSlug} className="shrink-0">
-                  Auto
-                </Button>
-              </div>
-            </div>
+          {/* Upload de Foto de Portada - SOLO para edición */}
+          {instructor && (
+            <InstructorCoverUpload
+              instructorId={instructor.id}
+              currentCoverUrl={instructor.cover_url}
+              onCoverChange={(url) => {
+                setCoverUrl(url)
+                setValue("cover_url", url)
+              }}
+            />
+          )}
+
+          {/* Nombre */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Nombre *</Label>
+            <Input id="name" {...register("name")} placeholder="Nombre completo" />
+            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
           </div>
 
+          {/* Slug */}
           <div className="space-y-2">
-            <Label htmlFor="bio">Biografía Premium</Label>
-            <Textarea id="bio" {...register("bio")} placeholder="Describe la trayectoria..." rows={5} />
+            <Label htmlFor="slug">Slug *</Label>
+            <div className="flex gap-2">
+              <Input id="slug" {...register("slug")} placeholder="nombre-instructor" />
+              <Button type="button" variant="outline" onClick={generateSlug} className="shrink-0 bg-transparent">
+                Generar
+              </Button>
+            </div>
+            {errors.slug && <p className="text-sm text-red-500">{errors.slug.message}</p>}
+          </div>
+
+          {/* Biografía */}
+          <div className="space-y-2">
+            <Label htmlFor="bio">Biografía</Label>
+            <Textarea id="bio" {...register("bio")} placeholder="Descripción del instructor..." rows={4} />
           </div>
 
           {/* Especialidades */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label>Especialidades</Label>
             <div className="flex gap-2">
               <Input
                 value={newSpecialty}
                 onChange={(e) => setNewSpecialty(e.target.value)}
-                placeholder="Añadir tag..."
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSpecialty())}
+                placeholder="Ej: Yoga, Meditación, Fitness"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    addSpecialty()
+                  }
+                }}
               />
-              <Button type="button" variant="secondary" onClick={addSpecialty}>
+              <Button type="button" variant="outline" size="icon" onClick={addSpecialty}>
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {specialties.map((s, i) => (
-                <span key={i} className="px-3 py-1 bg-zinc-100 text-xs font-medium rounded-full flex items-center gap-2">
-                  {s} <X className="w-3 h-3 cursor-pointer" onClick={() => removeSpecialty(i)} />
-                </span>
-              ))}
-            </div>
+            {specialties.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {specialties.map((specialty, index) => (
+                  <span key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded-md text-sm">
+                    {specialty}
+                    <button type="button" onClick={() => removeSpecialty(index)} className="hover:text-red-500">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Instagram */}
           <div className="space-y-2">
-            <Label htmlFor="instagram_url">Instagram</Label>
-            <Input id="instagram_url" {...register("instagram_url")} placeholder="https://..." />
+            <Label htmlFor="instagram_url">Instagram URL</Label>
+            <Input id="instagram_url" {...register("instagram_url")} placeholder="https://instagram.com/..." />
+            {errors.instagram_url && <p className="text-sm text-red-500">{errors.instagram_url.message}</p>}
           </div>
 
-          <div className="flex gap-3 sticky bottom-0 bg-white pt-4 pb-2">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="flex-1">
+          {/* Botones */}
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading} className="flex-1 bg-black text-white">
-              {loading ? "Guardando..." : instructor ? "Actualizar Perfil" : "Crear Instructor"}
+            <Button type="submit" disabled={loading} className="flex-1">
+              {loading ? "Guardando..." : instructor ? "Actualizar" : "Crear"}
             </Button>
           </div>
+
+          {/* Info para nuevos instructores */}
+          {!instructor && (
+            <p className="text-xs text-muted-foreground bg-blue-50 p-3 rounded">
+              💡 Después de crear el instructor, podrás agregar fotos desde la lista de instructores.
+            </p>
+          )}
         </form>
       </SheetContent>
     </Sheet>
