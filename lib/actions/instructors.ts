@@ -4,23 +4,26 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 /**
- * OBTENER UN INSTRUCTOR POR SLUG
+ * OBTENER UN INSTRUCTOR POR SLUG - VERSIÓN CORREGIDA
  */
 export async function getInstructor(slug: string) {
   try {
     const supabase = await createClient()
 
+    // Buscar por slug (case-insensitive)
     const { data: instructor, error } = await supabase
       .from('instructors')
       .select('*')
-      .eq('slug', slug)
+      .ilike('slug', slug)
       .single()
 
     if (error) {
-      console.error('Error obteniendo instructor:', error)
+      console.log('Instructor no encontrado con slug:', slug)
+      console.log('Error:', error)
       return null
     }
 
+    console.log('✅ Instructor encontrado:', instructor)
     return instructor
   } catch (error) {
     console.error('Error en getInstructor:', error)
@@ -45,7 +48,7 @@ export async function getInstructors() {
       return []
     }
 
-    return instructors
+    return instructors || []
   } catch (error) {
     console.error('Error en getInstructors:', error)
     return []
@@ -59,28 +62,35 @@ export async function createInstructor(data: {
   name: string
   slug: string
   bio?: string
-  avatar_url?: string
-  cover_url?: string
-  instagram_url?: string
+  avatar_url?: string | null
+  cover_url?: string | null
+  instagram_url?: string | null
   specialty?: string[]
 }) {
   try {
     const supabase = await createClient()
 
     // 1. Validar que sea admin
-    const { data: user } = await supabase.auth.getUser()
-    if (!user?.user) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user?.user?.id) {
       return { error: 'No autenticado' }
     }
 
-    // 2. Insertar instructor
+    // 2. Validar datos
+    if (!data.name || !data.slug) {
+      return { error: 'Nombre y slug son requeridos' }
+    }
+
+    // 3. Insertar instructor
     const { data: instructor, error } = await supabase
       .from('instructors')
       .insert([
         {
-          name: data.name,
-          slug: data.slug,
-          bio: data.bio || '',
+          name: data.name.trim(),
+          slug: data.slug.trim().toLowerCase(),
+          bio: data.bio?.trim() || '',
           avatar_url: data.avatar_url || null,
           cover_url: data.cover_url || null,
           instagram_url: data.instagram_url || null,
@@ -93,10 +103,10 @@ export async function createInstructor(data: {
 
     if (error) {
       console.error('Error creando instructor:', error)
-      return { error: error.message }
+      return { error: error.message || 'Error creando instructor' }
     }
 
-    // 3. Revalidar cache
+    // 4. Revalidar cache
     revalidatePath('/instructores')
     revalidatePath('/instructor')
 
@@ -116,9 +126,9 @@ export async function updateInstructor(
     name?: string
     slug?: string
     bio?: string
-    avatar_url?: string
-    cover_url?: string
-    instagram_url?: string
+    avatar_url?: string | null
+    cover_url?: string | null
+    instagram_url?: string | null
     specialty?: string[]
   }
 ) {
@@ -126,34 +136,40 @@ export async function updateInstructor(
     const supabase = await createClient()
 
     // 1. Validar que sea admin
-    const { data: user } = await supabase.auth.getUser()
-    if (!user?.user) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user?.user?.id) {
       return { error: 'No autenticado' }
     }
 
-    // 2. Actualizar instructor
+    // 2. Construir objeto de actualización
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    }
+
+    if (data.name) updateData.name = data.name.trim()
+    if (data.slug) updateData.slug = data.slug.trim().toLowerCase()
+    if (data.bio !== undefined) updateData.bio = data.bio?.trim() || ''
+    if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url
+    if (data.cover_url !== undefined) updateData.cover_url = data.cover_url
+    if (data.instagram_url !== undefined) updateData.instagram_url = data.instagram_url
+    if (data.specialty) updateData.specialty = data.specialty
+
+    // 3. Actualizar instructor
     const { data: instructor, error } = await supabase
       .from('instructors')
-      .update({
-        ...(data.name && { name: data.name }),
-        ...(data.slug && { slug: data.slug }),
-        ...(data.bio !== undefined && { bio: data.bio }),
-        ...(data.avatar_url !== undefined && { avatar_url: data.avatar_url }),
-        ...(data.cover_url !== undefined && { cover_url: data.cover_url }),
-        ...(data.instagram_url !== undefined && { instagram_url: data.instagram_url }),
-        ...(data.specialty && { specialty: data.specialty }),
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', instructorId)
       .select()
       .single()
 
     if (error) {
       console.error('Error actualizando instructor:', error)
-      return { error: error.message }
+      return { error: error.message || 'Error actualizando instructor' }
     }
 
-    // 3. Revalidar cache
+    // 4. Revalidar cache
     revalidatePath('/instructores')
     revalidatePath('/instructor')
 
@@ -172,8 +188,10 @@ export async function deleteInstructor(instructorId: string) {
     const supabase = await createClient()
 
     // 1. Validar que sea admin
-    const { data: user } = await supabase.auth.getUser()
-    if (!user?.user) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user?.user?.id) {
       return { error: 'No autenticado' }
     }
 
@@ -188,18 +206,26 @@ export async function deleteInstructor(instructorId: string) {
       return { error: 'Instructor no encontrado' }
     }
 
-    // 3. Eliminar archivos del storage
-    if (instructor.avatar_url) {
-      const avatarPath = instructor.avatar_url.split('/').pop()
-      if (avatarPath) {
-        await supabase.storage.from('avatars').remove([avatarPath])
+    // 3. Eliminar archivos del storage si existen
+    if (instructor?.avatar_url) {
+      try {
+        const avatarPath = instructor.avatar_url.split('/').pop()
+        if (avatarPath) {
+          await supabase.storage.from('avatars').remove([avatarPath])
+        }
+      } catch (e) {
+        console.warn('Error eliminando avatar:', e)
       }
     }
 
-    if (instructor.cover_url) {
-      const coverPath = instructor.cover_url.split('/').pop()
-      if (coverPath) {
-        await supabase.storage.from('covers').remove([coverPath])
+    if (instructor?.cover_url) {
+      try {
+        const coverPath = instructor.cover_url.split('/').pop()
+        if (coverPath) {
+          await supabase.storage.from('covers').remove([coverPath])
+        }
+      } catch (e) {
+        console.warn('Error eliminando cover:', e)
       }
     }
 
@@ -211,7 +237,7 @@ export async function deleteInstructor(instructorId: string) {
 
     if (deleteError) {
       console.error('Error eliminando instructor:', deleteError)
-      return { error: deleteError.message }
+      return { error: deleteError.message || 'Error eliminando instructor' }
     }
 
     // 5. Revalidar cache
