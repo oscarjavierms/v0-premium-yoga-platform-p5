@@ -5,7 +5,6 @@ import Image from "next/image"
 import { Upload, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { uploadInstructorAvatar } from "@/lib/actions/instructors"
 
 interface InstructorAvatarUploadProps {
   instructorId: string
@@ -26,30 +25,56 @@ export function InstructorAvatarUpload({
     const file = e.target.files?.[0]
     if (!file) return
 
+    if (!file.type.startsWith("image/")) {
+      toast.error("El archivo debe ser una imagen")
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen no debe superar 5MB")
+      return
+    }
+
     setLoading(true)
 
-    // Mostrar preview local inmediatamente
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      setPreview(event.target?.result as string)
-    }
-    reader.readAsDataURL(file)
+    try {
+      // Mostrar preview local
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setPreview(event.target?.result as string)
+      }
+      reader.readAsDataURL(file)
 
-    // Subir a Storage
-    const result = await uploadInstructorAvatar(file, instructorId)
+      // Crear FormData
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("instructorId", instructorId)
 
-    if (result.error) {
-      toast.error(result.error)
+      // Llamar a la API directamente
+      const response = await fetch("/api/upload-instructor-avatar", {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        toast.error(data.error || "Error al subir la foto")
+        setPreview(currentAvatarUrl || null)
+        return
+      }
+
+      toast.success("Foto actualizada correctamente")
+      onAvatarChange(data.url)
+    } catch (error) {
+      console.error("Error:", error)
+      toast.error("Error al procesar la foto")
       setPreview(currentAvatarUrl || null)
-    } else {
-      toast.success("Foto subida correctamente")
-      onAvatarChange(result.data)
-    }
-
-    setLoading(false)
-    // Limpiar input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+    } finally {
+      setLoading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
     }
   }
 
@@ -57,24 +82,23 @@ export function InstructorAvatarUpload({
     <div className="space-y-3">
       <label className="block text-sm font-medium">Foto del Instructor</label>
 
-      <div className="flex items-center gap-4">
-        {/* Preview */}
-        <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
+      <div className="flex items-center gap-6">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden bg-muted flex-shrink-0 border-2 border-border shadow-sm">
           {preview ? (
             <Image
               src={preview}
               alt="Preview"
               fill
               className="object-cover"
+              priority
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-2xl font-medium text-muted-foreground">
-              {currentAvatarUrl ? "?" : "+"}
+            <div className="w-full h-full flex items-center justify-center text-3xl font-medium text-muted-foreground">
+              +
             </div>
           )}
         </div>
 
-        {/* Botones */}
         <div className="flex flex-col gap-2">
           <input
             ref={fileInputRef}
@@ -86,30 +110,27 @@ export function InstructorAvatarUpload({
           />
           <Button
             type="button"
-            variant="outline"
-            size="sm"
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
-            className="gap-2 bg-transparent"
+            className="gap-2"
           >
             <Upload className="w-4 h-4" />
-            {loading ? "Subiendo..." : "Seleccionar foto"}
+            {loading ? "Subiendo..." : "Cambiar foto"}
           </Button>
 
-          {preview && (
+          {preview && currentAvatarUrl && (
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={() => {
                 setPreview(null)
                 onAvatarChange("")
               }}
               disabled={loading}
-              className="gap-2 bg-transparent text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <X className="w-4 h-4" />
-              Eliminar
+              Eliminar foto
             </Button>
           )}
         </div>
