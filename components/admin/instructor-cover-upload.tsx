@@ -19,6 +19,7 @@ export function InstructorCoverUpload({
 }: InstructorCoverUploadProps) {
   const [loading, setLoading] = useState(false)
   const [preview, setPreview] = useState<string | null>(currentCoverUrl || null)
+  const [localPreview, setLocalPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,10 +39,12 @@ export function InstructorCoverUpload({
     setLoading(true)
 
     try {
-      // Mostrar preview local
+      // Mostrar preview local INMEDIATAMENTE
       const reader = new FileReader()
       reader.onload = (event) => {
-        setPreview(event.target?.result as string)
+        const previewUrl = event.target?.result as string
+        setLocalPreview(previewUrl)
+        setPreview(previewUrl)
       }
       reader.readAsDataURL(file)
 
@@ -60,16 +63,22 @@ export function InstructorCoverUpload({
 
       if (!response.ok) {
         toast.error(data.error || "Error al subir la foto")
+        // Volver a preview anterior
         setPreview(currentCoverUrl || null)
+        setLocalPreview(null)
         return
       }
 
-      toast.success("Foto de portada actualizada correctamente")
+      // ✅ GUARDAR URL DEFINITIVA
+      toast.success("Foto de portada subida correctamente")
+      setPreview(data.url)
+      setLocalPreview(null)
       onCoverChange(data.url)
     } catch (error) {
       console.error("Error:", error)
       toast.error("Error al procesar la foto")
       setPreview(currentCoverUrl || null)
+      setLocalPreview(null)
     } finally {
       setLoading(false)
       if (fileInputRef.current) {
@@ -92,10 +101,20 @@ export function InstructorCoverUpload({
               fill
               className="object-cover"
               priority
+              unoptimized={Boolean(localPreview)}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-lg font-medium text-muted-foreground">
               Sin portada
+            </div>
+          )}
+          
+          {/* Indicador de carga */}
+          {loading && (
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <div className="animate-spin">
+                <Upload className="w-6 h-6 text-white" />
+              </div>
             </div>
           )}
         </div>
@@ -120,13 +139,14 @@ export function InstructorCoverUpload({
             {loading ? "Subiendo..." : "Cambiar portada"}
           </Button>
 
-          {preview && currentCoverUrl && (
+          {preview && preview !== currentCoverUrl && (
             <Button
               type="button"
               variant="outline"
               onClick={() => {
-                setPreview(null)
-                onCoverChange("")
+                setPreview(currentCoverUrl || null)
+                setLocalPreview(null)
+                onCoverChange(currentCoverUrl || "")
               }}
               disabled={loading}
               className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -134,6 +154,13 @@ export function InstructorCoverUpload({
               <X className="w-4 h-4" />
             </Button>
           )}
+        </div>
+
+        {/* Estado */}
+        <div className="text-xs text-muted-foreground">
+          {loading && "📤 Subiendo..."}
+          {preview && !loading && "✅ Foto cargada (click en Actualizar para guardar)"}
+          {!preview && !loading && "sin portada"}
         </div>
       </div>
 
