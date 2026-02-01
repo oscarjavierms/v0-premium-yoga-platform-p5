@@ -45,7 +45,8 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
   const [loading, setLoading] = useState(false)
   const [specialties, setSpecialties] = useState<string[]>([])
   const [newSpecialty, setNewSpecialty] = useState("")
-  const [tempId] = useState(() => instructor?.id || `temp-${Date.now()}`)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [instructorId] = useState(() => instructor?.id || "")
 
   const {
     register,
@@ -76,9 +77,11 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
       setValue("avatar_url", instructor.avatar_url || "")
       setValue("instagram_url", instructor.instagram_url || "")
       setSpecialties(instructor.specialty || [])
+      setAvatarUrl(instructor.avatar_url || null)
     } else {
       reset()
       setSpecialties([])
+      setAvatarUrl(null)
     }
   }, [instructor, setValue, reset])
 
@@ -106,7 +109,12 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
   const onSubmit = async (data: InstructorFormValues) => {
     setLoading(true)
     try {
-      const formData = { ...data, specialty: specialties }
+      // ✅ Usar avatarUrl guardado del upload
+      const formData = { 
+        ...data, 
+        specialty: specialties,
+        avatar_url: avatarUrl || data.avatar_url || ""
+      }
 
       const result = instructor 
         ? await updateInstructor(instructor.id, formData) 
@@ -118,6 +126,7 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
         toast.success(instructor ? "Instructor actualizado" : "Instructor creado")
         reset()
         setSpecialties([])
+        setAvatarUrl(null)
         onOpenChange(false)
         onSuccess?.()
       }
@@ -129,6 +138,8 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
     }
   }
 
+  // ✅ SOLO mostrar upload si es EDICIÓN (instructor existe)
+  // Para nuevos instructores, la foto se sube DESPUÉS de crear
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
@@ -141,12 +152,17 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
           
-          {/* Upload de Foto */}
-          <InstructorAvatarUpload
-            instructorId={tempId}
-            currentAvatarUrl={instructor?.avatar_url}
-            onAvatarChange={(url) => setValue("avatar_url", url)}
-          />
+          {/* Upload de Foto - SOLO para edición */}
+          {instructor && (
+            <InstructorAvatarUpload
+              instructorId={instructor.id}
+              currentAvatarUrl={instructor.avatar_url}
+              onAvatarChange={(url) => {
+                setAvatarUrl(url)
+                setValue("avatar_url", url)
+              }}
+            />
+          )}
 
           {/* Nombre */}
           <div className="space-y-2">
@@ -222,6 +238,13 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: In
               {loading ? "Guardando..." : instructor ? "Actualizar" : "Crear"}
             </Button>
           </div>
+
+          {/* Info para nuevos instructores */}
+          {!instructor && (
+            <p className="text-xs text-muted-foreground bg-blue-50 p-3 rounded">
+              💡 Después de crear el instructor, podrás agregar una foto desde la lista de instructores.
+            </p>
+          )}
         </form>
       </SheetContent>
     </Sheet>
