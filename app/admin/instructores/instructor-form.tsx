@@ -15,84 +15,152 @@ import { createInstructor, updateInstructor } from "@/lib/actions/instructors"
 import { InstructorAvatarUpload } from "@/components/admin/instructor-avatar-upload"
 
 const InstructorSchema = z.object({
-  name: z.string().min(2, "Requerido"),
-  slug: z.string().min(2, "Requerido"),
+  name: z.string().min(2, "Nombre requerido"),
+  slug: z.string().min(2, "Slug requerido"),
   bio: z.string().optional(),
   avatar_url: z.string().nullable().optional(),
   cover_url: z.string().nullable().optional(),
-  instagram_url: z.string().nullable().optional(),
+  instagram_url: z.string().url("URL de Instagram inválida").nullable().optional(),
 })
 
-export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: any) {
+type InstructorFormData = z.infer<typeof InstructorSchema>
+
+interface InstructorFormProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  instructor?: any
+  onSuccess?: () => void
+}
+
+export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: InstructorFormProps) {
   const [loading, setLoading] = useState(false)
   const [specialties, setSpecialties] = useState<string[]>([])
   const [newSpecialty, setNewSpecialty] = useState("")
 
-  const { register, handleSubmit, reset, setValue, watch } = useForm({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<InstructorFormData>({
     resolver: zodResolver(InstructorSchema),
     defaultValues: { 
-      name: "", slug: "", bio: "", avatar_url: "", cover_url: "", instagram_url: "" 
+      name: "",
+      slug: "",
+      bio: "",
+      avatar_url: null,
+      cover_url: null,
+      instagram_url: "",
     }
   })
 
-  // Leemos los valores actuales para que la imagen sepa qué mostrar
+  // Observar cambios de imágenes
   const valCover = watch("cover_url")
   const valAvatar = watch("avatar_url")
 
+  // Cargar datos cuando el modal abre o cambia el instructor
   useEffect(() => {
     if (open) {
       if (instructor) {
+        // Si es edición, cargar datos existentes
         reset({
           name: instructor.name || "",
           slug: instructor.slug || "",
           bio: instructor.bio || "",
-          avatar_url: instructor.avatar_url || "",
-          cover_url: instructor.cover_url || "",
+          avatar_url: instructor.avatar_url || null,
+          cover_url: instructor.cover_url || null,
           instagram_url: instructor.instagram_url || "",
         })
         setSpecialties(instructor.specialty || [])
       } else {
-        reset({ name: "", slug: "", bio: "", avatar_url: "", cover_url: "", instagram_url: "" })
+        // Si es creación, limpiar formulario
+        reset({
+          name: "",
+          slug: "",
+          bio: "",
+          avatar_url: null,
+          cover_url: null,
+          instagram_url: "",
+        })
         setSpecialties([])
       }
+      setNewSpecialty("")
     }
   }, [instructor, open, reset])
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: InstructorFormData) => {
     setLoading(true)
     try {
-      const result = instructor 
-        ? await updateInstructor(instructor.id, { ...data, specialty: specialties }) 
-        : await createInstructor({ ...data, specialty: specialties })
+      // Validaciones adicionales
+      if (!data.name.trim()) {
+        throw new Error("El nombre es requerido")
+      }
+      if (!data.slug.trim()) {
+        throw new Error("El slug es requerido")
+      }
 
-      if (result.error) throw new Error(result.error)
-      toast.success("Instructor guardado con éxito")
+      // Preparar datos con especialidades
+      const submitData = {
+        ...data,
+        specialty: specialties,
+      }
+
+      // Llamar a la acción (crear o actualizar)
+      const result = instructor 
+        ? await updateInstructor(instructor.id, submitData) 
+        : await createInstructor(submitData)
+
+      if (result.error) {
+        throw new Error(result.error)
+      }
+
+      toast.success(
+        instructor ? "Instructor actualizado exitosamente" : "Instructor creado exitosamente"
+      )
       onOpenChange(false)
       onSuccess?.()
+      
     } catch (error: any) {
-      toast.error(error.message)
+      console.error("Error en onSubmit:", error)
+      toast.error(error.message || "Error al guardar instructor")
     } finally {
       setLoading(false)
     }
   }
 
+  const addSpecialty = () => {
+    if (newSpecialty.trim()) {
+      setSpecialties([...specialties, newSpecialty.trim()])
+      setNewSpecialty("")
+    }
+  }
+
+  const removeSpecialty = (index: number) => {
+    setSpecialties(specialties.filter((_, idx) => idx !== index))
+  }
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
-        <SheetHeader><SheetTitle>Configuración de Instructor</SheetTitle></SheetHeader>
+        <SheetHeader>
+          <SheetTitle>
+            {instructor ? "Editar Instructor" : "Crear Instructor"}
+          </SheetTitle>
+        </SheetHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6 pb-10">
           
+          {/* SECCIÓN DE IMÁGENES - Solo si está editando */}
           {instructor && (
             <div className="space-y-6 bg-zinc-50 p-6 rounded-2xl border border-zinc-200">
               {/* CAMPO PORTADA */}
               <div className="space-y-2">
-                <Label className="text-[10px] font-bold uppercase text-zinc-500">Imagen de Portada (21:9)</Label>
+                <Label className="text-[10px] font-bold uppercase text-zinc-500">
+                  Imagen de Portada (21:9)
+                </Label>
                 <InstructorAvatarUpload
                   instructorId={instructor.id}
                   currentImageUrl={valCover}
                   onImageChange={(url) => {
-                    setValue("cover_url", url, { shouldDirty: true, shouldValidate: true })
+                    if (url) {
+                      setValue("cover_url", url, { shouldDirty: true, shouldValidate: true })
+                      toast.success("Portada actualizada")
+                    }
                   }}
                   variant="cover"
                 />
@@ -104,7 +172,10 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: an
                   instructorId={instructor.id}
                   currentImageUrl={valAvatar}
                   onImageChange={(url) => {
-                    setValue("avatar_url", url, { shouldDirty: true, shouldValidate: true })
+                    if (url) {
+                      setValue("avatar_url", url, { shouldDirty: true, shouldValidate: true })
+                      toast.success("Foto de perfil actualizada")
+                    }
                   }}
                   variant="circle"
                 />
@@ -116,42 +187,109 @@ export function InstructorForm({ open, onOpenChange, instructor, onSuccess }: an
             </div>
           )}
 
+          {/* FORMULARIO */}
           <div className="grid gap-4">
+            {/* Nombre */}
             <div className="grid gap-2">
-              <Label>Nombre</Label>
-              <Input {...register("name")} />
+              <Label>Nombre *</Label>
+              <Input 
+                {...register("name")} 
+                placeholder="Ej: Laura Díaz"
+              />
+              {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
             </div>
 
+            {/* Slug */}
             <div className="grid gap-2">
-              <Label>Instagram URL</Label>
-              <Input {...register("instagram_url")} placeholder="https://..." />
+              <Label>Slug *</Label>
+              <Input 
+                {...register("slug")} 
+                placeholder="Ej: laura-diaz"
+              />
+              {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
             </div>
 
+            {/* Instagram URL */}
+            <div className="grid gap-2">
+              <Label>URL Instagram</Label>
+              <Input 
+                {...register("instagram_url")} 
+                placeholder="https://instagram.com/..."
+              />
+              {errors.instagram_url && <p className="text-xs text-red-500">{errors.instagram_url.message}</p>}
+            </div>
+
+            {/* Biografía */}
             <div className="grid gap-2">
               <Label>Biografía</Label>
-              <Textarea {...register("bio")} rows={4} />
+              <Textarea 
+                {...register("bio")} 
+                rows={4}
+                placeholder="Cuéntale a los estudiantes sobre tu experiencia..."
+              />
             </div>
 
+            {/* Especialidades */}
             <div className="space-y-2">
               <Label>Especialidades</Label>
               <div className="flex gap-2">
-                <Input value={newSpecialty} onChange={(e) => setNewSpecialty(e.target.value)} />
-                <Button type="button" onClick={() => { if(newSpecialty){ setSpecialties([...specialties, newSpecialty]); setNewSpecialty(""); } }}>
+                <Input 
+                  value={newSpecialty} 
+                  onChange={(e) => setNewSpecialty(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      addSpecialty()
+                    }
+                  }}
+                  placeholder="Ej: Hatha Yoga"
+                />
+                <Button 
+                  type="button" 
+                  onClick={addSpecialty}
+                  className="bg-black hover:bg-zinc-800"
+                >
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {specialties.map((s, i) => (
-                  <span key={i} className="bg-black text-white px-3 py-1 rounded-full text-[10px] flex items-center gap-2">
-                    {s} <X className="w-3 h-3 cursor-pointer" onClick={() => setSpecialties(specialties.filter((_, idx) => idx !== i))} />
-                  </span>
-                ))}
-              </div>
+              
+              {/* Especialidades añadidas */}
+              {specialties.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {specialties.map((specialty, index) => (
+                    <span 
+                      key={index}
+                      className="bg-black text-white px-3 py-1 rounded-full text-[10px] font-medium flex items-center gap-2"
+                    >
+                      {specialty}
+                      <button
+                        type="button"
+                        onClick={() => removeSpecialty(index)}
+                        className="hover:opacity-70 transition"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full bg-black text-white h-12 rounded-xl">
-            {loading ? "Guardando..." : "Guardar Instructor"}
+          {/* Botón Submit */}
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full bg-black text-white h-12 rounded-xl hover:bg-zinc-800 disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <span className="inline-block animate-spin mr-2">⏳</span>
+                Guardando...
+              </>
+            ) : (
+              instructor ? "Actualizar Instructor" : "Crear Instructor"
+            )}
           </Button>
         </form>
       </SheetContent>
