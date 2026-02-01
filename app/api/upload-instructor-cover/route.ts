@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File
     const instructorId = formData.get("instructorId") as string
 
+    // Validaciones básicas
     if (!file || !instructorId) {
       return NextResponse.json(
         { error: "Archivo e ID requeridos" },
@@ -15,9 +16,48 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validar que sea imagen
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json(
+        { error: "El archivo debe ser una imagen" },
+        { status: 400 }
+      )
+    }
+
+    // Validar tamaño (máx 10MB para covers)
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "La imagen no debe superar 10MB" },
+        { status: 400 }
+      )
+    }
+
     const supabase = await createClient()
 
-    // Obtener cover actual
+    // Verificar autenticación
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: "No autenticado" },
+        { status: 401 }
+      )
+    }
+
+    // Verificar que es admin
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single()
+
+    if (profile?.role !== "admin") {
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 403 }
+      )
+    }
+
+    // Obtener cover actual para eliminarlo después
     const { data: instructor } = await supabase
       .from("instructors")
       .select("cover_url")
@@ -27,7 +67,6 @@ export async function POST(request: NextRequest) {
     // Eliminar cover anterior si existe
     if (instructor?.cover_url) {
       try {
-        // Extraer el nombre del archivo de la URL pública
         const urlParts = instructor.cover_url.split("/")
         const filename = urlParts[urlParts.length - 1]
         
@@ -38,17 +77,22 @@ export async function POST(request: NextRequest) {
         }
       } catch (err) {
         console.warn("[Cover Upload] No se pudo eliminar cover anterior:", err)
-        // Continuar sin fallar
       }
     }
 
     // Crear nombre único
-    const filename = `${instructorId}-${Date.now()}.jpg`
+    const extension = file.name.split(".").pop() || "jpg"
+    const filename = `${instructorId}-${Date.now()}.${extension}`
+
+    // Convertir a Buffer
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
     // Subir archivo
     const { error: uploadError } = await supabase.storage
       .from("covers")
-      .upload(`instructors/${filename}`, file, {
+      .upload(`instructors/${filename}`, buffer, {
+        contentType: file.type,
         cacheControl: "3600",
         upsert: false,
       })
@@ -84,17 +128,19 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error("[Cover Upload] Error actualizando BD:", updateError)
       return NextResponse.json(
-        { error: "Error al actualizar perfil" },
+        { error: "Error al actualizar perfil: " + updateError.message },
         { status: 500 }
       )
     }
 
+    // Revalidar paths
     revalidatePath("/admin/instructores")
     revalidatePath("/instructores")
 
     return NextResponse.json({ url: publicUrl })
+
   } catch (error) {
-    console.error("Upload error:", error)
+    console.error("[Cover Upload] Error:", error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Error al procesar la solicitud" },
       { status: 500 }
