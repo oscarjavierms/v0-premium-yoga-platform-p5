@@ -7,12 +7,12 @@ import { toast } from "sonner"
 
 interface Props {
   instructorId: string
-  currentAvatarUrl?: string | null
-  onAvatarChange: (url: string) => void
+  currentImageUrl?: string | null
+  onImageChange: (url: string) => void
   variant?: "circle" | "cover"
 }
 
-export function InstructorAvatarUpload({ instructorId, currentAvatarUrl, onAvatarChange, variant = "circle" }: Props) {
+export function InstructorAvatarUpload({ instructorId, currentImageUrl, onImageChange, variant = "circle" }: Props) {
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -21,11 +21,12 @@ export function InstructorAvatarUpload({ instructorId, currentAvatarUrl, onAvata
     if (!file) return
 
     setLoading(true)
-    const toastId = toast.loading("Subiendo imagen...")
+    const toastId = toast.loading(`Subiendo ${variant === "cover" ? "portada" : "perfil"}...`)
 
     try {
       const formData = new FormData()
       formData.append("file", file)
+      // Usamos un sufijo para que no se pisen en el storage
       formData.append("instructorId", variant === "cover" ? `${instructorId}-cover` : instructorId)
 
       const response = await fetch("/api/upload-instructor-avatar", {
@@ -36,10 +37,12 @@ export function InstructorAvatarUpload({ instructorId, currentAvatarUrl, onAvata
       const data = await response.json()
       if (!response.ok) throw new Error(data.error)
 
-      // Esto actualiza el valor en React Hook Form
-      onAvatarChange(data.url)
+      console.log(`URL recibida para ${variant}:`, data.url)
+      
+      onImageChange(data.url)
       toast.success("Imagen cargada", { id: toastId })
     } catch (error: any) {
+      console.error("Error subiendo imagen:", error)
       toast.error("Error al subir", { id: toastId })
     } finally {
       setLoading(false)
@@ -54,14 +57,14 @@ export function InstructorAvatarUpload({ instructorId, currentAvatarUrl, onAvata
       }`}
       onClick={() => fileInputRef.current?.click()}
     >
-      {currentAvatarUrl ? (
+      {currentImageUrl ? (
         <Image 
-          key={currentAvatarUrl} // FORZAR REFRESCO
-          src={currentAvatarUrl} 
+          key={currentImageUrl} 
+          src={currentImageUrl} 
           alt="Instructor Media" 
           fill 
           className="object-cover"
-          priority
+          unoptimized
         />
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400">
