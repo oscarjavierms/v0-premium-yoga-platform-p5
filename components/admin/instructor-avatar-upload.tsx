@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
-import { Upload, X } from "lucide-react"
+import { Upload, X, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
@@ -10,15 +10,16 @@ interface InstructorAvatarUploadProps {
   instructorId: string
   currentAvatarUrl?: string | null
   onAvatarChange: (url: string) => void
+  variant?: "circle" | "cover" // Agregamos variante
 }
 
 export function InstructorAvatarUpload({
   instructorId,
   currentAvatarUrl,
   onAvatarChange,
+  variant = "circle"
 }: InstructorAvatarUploadProps) {
   const [loading, setLoading] = useState(false)
-  const [preview, setPreview] = useState<string | null>(currentAvatarUrl || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,27 +31,15 @@ export function InstructorAvatarUpload({
       return
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen no debe superar 5MB")
-      return
-    }
-
+    // ELIMINADO: Límite de 5MB (ahora depende de tu servidor/Supabase)
     setLoading(true)
+    const toastId = toast.loading("Subiendo imagen de alta calidad...")
 
     try {
-      // Mostrar preview local
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        setPreview(event.target?.result as string)
-      }
-      reader.readAsDataURL(file)
-
-      // Crear FormData
       const formData = new FormData()
       formData.append("file", file)
       formData.append("instructorId", instructorId)
 
-      // Llamar a la API directamente
       const response = await fetch("/api/upload-instructor-avatar", {
         method: "POST",
         body: formData,
@@ -58,87 +47,43 @@ export function InstructorAvatarUpload({
 
       const data = await response.json()
 
-      if (!response.ok) {
-        toast.error(data.error || "Error al subir la foto")
-        setPreview(currentAvatarUrl || null)
-        return
-      }
+      if (!response.ok) throw new Error(data.error)
 
-      toast.success("Foto actualizada correctamente")
-      onAvatarChange(data.url)
-    } catch (error) {
-      console.error("Error:", error)
-      toast.error("Error al procesar la foto")
-      setPreview(currentAvatarUrl || null)
+      toast.success("Imagen actualizada", { id: toastId })
+      onAvatarChange(data.url) // Esto actualiza el formulario de inmediato
+    } catch (error: any) {
+      toast.error(error.message || "Error al subir", { id: toastId })
     } finally {
       setLoading(false)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
     }
   }
 
   return (
-    <div className="space-y-3">
-      <label className="block text-sm font-medium">Foto del Instructor</label>
-
-      <div className="flex items-center gap-6">
-        <div className="relative w-32 h-32 rounded-full overflow-hidden bg-muted flex-shrink-0 border-2 border-border shadow-sm">
-          {preview ? (
-            <Image
-              src={preview}
-              alt="Preview"
-              fill
-              className="object-cover"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-3xl font-medium text-muted-foreground">
-              +
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            disabled={loading}
-            className="hidden"
-          />
-          <Button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading}
-            className="gap-2"
-          >
-            <Upload className="w-4 h-4" />
-            {loading ? "Subiendo..." : "Cambiar foto"}
-          </Button>
-
-          {preview && currentAvatarUrl && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setPreview(null)
-                onAvatarChange("")
-              }}
-              disabled={loading}
-              className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <X className="w-4 h-4" />
-              Eliminar foto
-            </Button>
-          )}
+    <div className="space-y-3 w-full">
+      <div className={`relative overflow-hidden bg-muted border-2 border-dashed border-zinc-300 hover:border-black transition-all ${
+        variant === "circle" ? "w-32 h-32 rounded-full mx-auto" : "w-full aspect-[21/9] rounded-xl"
+      }`}>
+        {currentAvatarUrl ? (
+          <Image src={currentAvatarUrl} alt="Preview" fill className="object-cover" priority />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400 gap-2">
+            <ImageIcon className="w-8 h-8 opacity-20" />
+            <span className="text-[10px] uppercase tracking-widest font-bold">Sin imagen</span>
+          </div>
+        )}
+        
+        {/* Overlay de carga */}
+        <div 
+          onClick={() => fileInputRef.current?.click()}
+          className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity"
+        >
+          <span className="text-white text-[10px] font-bold uppercase tracking-widest">
+            {loading ? "Subiendo..." : "Cambiar Foto"}
+          </span>
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        JPG, PNG o GIF. Máximo 5MB.
-      </p>
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
     </div>
   )
 }
