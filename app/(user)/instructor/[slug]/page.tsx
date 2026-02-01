@@ -3,13 +3,14 @@ import Link from 'next/link'
 import { Instagram } from 'lucide-react'
 import { getInstructor } from '@/lib/actions/instructors'
 
-// ⚠️ IMPORTANTE: NO es 'use client' porque necesita hacer fetch en servidor
+export default async function InstructorPage({ params }: { params: Promise<{ slug: string }> }) {
+  // 1. AWAIT PARAMS PRIMERO
+  const { slug } = await params
 
-export default async function InstructorPage({ params }) {
-  // 1. OBTENER DATOS DEL INSTRUCTOR
-  const instructor = await getInstructor(params.slug)
+  // 2. OBTENER DATOS DEL INSTRUCTOR
+  const instructor = await getInstructor(slug)
 
-  // 2. VALIDAR QUE EXISTA
+  // 3. VALIDAR QUE EXISTA
   if (!instructor) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -23,7 +24,7 @@ export default async function InstructorPage({ params }) {
     )
   }
 
-  // 3. RENDERIZAR LA PÁGINA CON LOS DATOS
+  // 4. RENDERIZAR LA PÁGINA CON LOS DATOS
   return (
     <div className="min-h-screen bg-white">
       {/* PORTADA + FOTO DE PERFIL EN OVERLAP */}
@@ -43,7 +44,7 @@ export default async function InstructorPage({ params }) {
             <div className="w-full h-full bg-gradient-to-b from-blue-100 to-blue-50" />
           )}
 
-          {/* FOTO DE PERFIL EN OVERLAP - CAMBIO 2 */}
+          {/* FOTO DE PERFIL EN OVERLAP */}
           {instructor.avatar_url && (
             <Image
               src={instructor.avatar_url}
@@ -74,14 +75,14 @@ export default async function InstructorPage({ params }) {
           </p>
         )}
 
-        {/* ESPECIALIDADES - CAMBIO 3 */}
+        {/* ESPECIALIDADES */}
         {instructor.specialty && instructor.specialty.length > 0 && (
           <div className="mt-6">
             <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">
               Especialidades
             </h3>
             <div className="flex flex-wrap gap-2">
-              {instructor.specialty.map((specialty, index) => (
+              {instructor.specialty.map((specialty: string, index: number) => (
                 <span
                   key={index}
                   className="inline-flex items-center px-3 py-1
@@ -98,7 +99,7 @@ export default async function InstructorPage({ params }) {
         {/* INSTAGRAM */}
         {instructor.instagram_url && (
           <div className="mt-8">
-            <a
+            
               href={instructor.instagram_url}
               target="_blank"
               rel="noopener noreferrer"
