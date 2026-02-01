@@ -1,108 +1,109 @@
-"use server"
+'use client'
 
-import { revalidatePath } from "next/cache"
-import { createClient } from "@/lib/supabase/server"
-import { z } from "zod"
+import Image from 'next/image'
+import Link from 'next/link'
+import { Instagram } from 'lucide-react'
 
-const InstructorSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  slug: z.string().min(2, "El slug debe tener al menos 2 caracteres"),
-  bio: z.string().optional(),
-  specialty: z.array(z.string()).optional(),
-  avatar_url: z.string().nullable().optional(),
-  cover_url: z.string().nullable().optional(),
-  instagram_url: z.string().nullable().optional(),
-})
+export default function InstructorPage({ instructor }) {
+  return (
+    <div className="min-h-screen bg-white">
+      {/* PORTADA + FOTO DE PERFIL EN OVERLAP */}
+      <div className="pt-0">
+        <div className="relative w-full aspect-[21/9] bg-gradient-to-b from-black/5 to-black/20">
+          {/* PORTADA */}
+          <Image
+            src={instructor.cover_url}
+            alt={`${instructor.name} - Portada`}
+            fill
+            className="object-cover"
+            priority
+            unoptimized
+          />
 
-export type InstructorFormData = z.infer<typeof InstructorSchema>
+          {/* FOTO DE PERFIL EN OVERLAP - CAMBIO 2 */}
+          {instructor.avatar_url && (
+            <Image
+              src={instructor.avatar_url}
+              alt={instructor.name}
+              width={128}
+              height={128}
+              className="absolute bottom-0 translate-y-1/2 left-6
+                         w-32 h-32 rounded-full border-4 border-white
+                         shadow-lg object-cover"
+              unoptimized
+            />
+          )}
+        </div>
+      </div>
 
-export async function createInstructor(formData: InstructorFormData) {
-  const supabase = await createClient()
-  
-  const validation = InstructorSchema.safeParse(formData)
-  if (!validation.success) {
-    return { error: validation.error.errors[0].message }
-  }
-  
-  const { data, error } = await supabase
-    .from("instructors")
-    .insert({
-      name: formData.name,
-      slug: formData.slug,
-      bio: formData.bio || null,
-      specialty: formData.specialty || [],
-      avatar_url: formData.avatar_url || null,
-      cover_url: formData.cover_url || null,
-      instagram_url: formData.instagram_url || null,
-    })
-    .select()
-    .single()
-  
-  if (error) {
-    console.error('[Create Instructor Error]', error)
-    if (error.code === "23505") {
-      return { error: "Ya existe un instructor con ese slug" }
-    }
-    return { error: error.message }
-  }
-  
-  revalidatePath("/admin/instructores")
-  revalidatePath("/instructores")
-  return { data }
-}
+      {/* CONTENIDO - Con espacio para la foto de perfil */}
+      <div className="mt-20 px-6 md:px-12 py-8 max-w-4xl mx-auto">
+        
+        {/* NOMBRE */}
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+          {instructor.name}
+        </h1>
 
-export async function updateInstructor(id: string, formData: InstructorFormData) {
-  const supabase = await createClient()
-  
-  const validation = InstructorSchema.safeParse(formData)
-  if (!validation.success) {
-    return { error: validation.error.errors[0].message }
-  }
-  
-  console.log('[Update Instructor]', id, formData)
-  
-  const { data, error } = await supabase
-    .from("instructors")
-    .update({
-      name: formData.name,
-      slug: formData.slug,
-      bio: formData.bio || null,
-      specialty: formData.specialty || [],
-      avatar_url: formData.avatar_url || null,
-      cover_url: formData.cover_url || null,
-      instagram_url: formData.instagram_url || null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id)
-    .select()
-    .single()
-  
-  if (error) {
-    console.error('[Update Instructor Error]', error)
-    if (error.code === "23505") {
-      return { error: "Ya existe un instructor con ese slug" }
-    }
-    return { error: error.message }
-  }
-  
-  console.log('[Update Instructor Success]', data)
-  
-  revalidatePath("/admin/instructores")
-  revalidatePath("/instructores")
-  revalidatePath(`/instructor/${formData.slug}`)
-  return { data }
-}
+        {/* BIO */}
+        {instructor.bio && (
+          <p className="text-lg text-gray-600 mt-4 leading-relaxed max-w-2xl">
+            {instructor.bio}
+          </p>
+        )}
 
-export async function deleteInstructor(id: string) {
-  const supabase = await createClient()
-  
-  const { error } = await supabase.from("instructors").delete().eq("id", id)
-  
-  if (error) {
-    return { error: error.message }
-  }
-  
-  revalidatePath("/admin/instructores")
-  revalidatePath("/instructores")
-  return { success: true }
+        {/* ESPECIALIDADES - CAMBIO 3 */}
+        {instructor.specialty && instructor.specialty.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">
+              Especialidades
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {instructor.specialty.map((specialty, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1
+                             bg-black text-white text-sm font-medium
+                             rounded-full hover:bg-gray-800 transition"
+                >
+                  {specialty}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* INSTAGRAM */}
+        {instructor.instagram_url && (
+          <div className="mt-8">
+            <a
+              href={instructor.instagram_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2
+                         bg-gradient-to-r from-purple-500 to-pink-500
+                         text-white font-medium rounded-lg
+                         hover:opacity-90 transition"
+            >
+              <Instagram className="w-5 h-5" />
+              Sígueme en Instagram
+            </a>
+          </div>
+        )}
+
+        {/* DIVIDER */}
+        <div className="border-t border-gray-200 my-12" />
+
+        {/* SECCIÓN ADICIONAL */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            Sobre esta clase
+          </h2>
+          <p className="text-gray-600 leading-relaxed">
+            Explora las clases y programas que ofrece {instructor.name}.
+            Reserva tu sesión y comienza tu viaje hacia el bienestar.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
 }
