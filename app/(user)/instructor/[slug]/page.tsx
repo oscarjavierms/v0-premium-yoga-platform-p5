@@ -53,7 +53,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
               alt={instructor.name}
               width={128}
               height={128}
-              className="absolute bottom-0 translate-y-1/2 left-6 w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
+              className="absolute bottom-0 translate-y-1/2 left-6 w-40 h-40 rounded-full border-4 border-white shadow-lg object-cover"
               unoptimized
             />
           )}
