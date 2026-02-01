@@ -16,18 +16,27 @@ const InstructorSchema = z.object({
 export type InstructorFormData = z.infer<typeof InstructorSchema>
 
 // ✅ MEJORADO: Upload con eliminación de avatar anterior
-export async function uploadInstructorAvatar(file: File, instructorId: string) {
-  const supabase = await createClient()
+export async function getInstructor(slug: string) {
+  try {
+    const supabase = await createClient()
 
-  // Validar que sea imagen
-  if (!file.type.startsWith("image/")) {
-    return { error: "El archivo debe ser una imagen" }
-  }
+    const { data: instructor, error } = await supabase
+      .from('instructors')
+      .select('*')
+      .eq('slug', slug)
+      .single()
 
-  // Validar tamaño (máx 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    return { error: "La imagen no debe superar 5MB" }
+    if (error) {
+      console.error('Error obteniendo instructor:', error)
+      return null
+    }
+
+    return instructor
+  } catch (error) {
+    console.error('Error en getInstructor:', error)
+    return null
   }
+}
 
   try {
     // ✅ NUEVO: Obtener avatar actual para eliminarlo
