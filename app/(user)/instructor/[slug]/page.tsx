@@ -109,14 +109,15 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:opacity-90 transition"
             >
+              {/* INSTAGRAM */}
+        {instructor.instagram_url && (
+          <div className="mt-8">
+            <a href={instructor.instagram_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:opacity-90 transition">
               <Instagram className="w-5 h-5" />
               Sígueme en Instagram
             </a>
           </div>
         )}
-
-        {/* DIVIDER */}
-        <div className="border-t border-gray-200 my-12" />
 
         {/* SECCIÓN DE PROGRAMAS */}
         <div>
