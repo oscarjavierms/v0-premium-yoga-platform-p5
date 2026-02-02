@@ -33,7 +33,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
   return (
     <div className="min-h-screen bg-white">
       <div className="w-screen relative -ml-[calc((100vw-100%)/2)]">
-        <div className="relative w-full aspect-[28/9] -mt-12 bg-gradient-to-b from-black/5 to-black/20">
+        <div className="relative w-full aspect-[16/9] md:aspect-[32/9] -mt-8 bg-gradient-to-b from-black/5 to-black/20">
           {instructor.cover_url ? (
             <Image
               src={instructor.cover_url}
@@ -47,23 +47,23 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
             <div className="w-full h-full bg-gradient-to-b from-blue-100 to-blue-50" />
           )}
 
+          <div className="absolute inset-0 flex items-start justify-center pt-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-white text-center drop-shadow-lg">
+              {instructor.name}
+            </h1>
+          </div>
+
           {instructor.avatar_url && (
             <Image
               src={instructor.avatar_url}
               alt={instructor.name}
               width={160}
               height={160}
-              className="absolute bottom-0 translate-y-1/2 left-1/6 w-50 h-50 rounded-full border-4 border-white shadow-lg object-cover"
+              className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg object-cover"
               unoptimized
             />
           )}
         </div>
-      </div>
-
-  <div className="absolute inset-0 flex items-start justify-center pt-85">
-        <h1 className="text-4xl md:text-5xl font-bold text-white text-center drop-shadow-lg">
-          {instructor.name}
-        </h1>
       </div>
 
       <div className="mt-20 px-6 md:px-12 py-8 max-w-4xl mx-auto">
