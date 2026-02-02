@@ -2,54 +2,60 @@
 
 import { useState, useRef } from "react"
 import Image from "next/image"
-import { Upload, AlertCircle } from "lucide-react"
+import { Upload, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-interface Props {
+interface InstructorAvatarUploadProps {
   instructorId: string
   currentImageUrl?: string | null
   onImageChange: (url: string) => void
   variant?: "circle" | "cover"
 }
 
-export function InstructorAvatarUpload({ 
-  instructorId, 
-  currentImageUrl, 
-  onImageChange, 
-  variant = "circle" 
-}: Props) {
+export function InstructorAvatarUpload({
+  instructorId,
+  currentImageUrl,
+  onImageChange,
+  variant = "circle",
+}: InstructorAvatarUploadProps) {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(currentImageUrl || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validaciones del lado del cliente
     if (!file.type.startsWith("image/")) {
-      toast.error("Por favor selecciona una imagen válida")
+      toast.error("El archivo debe ser una imagen")
       return
     }
 
-    const maxSize = variant === "cover" ? 10 * 1024 * 1024 : 5 * 1024 * 1024
-    if (file.size > maxSize) {
-      toast.error(`La imagen no debe superar ${maxSize / 1024 / 1024}MB`)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("La imagen no debe superar 10MB")
       return
     }
 
     setLoading(true)
-    setError(null)
-    const toastId = toast.loading(`Subiendo ${variant === "cover" ? "portada" : "foto"}...`)
 
     try {
+      // Mostrar preview local
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setPreview(event.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+
+      // Crear FormData
       const formData = new FormData()
       formData.append("file", file)
-      // Agregar sufijo para que no se pisen en el storage
-      formData.append("instructorId", variant === "cover" ? `${instructorId}-cover` : instructorId)
+      formData.append("instructorId", instructorId)
+      formData.append("variant", variant)
 
+      // Llamar a la API correspondiente
       const endpoint = variant === "cover" 
-        ? "/api/upload-instructor-cover"
+        ? "/api/upload-instructor-cover" 
         : "/api/upload-instructor-avatar"
 
       const response = await fetch(endpoint, {
@@ -60,106 +66,136 @@ export function InstructorAvatarUpload({
       const data = await response.json()
 
       if (!response.ok) {
-        const errorMsg = data.error || `Error ${response.status}`
-        throw new Error(errorMsg)
+        toast.error(data.error || "Error al subir la foto")
+        setPreview(currentImageUrl || null)
+        return
       }
 
-      if (!data.url) {
-        throw new Error("No se recibió URL de la imagen")
-      }
-
-      console.log(`✅ ${variant} actualizado:`, data.url)
-      
-      onImageChange(data.url)
       toast.success(
-        variant === "cover" ? "Portada actualizada" : "Foto actualizada", 
-        { id: toastId }
+        variant === "cover" 
+          ? "Foto de portada actualizada correctamente" 
+          : "Foto de perfil actualizada correctamente"
       )
-      setError(null)
-
-    } catch (error: any) {
-      const errorMsg = error.message || "Error al subir imagen"
-      console.error(`❌ Error subiendo ${variant}:`, error)
-      setError(errorMsg)
-      toast.error(errorMsg, { id: toastId })
+      setPreview(data.url)
+      onImageChange(data.url)
+    } catch (error) {
+      console.error("Error:", error)
+      toast.error("Error al procesar la foto")
+      setPreview(currentImageUrl || null)
     } finally {
       setLoading(false)
-      if (fileInputRef.current) fileInputRef.current.value = ""
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
     }
   }
 
-  const handleClick = () => {
-    if (!loading) {
-      fileInputRef.current?.click()
-    }
-  }
+  const isCover = variant === "cover"
 
   return (
-    <div 
-      className={`relative overflow-hidden bg-zinc-100 border-2 border-dashed border-zinc-200 hover:border-black cursor-pointer transition-all ${
-        loading ? "opacity-60" : ""
-      } ${
-        variant === "circle" ? "w-24 h-24 rounded-full mx-auto" : "w-full aspect-[21/9] rounded-xl"
-      }`}
-      onClick={handleClick}
-    >
-      {currentImageUrl ? (
-        <>
-          <Image 
-            key={currentImageUrl} 
-            src={currentImageUrl} 
-            alt={variant === "cover" ? "Portada del instructor" : "Foto de perfil"} 
-            fill 
-            className="object-cover"
-            unoptimized
-            priority={false}
-          />
-          {/* Overlay semi-transparente al hover */}
-          <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
-            <Upload className="w-5 h-5 text-white" />
+    <div className="space-y-3">
+      <div className="space-y-3">
+        {/* Preview */}
+        {isCover ? (
+          // COVER - Rectangular
+          <div className="relative w-full h-40 rounded-lg overflow-hidden bg-muted border-2 border-border">
+            {preview ? (
+              <Image
+                src={preview}
+                alt="Cover Preview"
+                fill
+                className="object-cover"
+                priority
+                unoptimized
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-lg font-medium text-muted-foreground">
+                Sin portada
+              </div>
+            )}
+            {loading && (
+              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <div className="animate-spin">
+                  <Upload className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            )}
           </div>
-        </>
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 gap-1">
-          <Upload className="w-5 h-5" />
-          <span className="text-[10px] font-bold uppercase text-center px-2">
-            {variant === "cover" ? "Subir Portada" : "Subir Foto"}
-          </span>
-          {variant === "cover" && (
-            <span className="text-[8px] text-zinc-500">Proporción 21:9</span>
+        ) : (
+          // AVATAR - Circular
+          <div className="relative w-28 h-28 rounded-full overflow-hidden bg-muted border-2 border-border mx-auto">
+            {preview ? (
+              <Image
+                src={preview}
+                alt="Avatar Preview"
+                fill
+                className="object-cover"
+                priority
+                unoptimized
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-sm font-medium text-muted-foreground">
+                Sin foto
+              </div>
+            )}
+            {loading && (
+              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <div className="animate-spin">
+                  <Upload className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Botones */}
+        <div className="flex gap-2 justify-center">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            disabled={loading}
+            className="hidden"
+          />
+          <Button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading}
+            className="gap-2 flex-1"
+          >
+            <Upload className="w-4 h-4" />
+            {loading ? "Subiendo..." : isCover ? "Cambiar portada" : "Cambiar foto"}
+          </Button>
+
+          {preview && preview !== currentImageUrl && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setPreview(currentImageUrl || null)
+                onImageChange(currentImageUrl || "")
+              }}
+              disabled={loading}
+              className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           )}
         </div>
-      )}
-      
-      {/* Loading state */}
-      {loading && (
-        <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-5 h-5 border-2 border-black border-t-transparent animate-spin rounded-full" />
-            <span className="text-xs font-medium">Subiendo...</span>
-          </div>
-        </div>
-      )}
 
-      {/* Error state */}
-      {error && !loading && (
-        <div className="absolute inset-0 bg-red-50/90 flex items-center justify-center p-2">
-          <div className="flex flex-col items-center gap-1 text-center">
-            <AlertCircle className="w-4 h-4 text-red-600" />
-            <span className="text-[10px] text-red-700 font-medium">{error}</span>
-          </div>
+        {/* Estado */}
+        <div className="text-xs text-muted-foreground text-center">
+          {loading && "📤 Subiendo..."}
+          {preview && !loading && "✅ Foto cargada"}
+          {!preview && !loading && "Sin imagen"}
         </div>
-      )}
+      </div>
 
-      {/* Input file oculto */}
-      <input 
-        ref={fileInputRef} 
-        type="file" 
-        accept="image/*" 
-        onChange={handleFileSelect} 
-        disabled={loading}
-        className="hidden" 
-      />
+      <p className="text-xs text-muted-foreground">
+        JPG, PNG o GIF. Máximo 10MB.
+        {isCover && " Aspecto 21:9 recomendado."}
+      </p>
     </div>
   )
 }
