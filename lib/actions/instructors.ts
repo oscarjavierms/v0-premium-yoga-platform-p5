@@ -5,13 +5,13 @@ import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
 
 const InstructorSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  slug: z.string().min(2, "El slug debe tener al menos 2 caracteres"),
-  bio: z.string().optional(),
+  name: z.string().min(2, "Nombre es requerido"),
+  slug: z.string().min(2, "Slug es requerido"),
+  bio: z.string().optional().default(""),
   specialty: z.array(z.string()).optional(),
-  avatar_url: z.string().optional().or(z.literal("")),
-  cover_url: z.string().optional().or(z.literal("")),
-  instagram_url: z.string().url("URL inválida").optional().or(z.literal("")),
+  avatar_url: z.string().nullable().optional().default(null),
+  cover_url: z.string().nullable().optional().default(null),
+  instagram_url: z.string().nullable().optional().default(null),
 })
 
 export type InstructorFormData = z.infer<typeof InstructorSchema>
@@ -54,64 +54,91 @@ export async function getInstructors() {
   }
 }
 
-export async function createInstructor(formData: InstructorFormData) {
-  const supabase = await createClient()
-  const validation = InstructorSchema.safeParse(formData)
-  if (!validation.success) {
-    return { error: validation.error.errors[0].message }
-  }
-  const { data, error } = await supabase
-    .from("instructors")
-    .insert({
-      name: formData.name,
-      slug: formData.slug,
-      bio: formData.bio || null,
-      specialty: formData.specialty || [],
-      avatar_url: formData.avatar_url || null,
-      cover_url: formData.cover_url || null,
-      instagram_url: formData.instagram_url || null,
-    })
-    .select()
-    .single()
-  if (error) {
-    if (error.code === "23505") {
-      return { error: "Ya existe un instructor con ese slug" }
+export async function createInstructor(formData: any) {
+  try {
+    const supabase = await createClient()
+    
+    const validation = InstructorSchema.safeParse(formData)
+    if (!validation.success) {
+      console.error("❌ Validación fallida:", validation.error.errors)
+      return { error: validation.error.errors[0].message }
     }
+
+    const validData = validation.data
+
+    const { data, error } = await supabase
+      .from("instructors")
+      .insert({
+        name: validData.name,
+        slug: validData.slug,
+        bio: validData.bio || null,
+        specialty: validData.specialty || [],
+        avatar_url: validData.avatar_url || null,
+        cover_url: validData.cover_url || null,
+        instagram_url: validData.instagram_url || null,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("❌ Error en BD:", error)
+      if (error.code === "23505") {
+        return { error: "Ya existe un instructor con ese slug" }
+      }
+      return { error: error.message }
+    }
+
+    revalidatePath("/admin/instructores")
+    revalidatePath("/instructores")
+    return { data }
+  } catch (error: any) {
+    console.error("❌ Error en createInstructor:", error)
     return { error: error.message }
   }
-  revalidatePath("/admin/instructores")
-  return { data }
 }
 
-export async function updateInstructor(id: string, formData: InstructorFormData) {
-  const supabase = await createClient()
-  const validation = InstructorSchema.safeParse(formData)
-  if (!validation.success) {
-    return { error: validation.error.errors[0].message }
-  }
-  const { data, error } = await supabase
-    .from("instructors")
-    .update({
-      name: formData.name,
-      slug: formData.slug,
-      bio: formData.bio || null,
-      specialty: formData.specialty || [],
-      avatar_url: formData.avatar_url || null,
-      cover_url: formData.cover_url || null,
-      instagram_url: formData.instagram_url || null,
-    })
-    .eq("id", id)
-    .select()
-    .single()
-  if (error) {
-    if (error.code === "23505") {
-      return { error: "Ya existe un instructor con ese slug" }
+export async function updateInstructor(id: string, formData: any) {
+  try {
+    const supabase = await createClient()
+
+    const validation = InstructorSchema.safeParse(formData)
+    if (!validation.success) {
+      console.error("❌ Validación fallida:", validation.error.errors)
+      return { error: validation.error.errors[0].message }
     }
+
+    const validData = validation.data
+
+    const { data, error } = await supabase
+      .from("instructors")
+      .update({
+        name: validData.name,
+        slug: validData.slug,
+        bio: validData.bio || null,
+        specialty: validData.specialty || [],
+        avatar_url: validData.avatar_url || null,
+        cover_url: validData.cover_url || null,
+        instagram_url: validData.instagram_url || null,
+      })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("❌ Error en BD:", error)
+      if (error.code === "23505") {
+        return { error: "Ya existe un instructor con ese slug" }
+      }
+      return { error: error.message }
+    }
+
+    revalidatePath("/admin/instructores")
+    revalidatePath("/instructores")
+    return { data }
+  } catch (error: any) {
+    console.error("❌ Error en updateInstructor:", error)
     return { error: error.message }
   }
-  revalidatePath("/admin/instructores")
-  revalidatePath("/instructores")
-  return { data }
 }
 
 export async function deleteInstructor(id: string) {
