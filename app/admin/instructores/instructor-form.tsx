@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { toast } from "sonner"
-import { X, Plus } from "lucide-react"
+import { X, Plus, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react"
 import { createInstructor, updateInstructor } from "@/lib/actions/instructors"
 import { InstructorAvatarUpload } from "@/components/admin/instructor-avatar-upload"
 
@@ -19,6 +19,8 @@ const InstructorSchema = z.object({
   name: z.string().min(2, "Nombre es requerido"),
   slug: z.string().min(2, "Slug es requerido"),
   bio: z.string().optional().default(""),
+  bio_title: z.string().optional().default(""),
+  bio_align: z.enum(["left", "center", "right", "justify"]).optional().default("left"),
   avatar_url: z.string().nullable().optional().default(null),
   cover_url: z.string().nullable().optional().default(null),
   instagram_url: z.string().nullable().optional().default(null),
@@ -42,6 +44,7 @@ export function InstructorForm({
   const [loading, setLoading] = useState(false)
   const [specialties, setSpecialties] = useState<string[]>([])
   const [newSpecialty, setNewSpecialty] = useState("")
+  const [textAlign, setTextAlign] = useState<"left" | "center" | "right" | "justify">("left")
 
   const { 
     register, 
@@ -56,6 +59,8 @@ export function InstructorForm({
       name: "",
       slug: "",
       bio: "",
+      bio_title: "",
+      bio_align: "left",
       avatar_url: null,
       cover_url: null,
       instagram_url: null,
@@ -65,6 +70,7 @@ export function InstructorForm({
   // Observar cambios en las URLs de imágenes
   const watchCoverUrl = watch("cover_url")
   const watchAvatarUrl = watch("avatar_url")
+  const watchBioAlign = watch("bio_align")
 
   // Cargar datos cuando abre el modal
   useEffect(() => {
@@ -76,11 +82,14 @@ export function InstructorForm({
           name: instructor.name || "",
           slug: instructor.slug || "",
           bio: instructor.bio || "",
+          bio_title: instructor.bio_title || "",
+          bio_align: instructor.bio_align || "left",
           avatar_url: instructor.avatar_url || null,
           cover_url: instructor.cover_url || null,
           instagram_url: instructor.instagram_url || null,
         })
         setSpecialties(instructor.specialty || [])
+        setTextAlign(instructor.bio_align || "left")
       } else {
         // Modo creación
         console.log("➕ Creando nuevo instructor")
@@ -88,15 +97,24 @@ export function InstructorForm({
           name: "",
           slug: "",
           bio: "",
+          bio_title: "",
+          bio_align: "left",
           avatar_url: null,
           cover_url: null,
           instagram_url: null,
         })
         setSpecialties([])
+        setTextAlign("left")
       }
       setNewSpecialty("")
     }
   }, [instructor, open, reset])
+
+  // Manejar cambio de alineación
+  const handleAlignChange = (align: "left" | "center" | "right" | "justify") => {
+    setTextAlign(align)
+    setValue("bio_align", align, { shouldDirty: true })
+  }
 
   // Manejar submit del formulario
   const onSubmit = async (data: InstructorFormData) => {
@@ -284,17 +302,85 @@ export function InstructorForm({
               )}
             </div>
 
-            {/* Biografía */}
+            {/* Título de Biografía */}
+            <div className="grid gap-2">
+              <Label htmlFor="bio-title" className="font-medium">
+                Título de Biografía
+              </Label>
+              <Input 
+                id="bio-title"
+                {...register("bio_title")} 
+                placeholder="Ej: Instructora Certificada de Yoga"
+              />
+              <p className="text-xs text-zinc-500">
+                Título corto que describe tu rol o especialidad principal
+              </p>
+            </div>
+
+            {/* Biografía con Alineación */}
             <div className="grid gap-2">
               <Label htmlFor="bio" className="font-medium">
                 Biografía
               </Label>
+              
+              {/* Botones de Alineación */}
+              <div className="flex gap-2 mb-3 p-2 bg-zinc-100 rounded-lg border border-zinc-200">
+                <button
+                  type="button"
+                  onClick={() => handleAlignChange("left")}
+                  title="Alinear a la izquierda"
+                  className={`p-2 rounded transition ${
+                    watchBioAlign === "left" 
+                      ? "bg-black text-white" 
+                      : "bg-white text-zinc-700 hover:bg-zinc-200"
+                  }`}
+                >
+                  <AlignLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAlignChange("center")}
+                  title="Centrar"
+                  className={`p-2 rounded transition ${
+                    watchBioAlign === "center" 
+                      ? "bg-black text-white" 
+                      : "bg-white text-zinc-700 hover:bg-zinc-200"
+                  }`}
+                >
+                  <AlignCenter className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAlignChange("right")}
+                  title="Alinear a la derecha"
+                  className={`p-2 rounded transition ${
+                    watchBioAlign === "right" 
+                      ? "bg-black text-white" 
+                      : "bg-white text-zinc-700 hover:bg-zinc-200"
+                  }`}
+                >
+                  <AlignRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAlignChange("justify")}
+                  title="Justificar"
+                  className={`p-2 rounded transition ${
+                    watchBioAlign === "justify" 
+                      ? "bg-black text-white" 
+                      : "bg-white text-zinc-700 hover:bg-zinc-200"
+                  }`}
+                >
+                  <AlignJustify className="w-4 h-4" />
+                </button>
+              </div>
+
               <Textarea 
                 id="bio"
                 {...register("bio")} 
                 rows={4}
                 placeholder="Cuéntale a los estudiantes sobre tu experiencia, especialidades y enfoque..."
-                className="resize-none"
+                className={`resize-none text-${watchBioAlign}`}
               />
               <p className="text-xs text-zinc-500">
                 {watch("bio")?.length || 0} caracteres
