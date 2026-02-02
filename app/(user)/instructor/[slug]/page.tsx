@@ -33,8 +33,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
   return (
     <div className="min-h-screen bg-white">
       <div className="w-screen relative -ml-[calc((100vw-100%)/2)]">
-        {/* PORTADA - Más alta en móvil */}
-        <div className="relative w-full aspect-[16/9] md:aspect-[28/9] -mt-12 bg-gradient-to-b from-black/5 to-black/20">
+        <div className="relative w-full aspect-[16/9] md:aspect-[32/9] -mt-8 bg-gradient-to-b from-black/5 to-black/20">
           {instructor.cover_url ? (
             <Image
               src={instructor.cover_url}
@@ -48,35 +47,42 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
             <div className="w-full h-full bg-gradient-to-b from-blue-100 to-blue-50" />
           )}
 
-          {/* Overlay para mejor legibilidad del nombre en móvil */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent md:bg-gradient-to-b md:from-black/5 md:to-black/20" />
-
-          {/* NOMBRE - Centrado en móvil, arriba en desktop */}
-          <div className="absolute inset-0 flex items-center justify-center md:items-start md:justify-center md:pt-70">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center drop-shadow-lg px-4">
+          <div className="absolute inset-0 flex items-start justify-center pt-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-white text-center drop-shadow-lg">
               {instructor.name}
             </h1>
           </div>
 
-          {/* AVATAR - Centrado abajo en móvil, izquierda en desktop */}
           {instructor.avatar_url && (
             <Image
               src={instructor.avatar_url}
               alt={instructor.name}
-              width={128}
-              height={128}
-              className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 md:left-1/6 md:translate-x-0 w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg object-cover"
+              width={160}
+              height={160}
+              className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg object-cover"
               unoptimized
             />
           )}
         </div>
       </div>
 
-      {/* Espacio para el avatar que sobresale - Más en móvil */}
-      <div className="mt-20 md:mt-20 px-6 md:px-12 py-8 max-w-4xl mx-auto">
+      <div className="mt-20 px-6 md:px-12 py-8 max-w-4xl mx-auto">
+
+        {instructor.bio_title && (
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
+            {instructor.bio_title}
+          </h2>
+        )}
 
         {instructor.bio && (
-          <p className="text-lg text-gray-600 mt-4 leading-relaxed max-w-2xl">
+          <p 
+            className={`text-lg text-gray-600 mt-4 leading-relaxed max-w-4xl ${
+              instructor.bio_align === "center" ? "text-center mx-auto" :
+              instructor.bio_align === "right" ? "text-right" :
+              instructor.bio_align === "justify" ? "text-justify" :
+              "text-left"
+            }`}
+          >
             {instructor.bio}
           </p>
         )}
@@ -86,7 +92,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
             <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">
               Especialidades
             </h3>
-            <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+            <div className="flex flex-wrap gap-2">
               {instructor.specialty.map((specialty: string, index: number) => (
                 <span
                   key={index}
@@ -100,7 +106,7 @@ export default async function InstructorPage({ params }: { params: Promise<{ slu
         )}
 
         {instructor.instagram_url && (
-          <div className="mt-8 flex justify-center md:justify-start">
+          <div className="mt-8">
             <a href={instructor.instagram_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:opacity-90 transition">
               <Instagram className="w-5 h-5" />
               Sígueme en Instagram
